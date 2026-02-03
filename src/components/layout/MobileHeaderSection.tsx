@@ -18,7 +18,7 @@ export default function MobileHeaderSection() {
     return (
         <header className="pt-6 px-4 bg-white md:px-8 flex lg:hidden border-b justify-center items-center">
             <div className="flex items-center justify-between flex-wrap w-full lg:hidden pb-8">
-                <Logo width={90} height={90} />
+                <Logo width={100} height={100} />
 
                 <MobileNavMenu 
                     isOpen={isMenuOpen} 

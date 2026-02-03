@@ -12,12 +12,17 @@ function DesktopSideNav() {
     const pathName = usePathname()
     
     // Dropdown logic: Only open if we are within the account-settings path
-    const isSettingsActive = pathName?.startsWith("/account-settings")
+    const isSettingsActive = pathName?.startsWith(NAVIGATION_LINKS.ACCOUNT_SETTINGS.href)
+
 
     const isActiveRoute = (route: string) => {
-        if (!pathName) return false
-        if (route === "/") return pathName === "/"
-        return pathName === route || (pathName.startsWith(route + '/') && route !== "/")
+        if (!pathName) return false;
+
+        if (route === "/dashboard") {
+            return pathName === "/dashboard";
+        }
+
+        return pathName === route || pathName.startsWith(`${route}/`)
     }
 
     return (
@@ -27,12 +32,12 @@ function DesktopSideNav() {
                 <ul className="mt-8 flex flex-col gap-2">
                     {Object.values(NAVIGATION_LINKS).map((v) => {
                         const isActive = isActiveRoute(v.href)
-                        const isSettingsLink = v.href === "/account-settings"
+                        const isSettingsLink = v.href === NAVIGATION_LINKS.ACCOUNT_SETTINGS.href
 
                         return (
                             <li key={v.href} className="flex flex-col">
                                 <Link
-                                    href={isSettingsLink ? "/account-settings/profile" : v.href}
+                                    href={isSettingsLink ? SETTINGS_SUB_LINKS[0].href : v.href}
                                     className={cn(
                                         "relative flex items-center gap-2 text-sm px-3 min-h-12 rounded-md transition-all duration-200",
                                         isActive || (isSettingsLink && isSettingsActive)

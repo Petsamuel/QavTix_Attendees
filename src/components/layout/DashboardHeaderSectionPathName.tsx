@@ -7,12 +7,21 @@ import { usePathname } from 'next/navigation';
 const useDashboardSegment = () => {
     const pathName = usePathname()
     
-    if (pathName === "/"){
+    if (pathName === "/dashboard" || pathName === "/dashboard/") {
         return "My Tickets"
     }
-    const dashboardSegment = pathName.split("/")[1]
+
+    const segments = pathName.split("/").filter(Boolean)
     
-    return dashboardSegment.split("-").join(" ")
+    const dashboardIndex = segments.indexOf("dashboard")
+    const firstSegment = segments[dashboardIndex + 1]
+
+    if (!firstSegment) return "My Tickets"
+
+    return firstSegment
+        .split("-")
+        .join(" ")
+        .replace(/\b\w/g, (l) => l.toUpperCase())
 }
 
 export function DashboardHeaderSectionPathName() {

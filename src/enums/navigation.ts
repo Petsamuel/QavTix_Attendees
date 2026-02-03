@@ -1,62 +1,61 @@
 interface ILink {
-    readonly href: string,
-    label?: string,
-    icon?: string
+    readonly href: string;
+    label?: string;
+    icon?: string;
 }
 
-interface INavigationLinks {
-    [key: string] : ILink
-}
 
-export const NAVIGATION_LINKS : INavigationLinks = {
+export const NAVIGATION_LINKS = {
     MY_TICKETS: {
-        href: "/",
+        href: "/dashboard",
         icon: "hugeicons:ticket-02",
         label: "My Tickets"
     },
     FAVOURITES: {
-        href: "/favourites",
+        href: "/dashboard/favourites",
         icon: "hugeicons:favourite",
         label: "Favourites"
     },
     MARKETPLACE: {
-        href: "/marketplace",
+        href: "/dashboard/marketplace",
         icon: "hugeicons:store-location-02",
         label: "Marketplace"
     },
     AFFLIATES: {
-        href: "/affliates",
+        href: "/dashboard/affliates",
         icon: "hugeicons:target-dollar",
         label: "Affliates"
     },
     ACCOUNT_SETTINGS: {
-        href: "/account-settings",
+        href: "/dashboard/account-settings",
         icon: "hugeicons:account-setting-02",
         label: "Account Settings"
     }
-}
+} as const satisfies Record<string, ILink>;
 
 export const SETTINGS_SUB_LINKS = [
-    { label: "Profile Information", href: "/account-settings/profile" },
-    { label: "Security", href: "/account-settings/security" },
-    { label: "Notification", href: "/account-settings/notifications" },
-    { label: "Group Settings", href: "/account-settings/groups" },
-    { label: "Privacy", href: "/account-settings/privacy" },
-    { label: "Payment Method", href: "/account-settings/payment" },
-    { label: "Bank Accounts", href: "/account-settings/bank-accounts" },
-]
-
+    { label: "Profile Information", href: `${NAVIGATION_LINKS.ACCOUNT_SETTINGS.href}/profile` },
+    { label: "Security", href: `${NAVIGATION_LINKS.ACCOUNT_SETTINGS.href}/security` },
+    { label: "Notification", href: `${NAVIGATION_LINKS.ACCOUNT_SETTINGS.href}/notifications` },
+    { label: "Group Settings", href: `${NAVIGATION_LINKS.ACCOUNT_SETTINGS.href}/groups` },
+    { label: "Privacy", href: `${NAVIGATION_LINKS.ACCOUNT_SETTINGS.href}/privacy` },
+    { label: "Payment Method", href: `${NAVIGATION_LINKS.ACCOUNT_SETTINGS.href}/payment` },
+    { label: "Bank Accounts", href: `${NAVIGATION_LINKS.ACCOUNT_SETTINGS.href}/bank-accounts` },
+] as const satisfies readonly ILink[];
 
 export const DISCOVER_EVENTS = {
     MAIN: {
-        href: "/events"
+        href: "/dashboard/events"
     },
     DETAILS: {
-        href: "/events/details/[event_id]"
+        href: "/dashboard/events/details/[event_id]"
     }
-} as const;
+} as const satisfies Record<string, ILink>;
 
+const groupSettingsPath = SETTINGS_SUB_LINKS.find(v => v.label === "Group Settings")?.href;
 
-export const EDIT_GROUP : ILink = {
-    href: `${SETTINGS_SUB_LINKS.find(v => v.href.includes(`${NAVIGATION_LINKS.ACCOUNT_SETTINGS.href}/groups`))?.href}/edit/[group_id]`
-}
+export const EDIT_GROUP = {
+    href: `${groupSettingsPath}/edit/[group_id]`
+} as const satisfies ILink;
+
+export type NavigationKey = keyof typeof NAVIGATION_LINKS;

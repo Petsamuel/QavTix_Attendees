@@ -41,7 +41,7 @@ export default function MyCancelledEventsTicketsTable() {
                         </thead>
                         <tbody className="divide-y divide-neutral-5 bg-white">
                             {pagination.currentItems.map((item, index) => (
-                                <tr key={item.id} className="hover:bg-brand-neutral-3/70 transition-colors group">
+                                <tr key={item.id} className="hover:bg-brand-neutral-3/50 transition-colors group">
                                     <td className="py-4 px-4 text-brand-secondary-8 text-xs text-center">
                                         {pagination.startIndex + index + 1}
                                     </td>

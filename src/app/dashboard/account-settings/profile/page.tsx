@@ -61,29 +61,31 @@ export default function ProfileInformationForm() {
                     onClick={() => setIsEditing(true)}
                     className={cn(
                         isEditing ? "hidden" : "flex",
-                        'items-center bg-brand-primary-1 p-2 rounded-lg justify-between text-xs font-bold gap-2 transition-opacity',
-                         'disabled:opacity-50 disabled:cursor-not-allowed',
+                        'items-center md:bg-brand-primary-1 p-2 rounded-lg justify-between text-xs font-bold gap-2 transition-opacity',
+                        'disabled:opacity-50 disabled:cursor-not-allowed',
                         'text-brand-primary-5 hover:text-brand-primary-7'
                     )}
                 >
                     <span className={cn(
-                        'size-9 md:size-7 aspect-square rounded flex justify-center items-center text-white',
+                        'size-11 md:size-7 aspect-square rounded-md flex justify-center items-center text-white',
                         'bg-brand-primary-3'
                     )}>
-                        <Icon icon="hugeicons:pencil-edit-01" width="18" />
+                        <Icon icon="hugeicons:pencil-edit-01" width="30" className="md:w-4.5" />
                     </span>
-                    Edit Info
+                    <span className="sr-only md:not-sr-only">Edit Info</span>
                 </button>
             </div>
 
             <form className="space-y-8">
-                <ProfileImageUploader 
-                    isEditing={isEditing} 
-                    initialImage={null} 
-                    onImageChange={(v) => {
-                        setValue("profileImage", v)
-                    }}
-                />
+                <div className="flex justify-center items-center md:justify-start">
+                    <ProfileImageUploader 
+                        isEditing={isEditing} 
+                        initialImage={null} 
+                        onImageChange={(v) => {
+                            setValue("profileImage", v)
+                        }}
+                    />
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
                     <CustomInput2
