@@ -80,7 +80,7 @@ export function MobileBottomSheet({
                             <div className="p-6 space-y-6">
                                 {/* Header */}
                                 {(title || true) && (
-                                    <div className="flex items-center justify-between sticky top-0 bg-white z-10 -mt-6 pt-6 pb-4">
+                                    <div className="flex items-center justify-between sticky top-0 bg-transparent z-10 -mt-5 pt-6 pb-4">
                                         {title && (
                                             <h3 className="font-medium text-xl text-gray-900">
                                                 {title}
