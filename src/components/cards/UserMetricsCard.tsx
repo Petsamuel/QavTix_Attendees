@@ -1,7 +1,7 @@
 import { calculateTrend } from "@/helper-fns/calculateTrend";
 import { cn } from "@/lib/utils";
-import MetricSparkline from "../charts/MetricsSparkLine";
 import { space_grotesk } from "@/lib/fonts";
+import UserProfileMetricSparkline from "../charts/UserProfileMetricsSparkLine";
 
 interface UserMetricCardProps {
     label: string;
@@ -21,9 +21,24 @@ export default function UserMetricCard({
     
     const trend = calculateTrend(trendData)
     
+    // Determine the status for the sparkline
+    const getSparklineStatus = (): 'good' | 'moderate' | 'bad' => {
+        if (trend.direction === 'stable') return 'moderate';
+        
+        if (isNegativeGood) {
+            // Inverted logic: down is good, up is bad
+            return trend.direction === 'down' ? 'good' : 'bad';
+        }
+        
+        // Normal logic: up is good, down is bad
+        return trend.direction === 'up' ? 'good' : 'bad';
+    };
+
+    const sparklineStatus = getSparklineStatus();
+    
     // Adjust color logic if negative trend is good (e.g., refund count)
     const displayColor = isNegativeGood 
-        ? trend.direction === 'down' ? '#10B981' : trend.direction === 'up' ? '#EF4444' : trend.color
+        ? trend.direction === 'down' ? '#359160' : trend.direction === 'up' ? '#FF392B' : '#FF9249'
         : trend.color;
     
     const displayDirection = isNegativeGood && trend.direction !== 'stable'
@@ -56,11 +71,11 @@ export default function UserMetricCard({
                     {value}
                 </h3>
                 <div>
-                    <MetricSparkline 
+                    <UserProfileMetricSparkline 
                         data={trendData}
-                        color={displayColor}
                         width={80}
                         height={40}
+                        status={sparklineStatus}
                     />
                 </div>
             </div>
