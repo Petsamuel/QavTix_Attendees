@@ -1,18 +1,24 @@
 'use client'
 
+
 import { useState } from 'react'
-import { AnimatedDialog } from "../../dialogs/AnimatedDialog"
-import EventFilterTypeBtn from "./buttons-and-inputs/EventFilterTypeBtn"
 import { Icon } from "@iconify/react"
-import FilterButtonsActions1 from "./buttons-and-inputs/FilterActionButtons1"
 import { cn } from "@/lib/utils"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+import EventFilterTypeBtn from './buttons-and-inputs/EventFilterTypeBtn'
 
 const statusOptions = [
-  { value: 'live',       label: 'Live',       color: 'bg-green-500',   icon: 'mdi:circle',           description: 'Currently happening' },
-  { value: 'upcoming',   label: 'Upcoming',   color: 'bg-blue-500',    icon: 'mdi:clock-outline',    description: 'Scheduled for future' },
-  { value: 'ended',      label: 'Ended',      color: 'bg-gray-500',    icon: 'mdi:check-circle',     description: 'Already completed' },
-  { value: 'cancelled',  label: 'Cancelled',  color: 'bg-red-500',     icon: 'mdi:close-circle',     description: 'Event cancelled' },
-  { value: 'draft',      label: 'Draft',      color: 'bg-yellow-500',  icon: 'mdi:pencil-outline',   description: 'Not yet published' },
+  { value: 'live', label: 'Live', color: 'bg-green-500' },
+  { value: 'upcoming', label: 'Upcoming', color: 'bg-blue-500' },
+  { value: 'ended', label: 'Ended', color: 'bg-slate-400' },
+  { value: 'cancelled', label: 'Cancelled', color: 'bg-red-500' },
+  { value: 'draft', label: 'Draft', color: 'bg-amber-400' },
 ] as const
 
 interface StatusFilterProps {
@@ -21,78 +27,99 @@ interface StatusFilterProps {
   icon: string
 }
 
-export function StatusFilter({ value = [], onChange, icon }: StatusFilterProps) {
+export function StatusFilter({ value, onChange, icon }: StatusFilterProps) {
+
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(value)
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(value || [])
 
   const handleToggle = (statusValue: string) => {
-    if (selectedStatuses.length){
-      setSelectedStatuses(prev =>
-        prev.includes(statusValue)
-           ? prev.filter(v => v !== statusValue)
-          : [statusValue]
-      )
-    }
-    else {
-      setSelectedStatuses([statusValue])
-    }
-  }
-
-  const handleApply = () => {
-    onChange(selectedStatuses)
-    setIsOpen(false)
-  }
-
-  const handleClear = () => {
-    setSelectedStatuses([])
-    onChange([])
+    const next = selectedStatuses.includes(statusValue)
+      ? selectedStatuses.filter(v => v !== statusValue)
+      : [...selectedStatuses, statusValue]
+    
+    setSelectedStatuses(next)
+    onChange(next)
   }
 
   return (
-    <AnimatedDialog
-      open={isOpen}
-      onOpenChange={setIsOpen}
-      title="Event Status"
-      trigger={
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+      <DropdownMenuTrigger asChild>
         <EventFilterTypeBtn
           icon={icon}
-          onClick={() => setIsOpen(true)}
           displayText="Status"
-          hasActiveFilter={selectedStatuses?.length > 0}
+          onClick={() => setIsOpen(true)}
+          hasActiveFilter={selectedStatuses.length > 0}
         />
-      }
-    >
-      <div className="space-y-2 overflow-x-hidden p-4 pb-16 overflow-y-auto relative max-h-[20em]">
+      </DropdownMenuTrigger>
+      
+      <DropdownMenuContent 
+        align="start" 
+        sideOffset={5}
+        className={cn(
+          "w-full z-200! p-4 rounded-xl shadow-[0px_3.69px_14.76px_0px_rgba(51,38,174,0.08)]",
+          // Open animation
+          "data-[state=open]:animate-in",
+          "data-[state=open]:fade-in-0",
+          "data-[state=open]:duration-500 data-[state=open]:ease-[cubic-bezier(0.16,1,0.3,1)]",
+          "data-[state=open]:zoom-in-90",
+          "data-[state=open]:slide-in-from-top-4",
+          // Close animation
+          "data-[state=closed]:animate-out",
+          "data-[state=closed]:fade-out-0",
+          "data-[state=closed]:duration-400 data-[state=closed]:ease-in",
+          "data-[state=closed]:zoom-out-90",
+          "data-[state=closed]:slide-out-to-top-4"
+        )}
+      >
+        <p className="px-2 py-1.5 text-[10px] uppercase tracking-wider font-bold text-brand-neutral-5">
+          Filter by Status
+        </p>
+        
         {statusOptions.map(status => {
-          const isSelected = selectedStatuses?.includes(status.value)
-
+          const isSelected = selectedStatuses.includes(status.value)
           return (
-            <button
+            <DropdownMenuItem
               key={status.value}
-              onClick={() => handleToggle(status.value)}
+              onSelect={(e) => {
+                e.preventDefault()
+                handleToggle(status.value)
+              }}
               className={cn(
-                'w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-sm',
-                isSelected
-                  ? 'border-brand-primary-6 bg-brand-primary-1/50 shadow-sm'
-                  : 'border-brand-neutral-3 hover:border-brand-neutral-5'
+                "flex items-center gap-2.5 px-2 py-2 rounded-lg cursor-pointer transition-colors outline-none",
+                "focus:bg-brand-neutral-1 active:scale-[0.98]",
+                isSelected ? "bg-brand-primary-1/40" : ""
               )}
             >
-              <div className={cn('w-2.5 h-2.5 rounded-full shrink-0', status.color)} />
-              <Icon icon={status.icon} className="w-4 h-4 text-brand-neutral-7 shrink-0" />
-              <div className="flex-1 text-left min-w-0">
-                <p className="font-medium text-brand-secondary-9 truncate">{status.label}</p>
-                <p className="text-xs text-brand-neutral-6 truncate">{status.description}</p>
-              </div>
+              <div className={cn("size-1.5 rounded-full shrink-0 shadow-sm", status.color)} />
+              <span className={cn(
+                "text-xs flex-1",
+                isSelected ? "font-semibold text-brand-primary-9" : "text-brand-secondary-8"
+              )}>
+                {status.label}
+              </span>
               {isSelected && (
-                <Icon icon="mdi:check-circle" className="w-5 h-5 text-primary-6 shrink-0" />
+                <Icon icon="iconamoon:check-bold" className="text-brand-primary-6 size-3" />
               )}
-            </button>
+            </DropdownMenuItem>
           )
         })}
-        <div className='fixed rounded-b-3xl left-0 ps-4 bottom-0 w-full h-[5em] bg-white'>
-          <FilterButtonsActions1 onApply={handleApply} onClear={handleClear} />
-        </div>
-      </div>
-    </AnimatedDialog>
+        
+        {selectedStatuses.length > 0 && (
+          <>
+            <DropdownMenuSeparator className="my-1 bg-brand-neutral-2" />
+            <button 
+              onClick={(e) => {
+                e.stopPropagation()
+                setSelectedStatuses([])
+                onChange([])
+              }}
+              className="w-full text-center py-1.5 text-[11px] font-medium text-brand-neutral-6 hover:text-red-500 transition-colors"
+            >
+              Reset Filters
+            </button>
+          </>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
