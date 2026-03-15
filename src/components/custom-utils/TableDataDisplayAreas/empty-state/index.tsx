@@ -24,6 +24,7 @@ export default function EmptyTicketsState({ title, text, btnText, href, icon }:{
 
             <Link 
                 href={href}
+                target="_blank"
                 className="bg-brand-primary-6 h-12 flex justify-center items-center hover:bg-brand-primary-7 hover:shadow text-sm text-white px-8 py-6 rounded-[7px] font-bold"
             >
                 {btnText || "Discover Events"}

@@ -33,6 +33,13 @@ export const formatDate = (date: Date | undefined, formatStr: string = 'MM / dd 
   return `${month} / ${day} / ${year}`
 }
 
+
+export function formatDateSimple(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-GB", {
+    day: "numeric", month: "short", year: "numeric",
+  })
+}
+
 export const addDays = (date: Date, days: number): Date => {
   const result = new Date(date)
   result.setDate(result.getDate() + days)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,12 +13,6 @@ import EventFilterTypeBtn from './buttons-and-inputs/EventFilterTypeBtn'
 import FilterButtonsActions1 from './buttons-and-inputs/FilterActionButtons1'
 import { MobileBottomSheet } from '../../dialogs/EventFilterDropdownMobileBottomSheet'
 
-interface Category {
-    value: string
-    label: string
-    count: number
-}
-
 interface CategoryFilterProps {
     value?: string[]
     onChange: (value: string[]) => void
@@ -26,15 +20,15 @@ interface CategoryFilterProps {
 }
 
 const defaultCategories: Category[] = [
-    { value: 'all', label: 'All Events', count: 30 },
-    { value: 'concerts', label: 'Concerts & Music', count: 30 },
-    { value: 'sports', label: 'Sport & Fitness', count: 30 },
-    { value: 'arts', label: 'Arts & Theater', count: 30 },
-    { value: 'food', label: 'Food & Dining', count: 30 },
-    { value: 'festivals', label: 'Festivals', count: 30 },
-    { value: 'business', label: 'Business & Networking', count: 30 },
-    { value: 'travel', label: 'Travel & Tours', count: 30 },
-    { value: 'nightlife', label: 'Nightlife & Parties', count: 30 },
+    { id: 1, name: 'all', value: 'all', label: 'All Events', count: 30 },
+    { id: 2, name: 'concerts', value: 'concerts', label: 'Concerts & Music', count: 30 },
+    { id: 3, name: 'sports', value: 'sports', label: 'Sport & Fitness', count: 30 },
+    { id: 4, name: 'arts', value: 'arts', label: 'Arts & Theater', count: 30 },
+    { id: 5, name: 'food', value: 'food', label: 'Food & Dining', count: 30 },
+    { id: 6, name: 'festivals', value: 'festivals', label: 'Festivals', count: 30 },
+    { id: 7, name: 'business', value: 'business', label: 'Business & Networking', count: 30 },
+    { id: 8, name: 'travel', value: 'travel', label: 'Travel & Tours', count: 30 },
+    { id: 9, name: 'nightlife', value: 'nightlife', label: 'Nightlife & Parties', count: 30 },
 ]
 
 export default function CategoryFilter({
@@ -137,7 +131,7 @@ export default function CategoryFilter({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent 
                         className={cn(
-                            "w-full z-100! p-4 rounded-xl shadow-[0px_3.69px_14.76px_0px_rgba(51,38,174,0.08)]",
+                            "w-full min-w-[18em] z-100! p-4 rounded-xl shadow-[0px_3.69px_14.76px_0px_rgba(51,38,174,0.08)]",
                             // Open animation
                             "data-[state=open]:animate-in",
                             "data-[state=open]:fade-in-0",

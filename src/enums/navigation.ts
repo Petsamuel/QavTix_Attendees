@@ -43,15 +43,6 @@ export const SETTINGS_SUB_LINKS = [
     { label: "Bank Accounts", href: `${NAVIGATION_LINKS.ACCOUNT_SETTINGS.href}/bank-accounts` },
 ] as const satisfies readonly ILink[];
 
-export const DISCOVER_EVENTS = {
-    MAIN: {
-        href: "/dashboard/events"
-    },
-    DETAILS: {
-        href: "/dashboard/events/details/[event_id]"
-    }
-} as const satisfies Record<string, ILink>;
-
 const groupSettingsPath = SETTINGS_SUB_LINKS.find(v => v.label === "Group Settings")?.href;
 
 export const EDIT_GROUP = {
@@ -59,3 +50,7 @@ export const EDIT_GROUP = {
 } as const satisfies ILink;
 
 export type NavigationKey = keyof typeof NAVIGATION_LINKS;
+
+
+export const HOST_PROFILE_LINK = `${process.env.NEXT_PUBLIC_APP_DOMAIN}/host/profile/[host_id]` as const;
+export const EXPLORE_EVENT_LINK = `${process.env.NEXT_PUBLIC_APP_DOMAIN}/events` as const;

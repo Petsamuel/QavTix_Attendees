@@ -5,5 +5,32 @@ interface FilterValues {
     status: StatusOption["value"] | null
     categories: Category["value"][]
     ticketType: string[],
+    priceRange?: PriceRange
     purchaseDate?: Date | null
+}
+
+
+
+interface PriceRange {
+    min: number
+    max: number
+}
+
+interface Category {
+    value: string
+    label: string
+    count: number
+}
+
+interface Location {
+    country: string
+    state: string
+}
+
+interface StatusOption {
+    value: string
+    label: string
+    color: string
+    icon: string
+    description: string
 }

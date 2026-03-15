@@ -10,6 +10,7 @@ type FilterComponentProps<T> = {
   onChange: (value: T) => void
   className?: string
   icon: string
+  categories?: Category[]
 }
 
 type FilterRegistryEntry<T> = {
@@ -32,6 +33,6 @@ export const filterRegistry: Partial<Record<FilterKey, FilterRegistryEntry<any>>
   },
   priceRange: {
     component: PriceFilter,
-    stateKey: 'dateRange'
+    stateKey: 'priceRange'
   },
 }

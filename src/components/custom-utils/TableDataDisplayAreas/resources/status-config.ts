@@ -1,36 +1,37 @@
 export const paymentStatusConfig = {
-    pending: {
-        label: "Pending",
-        className: "border-brand-accent-2 bg-brand-accent-1 text-brand-accent-4",
-    },
-    confirmed: {
-        label: "Confirmed",
+    completed: {
+        label:     "Confirmed",
         className: "border-[#35916033] bg-[#3591601A] text-[#359160]",
     },
-    refunded: {
-        label: "Refunded",
-        className: "border-brand-primary-2 bg-brand-primary-1 text-brand-primary-4",
+    pending: {
+        label:     "Pending",
+        className: "border-brand-accent-2 bg-brand-accent-1 text-brand-accent-4",
     },
-    cancelled: {
-        label: "Cancelled",
+    failed: {
+        label:     "Failed",
         className: "border-[#FF000033] bg-[#FF00001A] text-[#FF0000]",
+    },
+    refunded: {
+        label:     "Refunded",
+        className: "border-brand-primary-2 bg-brand-primary-1 text-brand-primary-4",
     },
 }
 
 export const eventTimelineConfig = {
     today: {
-        label: "Today",
+        label:     "Today",
         className: "border-[#C100C833] bg-[#C100C81A] text-[#C100C8]",
     },
     tomorrow: {
-        label: "Tomorrow",
+        label:     "Tomorrow",
         className: "border-[#E2DB0033] bg-[#E2DB001A] text-[#E2DB00]",
     },
     upcoming: {
-        label: "Upcoming",
+        label:     "Upcoming",
         className: "border-[#94C80033] bg-[#94C8001A] text-[#94C800]",
     },
 }
+
 
 
 

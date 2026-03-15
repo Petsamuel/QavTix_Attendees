@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
 
-export default function ViewTicket({ className }:{ className?: string }){
+export default function ViewTicket({ className, ticket }:{ className?: string, ticket: EventTicket }){
 
     const [showTicket, setShowTicket] = useState(false)
 
@@ -15,7 +15,7 @@ export default function ViewTicket({ className }:{ className?: string }){
                 View Ticket <Icon icon="lucide:arrow-right" className="size-3" />
             </button>
 
-            <TicketPreviewModal open={showTicket} setOpen={setShowTicket} />
+            <TicketPreviewModal open={showTicket} setOpen={setShowTicket} ticket={ticket} />
         </>
     )
 }

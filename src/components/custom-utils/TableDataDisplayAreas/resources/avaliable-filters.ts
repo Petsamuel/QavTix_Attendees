@@ -67,7 +67,6 @@ export type TabListItem = {
 export const MyTicketsFiltersNTabsData = {
   filterOptions: [
     ALL_FILTERS.categories,
-    ALL_FILTERS.status, 
     ALL_FILTERS.dateRange
   ] as const,
   tabList: [

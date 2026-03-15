@@ -1,10 +1,13 @@
+import { formatPrice } from "@/helper-fns/formatPrice"
+import { Currency } from "@/lib/redux/slices/settingsSlice"
+
 export interface MetricConfig {
     id: string
     label: string
     description: string
     icon: string
     iconColor: string
-    valueFormatter?: (value: any) => string
+    valueFormatter?: (value: number, currency: Currency) => string
 }
 
 
@@ -14,15 +17,16 @@ export const myTicketsMetricsConfig: Record<string, MetricConfig> = {
         id: 'total-earnings',
         label: "Total Earnings",
         icon: "/images/vectors/dollar-in.svg",
-        valueFormatter: (value: number) => `₦${value.toLocaleString()}`,
+        valueFormatter: (value, currency) => formatPrice(value, currency!),
         iconColor: "",
         description: "",
     },
-    'tickets-spent': {
-        id: 'tickets-spent',
-        label: "Tickets Spent",
+    'total-spent': {
+        id: 'total-spent',
+        label: "Total Spent",
         icon: "/images/vectors/dollar-out.svg",
         iconColor: "",
+        valueFormatter: (value, currency) => formatPrice(value, currency!),
         description: "",
     },
     'ticket-purchased': {
@@ -38,7 +42,6 @@ export const myTicketsMetricsConfig: Record<string, MetricConfig> = {
         icon: "/images/vectors/upcoming-events.svg",
         description: "",
         iconColor: "",
-        valueFormatter: (value: number) => `₦${value.toLocaleString()}`
     }
 }
 

@@ -11,6 +11,7 @@ interface FilterRendererProps {
     filter: TableDataDisplayFilter
     filters: Partial<FilterValues>
     setFilters: Dispatch<SetStateAction<Partial<FilterValues>>>
+    categories?: Category[]
     className?: string
 }
 
@@ -18,6 +19,7 @@ export function FilterRenderer({
     filterKey,
     filter,
     filters,
+    categories,
     setFilters,
     className
 }: FilterRendererProps) {
@@ -40,6 +42,7 @@ export function FilterRenderer({
             onChange={onChange}
             className={className}
             icon={filter.icon}
+            categories={categories}
         />
     )
 }

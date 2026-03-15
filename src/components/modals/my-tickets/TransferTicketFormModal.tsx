@@ -5,6 +5,7 @@ import { AnimatedDialog } from "../../custom-utils/dialogs/AnimatedDialog";
 import { DialogTitle } from "../../ui/dialog";
 import CustomInput2 from "../../custom-utils/inputs/CustomInput2";
 import { validateEmail } from "@/helper-fns/validateEmail";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface TransferTicketProps {
     open: boolean;
@@ -48,14 +49,15 @@ export default function TransferTicketFormModal({ open, setOpen, onTransfer }: T
                 <DialogTitle className="text-lg md:text-xl font-bold text-brand-secondary-8">
                     Transfer Ticket
                 </DialogTitle>
-                <p className="text-xs md:text-sm text-brand-secondary-6 mt-1">
+                <DialogDescription className="text-xs md:text-sm text-brand-secondary-6 mt-1">
                     Enter Recipient Email Address
-                </p>
+                </DialogDescription>
             </div>
 
             <form onSubmit={handleSubmit} className="mt-5 space-y-8">
                 <CustomInput2
                     label="Recipient"
+                    type="email"
                     placeholder="Enter Recipient's Email"
                     value={email}
                     error={error}
