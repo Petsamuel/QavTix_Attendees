@@ -21,10 +21,10 @@ export const NAVIGATION_LINKS = {
         icon: "hugeicons:store-location-02",
         label: "Marketplace"
     },
-    AFFLIATES: {
-        href: "/dashboard/affliates",
+    AFFILIATES: {
+        href: "/dashboard/affiliates",
         icon: "hugeicons:target-dollar",
-        label: "Affliates"
+        label: "Affiliates"
     },
     ACCOUNT_SETTINGS: {
         href: "/dashboard/account-settings",

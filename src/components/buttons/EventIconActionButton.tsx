@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { Icon } from "@iconify/react"
 import { useState } from "react"
-
+import { cn } from "@/lib/utils"
 
 function ActionFeedback({ message }: { message: string }) {
     return (
@@ -20,22 +20,35 @@ export function EventIconActionButton({
     icon,
     onClick,
     feedback,
-    className
+    externalFeedback,
+    iconStyles,
+    className,
 }: {
-    icon: string
-    onClick: () => void
-    feedback: string
-    className?: string
+    icon:              string
+    onClick:           () => void
+    feedback:          string       // shown instantly on click (share, copy, etc.)
+    externalFeedback?: string | null // when provided, overrides internal feedback (favourites)
+    iconStyles?:       string
+    className?:        string
 }) {
-    const [showFeedback, setShowFeedback] = useState(false)
+    const [internalFeedback, setInternalFeedback] = useState(false)
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()
-        setShowFeedback(true)
         onClick()
-        setTimeout(() => setShowFeedback(false), 1200)
+
+        if (externalFeedback === undefined) {
+            setInternalFeedback(true)
+            setTimeout(() => setInternalFeedback(false), 1200)
+        }
     }
+
+    const visibleMessage = externalFeedback !== undefined
+        ? externalFeedback
+        : internalFeedback
+            ? feedback
+            : null
 
     return (
         <div className="relative">
@@ -53,15 +66,11 @@ export function EventIconActionButton({
                     className,
                 ].filter(Boolean).join(" ")}
             >
-                <Icon
-                    icon={icon}
-                    className="text-inherit"
-                    width="18"
-                />
+                <Icon icon={icon} className={cn("text-inherit", iconStyles ?? "")} width="18" />
             </motion.button>
 
             <AnimatePresence>
-                {showFeedback && <ActionFeedback message={feedback} />}
+                {visibleMessage && <ActionFeedback message={visibleMessage} />}
             </AnimatePresence>
         </div>
     )

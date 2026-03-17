@@ -59,10 +59,22 @@ export default function FavouritesPageCW({ initialData, categories }: Props) {
         if (isError) return (
             <div className="flex flex-col items-center justify-center py-16 gap-3 text-center mt-10">
                 <div className="p-3 rounded-full bg-red-50">
-                    <Icon icon="mage:warning-circle" className="size-6 text-red-400" />
+                    <Icon icon="nonicons:error-16" className="size-6 text-red-400" />
                 </div>
                 <p className="text-sm font-medium text-brand-secondary-8">Something went wrong</p>
                 <p className="text-xs text-brand-secondary-5">Could not load saved events. Please try again.</p>
+            </div>
+        )
+        
+        if (items.length === 0) return (
+            <div className="mt-10">
+                <EmptyTicketsState
+                    href={`${process.env.NEXT_PUBLIC_APP_DOMAIN}/events/`}
+                    text="When you find events you like, click the heart icon to save them here"
+                    title="No Saved Events Yet"
+                    btnText="Browse Events"
+                    icon="clarity:heart-broken-line"
+                />
             </div>
         )
 
@@ -90,20 +102,9 @@ export default function FavouritesPageCW({ initialData, categories }: Props) {
             </div>
         )
 
-        if (items.length === 0) return (
-            <div className="mt-10">
-                <EmptyTicketsState
-                    href={`${process.env.NEXT_PUBLIC_APP_DOMAIN}/events/`}
-                    text="When you find events you like, click the heart icon to save them here"
-                    title="No Saved Events Yet"
-                    btnText="Browse Events"
-                    icon="clarity:heart-broken-line"
-                />
-            </div>
-        )
 
         if (displayType === "grid") return (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(14em,1fr))] md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,minmax(14em,1fr))] gap-6 lg:gap-8 mt-10 justify-items-center md:justify-items-start">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(14em,1fr))] md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,minmax(16em,1fr))] gap-y-6 gap-x-4 justify-items-center md:justify-items-start">
                 {items.map((event) => (
                     <EventsCard key={event.id} {...fromFavouriteEvent(event)} />
                 ))}

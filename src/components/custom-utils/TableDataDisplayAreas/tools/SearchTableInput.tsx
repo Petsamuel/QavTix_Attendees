@@ -1,33 +1,36 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { cn } from '@/lib/utils'
 
 interface SearchTableInputProps {
-  placeholder?: string
-  className?: string
-  minSearchLength?: number
-  debounceMs?: number
-  onSearch?: (query: string) => void
+    placeholder?:    string
+    className?:      string
+    minSearchLength?: number
+    debounceMs?:     number
+    onSearch?:       (query: string) => void
 }
 
 export default function SearchTableInput1({
-  placeholder = 'Search event',
-  className,
-  minSearchLength = 3,
-  debounceMs = 500,
-  onSearch
+    placeholder     = 'Search event',
+    className,
+    minSearchLength = 3,
+    debounceMs      = 500,
+    onSearch,
 }: SearchTableInputProps) {
 
-    const [isFocused,    setIsFocused]    = useState(false)
-    const [searchValue,  setSearchValue]  = useState('')
-    const [isSearching,  setIsSearching]  = useState(false)
+    const [isFocused,   setIsFocused]   = useState(false)
+    const [searchValue, setSearchValue] = useState('')
+    const [isSearching, setIsSearching] = useState(false)
+
+
+    const onSearchRef    = useRef(onSearch)
+    onSearchRef.current  = onSearch
 
     useEffect(() => {
         if (searchValue.length === 0) {
-            // User cleared the input — reset search
-            onSearch?.('')
+            onSearchRef.current?.('')
             setIsSearching(false)
             return
         }
@@ -39,16 +42,16 @@ export default function SearchTableInput1({
 
         setIsSearching(true)
         const timer = setTimeout(() => {
-            onSearch?.(searchValue)
+            onSearchRef.current?.(searchValue)
             setIsSearching(false)
         }, debounceMs)
 
         return () => clearTimeout(timer)
-    }, [searchValue, minSearchLength, debounceMs, onSearch])
+    }, [searchValue, minSearchLength, debounceMs])
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && searchValue.length >= minSearchLength) {
-            onSearch?.(searchValue)
+            onSearchRef.current?.(searchValue)
         }
     }
 

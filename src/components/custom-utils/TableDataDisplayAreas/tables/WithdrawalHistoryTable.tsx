@@ -1,20 +1,76 @@
-"use client";
+"use client"
 
-import { usePagination } from "@/custom-hooks/PaginationHook";
-import { withdrawalStatusConfig } from "../resources/status-config";
-import { mockWithdrawalData } from "@/mock-data";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
-import PaginationControls from "../tools/PaginationControl";
+import { useState } from "react"
+import { withdrawalStatusConfig } from "../resources/status-config"
+import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
+import { Icon } from "@iconify/react"
+import PaginationControls from "../tools/PaginationControl"
+import { getWithdrawalHistory } from "@/actions/affiliates"
+import { formatPrice } from "@/helper-fns/formatPrice"
+import { useAppSelector } from "@/lib/redux/hooks"
+import TableLoader from "@/components/loaders/TableLoader"
 
+interface Props {
+    initialData: PaginatedResponse<WithdrawalHistoryItem>
+}
 
-export default function WithdrawalHistoryTable() {
-    const pagination = usePagination(mockWithdrawalData, 5)
+const PAGE_SIZE = 10
+
+export default function WithdrawalHistoryTable({ initialData }: Props) {
+
+    const { currency } = useAppSelector(store => store.settings)
+
+    const [items,       setItems]       = useState<WithdrawalHistoryItem[]>(initialData.results)
+    const [isLoading,   setIsLoading]   = useState(false)
+    const [isError,     setIsError]     = useState(false)
+    const [currentPage, setCurrentPage] = useState(1)
+    const [totalPages,  setTotalPages]  = useState(initialData.total_pages ?? Math.ceil(initialData.count / PAGE_SIZE))
+    const [totalItems,  setTotalItems]  = useState(initialData.count)
+
+    const fetchPage = async (page: number) => {
+        setIsLoading(true)
+        setIsError(false)
+        const res = await getWithdrawalHistory(page)
+        if (res.success && res.data) {
+            setItems(res.data.results)
+            setTotalItems(res.data.count)
+            setTotalPages(res.data.total_pages ?? Math.ceil(res.data.count / PAGE_SIZE))
+            setCurrentPage(page)
+        } else {
+            setIsError(true)
+        }
+        setIsLoading(false)
+    }
+
+    const startIndex = (currentPage - 1) * PAGE_SIZE + 1
+    const endIndex   = Math.min(currentPage * PAGE_SIZE, totalItems)
+
+    if (isLoading) return <TableLoader />
+
+    if (isError) return (
+        <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
+            <div className="p-3 rounded-full bg-red-50">
+                <Icon icon="mage:warning-circle" className="size-6 text-red-400" />
+            </div>
+            <p className="text-sm font-medium text-brand-secondary-8">Something went wrong</p>
+            <p className="text-xs text-brand-secondary-5">Could not load withdrawal history.</p>
+        </div>
+    )
+
+    if (items.length === 0) return (
+        <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
+            <div className="p-3 rounded-full bg-brand-neutral-2">
+                <Icon icon="hugeicons:money-send-square" className="size-6 text-brand-neutral-6" />
+            </div>
+            <p className="text-sm font-medium text-brand-secondary-8">No withdrawals yet</p>
+            <p className="text-xs text-brand-secondary-5">Your withdrawal history will appear here.</p>
+        </div>
+    )
 
     return (
         <div className="w-full space-y-4 mt-5">
-            {/* Desktop Table */}
+            {/* Desktop */}
             <div className="hidden md:block border border-brand-neutral-3 rounded-xl overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
@@ -27,28 +83,25 @@ export default function WithdrawalHistoryTable() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-brand-neutral-3 bg-white">
-                            {pagination.currentItems.map((item) => {
-                                const status = withdrawalStatusConfig[item.status as keyof typeof withdrawalStatusConfig];
+                            {items.map(item => {
+                                const status = withdrawalStatusConfig[item.status as keyof typeof withdrawalStatusConfig]
                                 return (
                                     <tr key={item.id} className="hover:bg-brand-neutral-1/50 transition-colors">
-                                        <td className="p-4 text-brand-secondary-9 text-[11px]">{item.date}</td>
                                         <td className="p-4 text-brand-secondary-9 text-[11px]">
-                                            ₦{item.amount.toLocaleString()}
+                                            {new Date(item.created_at).toLocaleDateString()}
+                                        </td>
+                                        <td className="p-4 text-brand-secondary-9 text-[11px]">
+                                            {formatPrice(parseFloat(item.amount), currency)}
                                         </td>
                                         <td className="p-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="size-10 rounded-lg overflow-hidden shrink-0">
-                                                    <Image width={50} height={50} src={item.bank.logo} alt="" className="size-full object-cover" />
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-brand-secondary-9 text-xs font-bold leading-tight">{item.bank.name}</span>
-                                                    <span className="text-brand-secondary-6 text-[11px]">{item.bank.bankName}</span>
-                                                </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-brand-secondary-9 text-xs font-bold">{item.account_name}</span>
+                                                <span className="text-brand-secondary-6 text-[11px]">{item.bank_name} · {item.bank_account}</span>
                                             </div>
                                         </td>
                                         <td className="p-4 text-right">
                                             <Badge className={cn("px-4 py-1.5 text-[11px] rounded-sm! font-medium shadow-none", status?.className)}>
-                                                {status?.label}
+                                                {status?.label ?? item.status}
                                             </Badge>
                                         </td>
                                     </tr>
@@ -59,52 +112,43 @@ export default function WithdrawalHistoryTable() {
                 </div>
             </div>
 
-            {/* Mobile Cards */}
+            {/* Mobile */}
             <div className="md:hidden flex flex-col divide-y divide-brand-neutral-4">
-                {pagination.currentItems.map((item) => {
-                    const status = withdrawalStatusConfig[item.status as keyof typeof withdrawalStatusConfig];
+                {items.map(item => {
+                    const status = withdrawalStatusConfig[item.status as keyof typeof withdrawalStatusConfig]
                     return (
                         <div key={item.id} className="py-4 space-y-2">
                             <div className="flex justify-between items-start">
-                                <div className="flex items-center gap-3">
-                                    <div className="size-10 rounded-lg overflow-hidden shrink-0">
-                                        <Image width={50} height={50} src={item.bank.logo} alt="" className="size-full object-cover" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-brand-secondary-9 text-sm font-bold">{item.bank.name}</span>
-                                        <span className="text-brand-secondary-6 text-[11px]">{item.bank.bankName}</span>
-                                    </div>
+                                <div className="flex flex-col">
+                                    <span className="text-brand-secondary-9 text-sm font-bold">{item.account_name}</span>
+                                    <span className="text-brand-secondary-6 text-[11px]">{item.bank_name} · {item.bank_account}</span>
                                 </div>
-                                <div className="flex text-right flex-col gap-1">
+                                <div className="flex flex-col items-end gap-1">
                                     <span className="text-[11px] text-brand-neutral-7">Status</span>
                                     <Badge className={cn("px-3 py-1 text-[10px] font-medium shadow-none", status?.className)}>
-                                        {status?.label}
+                                        {status?.label ?? item.status}
                                     </Badge>
                                 </div>
                             </div>
-                            <div className="flex justify-between items-end text-xs text-brand-secondary-9">
-                                <div className="flex flex-col items-end">
-                                    <span className="font-bold">Amount</span>
-                                    <span>₦{item.amount.toLocaleString()}</span>
-                                </div>
-                                <span>{item.date}</span>
+                            <div className="flex justify-between text-xs text-brand-secondary-9">
+                                <span className="font-bold">{formatPrice(parseFloat(item.amount), currency)}</span>
+                                <span>{new Date(item.created_at).toLocaleDateString()}</span>
                             </div>
                         </div>
                     )
                 })}
             </div>
 
-
             <PaginationControls
-                endIndex={pagination.endIndex}
-                startIndex={pagination.startIndex}
-                totalItems={mockWithdrawalData.length}
-                hasNextPage={pagination.hasNextPage}
-                hasPreviousPage={pagination.hasPreviousPage}
-                onNextPage={pagination.nextPage}
-                onPreviousPage={pagination.previousPage}
-                currentPage={pagination.currentPage}
-                totalPages={pagination.totalPages}
+                startIndex={startIndex}
+                endIndex={endIndex}
+                totalItems={totalItems}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                hasNextPage={currentPage < totalPages}
+                hasPreviousPage={currentPage > 1}
+                onNextPage={() => fetchPage(currentPage + 1)}
+                onPreviousPage={() => fetchPage(currentPage - 1)}
             />
         </div>
     )

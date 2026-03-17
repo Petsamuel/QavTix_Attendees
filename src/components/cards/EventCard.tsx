@@ -17,15 +17,19 @@ import { EventCardProps } from './resources/event-card-adapter'
 import { formatPrice } from '@/helper-fns/formatPrice'
 import { useAppSelector } from '@/lib/redux/hooks'
 import { useFavourite } from '@/custom-hooks/UseFavourite'
+import { usePathname } from 'next/navigation'
+import { formatEventDate } from '@/helper-fns/date-utils'
+import { delistTicket } from '@/actions/marketplace'
 
 export default function EventsCard(card: EventCardProps) {
 
     const { currency } = useAppSelector(store => store.settings)
-    const [imageError, setImageError] = useState(false)
-    const [showShare,  setShowShare]  = useState(false)
+    const [imageError,  setImageError]  = useState(false)
+    const [showShare,   setShowShare]   = useState(false)
+    const [isDelisting, setIsDelisting] = useState(false)
+    const pathName = usePathname()
 
-    // isFavourite defaults to false — fromFavouriteEvent adapter passes true
-    const { isFavourite, toggle: toggleFavourite } = useFavourite(card.id, true)
+    const { isFavourite, toggle: toggleFavourite, feedbackMsg } = useFavourite(card.id, card.isFavourite)
 
     const eventUrl = `${process.env.NEXT_PUBLIC_APP_DOMAIN}/events/details/${card.id}`
 
@@ -38,6 +42,15 @@ export default function EventsCard(card: EventCardProps) {
         }
     }
 
+    const handleDelist = async (e: React.MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (isDelisting) return
+        setIsDelisting(true)
+        await delistTicket(card.id)
+        setIsDelisting(false)
+    }
+
     return (
         <>
             <div
@@ -46,7 +59,7 @@ export default function EventsCard(card: EventCardProps) {
             >
                 <div className="flex flex-col h-full">
                     <div className="relative shrink-0">
-                        {card.status && (
+                        {!pathName.includes("marketplace") && card.status ?
                             <span className={cn(
                                 "absolute top-2 shadow-sm left-2 z-10 py-1 px-2 rounded-2xl text-center text-xs font-medium capitalize",
                                 statusStyles[card.status as keyof StatusStylesRecord]?.bg,
@@ -54,7 +67,21 @@ export default function EventsCard(card: EventCardProps) {
                             )}>
                                 {card.status}
                             </span>
-                        )}
+                            :
+                            <button
+                                onClick={handleDelist}
+                                disabled={isDelisting}
+                                className="absolute top-3 shadow-sm left-3 z-10 flex justify-center rounded-lg items-center p-2 h-9.5 bg-white text-xs gap-1.5 font-medium text-brand-secondary-9 disabled:opacity-70 disabled:cursor-not-allowed transition-opacity"
+                            >
+                                <span className="flex justify-center items-center rounded-full aspect-square size-7 bg-brand-primary-2">
+                                    {isDelisting
+                                        ? <Icon icon="eos-icons:three-dots-loading" width="18" height="18" className="text-brand-primary-6" />
+                                        : <Icon icon="bytesize:trash" width="18" height="18" className="text-brand-primary-6" />
+                                    }
+                                </span>
+                                <span>{isDelisting ? "Delisting..." : "Delist Ticket"}</span>
+                            </button>
+                        }
 
                         <figure className="relative w-full aspect-4/3 h-40 rounded-4xl overflow-hidden">
                             {!imageError && card.image ? (
@@ -62,6 +89,7 @@ export default function EventsCard(card: EventCardProps) {
                                     src={"/images/demo-images/event-detail-img.png"}
                                     alt={card.title}
                                     fill
+                                    sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
                                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                                     placeholder="blur"
                                     blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNlNWU3ZWIiLz4KPC9zdmc+"
@@ -88,10 +116,11 @@ export default function EventsCard(card: EventCardProps) {
                                 feedback="Link copied!"
                             />
                             <EventIconActionButton
-                                icon={isFavourite ? "hugeicons:favourite-square" : "hugeicons:favourite"}
+                                icon={isFavourite ? "teenyicons:heart-solid" : "hugeicons:favourite"}
                                 onClick={toggleFavourite}
-                                feedback={isFavourite ? "Removed!" : "Saved!"}
-                                className={isFavourite ? "text-red-500!" : ""}
+                                feedback=""
+                                externalFeedback={feedbackMsg}
+                                iconStyles={isFavourite ? "text-brand-primary-5" : ""}
                             />
                         </div>
                     </div>
@@ -115,7 +144,7 @@ export default function EventsCard(card: EventCardProps) {
                                         <hr className="w-px h-2 border border-brand-neutral-6" />
                                         <Icon icon="hugeicons:clock-01" className="size-4 shrink-0 text-brand-accent-6" />
                                     </div>
-                                    <span className="text-brand-neutral-7 text-[11px] truncate flex-1">{card.date}</span>
+                                    <span className="text-brand-neutral-7 text-[11px] truncate flex-1">{formatEventDate(card.date)}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
                                     <Icon icon="hugeicons:location-01" className="size-4 shrink-0 text-brand-accent-6" />

@@ -57,6 +57,8 @@ export default function ActiveFilterChips({ filters, categories, setFilters, cla
             categories: [],
             status:     null,
             ticketType: [],
+            priceRange: undefined,
+            dateRange:  undefined,
         }))
     }
 

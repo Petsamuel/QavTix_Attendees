@@ -19,7 +19,7 @@ export default function EmptyTicketsState({ title, text, btnText, href, icon }:{
             </h3>
             
             <p className="text-brand-neutral-7 text-sm mb-6 text-center">
-                Y{text}
+                {text}
             </p>
 
             <Link 

@@ -41,7 +41,7 @@ export const statusStyles: StatusStylesRecord = {
   },
   active: {
     bg: "bg-positive-tertiary",
-    text: "text-brand-secondary-9",
+    text: "text-brand-secondary-2",
     label: "Active",
   },
   ended: {

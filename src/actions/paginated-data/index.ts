@@ -11,11 +11,12 @@ export interface FetchParams {
 }
 
 export interface FetchResult<T> {
-    success: boolean
-    results: T[]
-    count:   number
-    next:    string | null
-    message?: string
+    success:      boolean
+    results:      T[]
+    count:        number
+    next:         number | null
+    total_pages?: number
+    message?:     string
 }
 
 export async function fetchPaginatedData<T>(params: FetchParams): Promise<FetchResult<T>> {
@@ -29,27 +30,24 @@ export async function fetchPaginatedData<T>(params: FetchParams): Promise<FetchR
             ...(params.search ? { search: params.search } : {}),
         }
 
-        // Ensure leading slash so axios baseURL joining works correctly
         const endpoint = params.endpoint.startsWith('/') ? params.endpoint : `/${params.endpoint}`
 
-        console.log("[fetchPaginatedData] endpoint :", endpoint)
-        console.log("[fetchPaginatedData] params   :", JSON.stringify(requestParams))
+        const { data } = await axiosInstance.get(endpoint, { params: requestParams })
 
-        const { data } = await axiosInstance.get(endpoint, {
-            params: requestParams,
-        })
+        const d = data.data ?? data
+
         return {
-            success: true,
-            results: data.data?.results ?? data.results ?? [],
-            count:   data.data?.count   ?? data.count   ?? 0,
-            next:    data.data?.next    ?? data.next     ?? null,
+            success:     true,
+            results:     d?.results    ?? [],
+            count:       d?.count      ?? 0,
+            next:        d?.next       ?? null,
+            total_pages: d?.total_pages ?? undefined,
         }
     } catch (err: any) {
-        const status  = err?.response?.status
-        const body    = err?.response?.data
-        const url     = err?.config?.baseURL + err?.config?.url
-        const sentParams = err?.config?.params
-
+        console.log("[fetchPaginatedData] status :", err?.response?.status)
+        console.log("[fetchPaginatedData] url    :", err?.config?.baseURL + err?.config?.url)
+        console.log("[fetchPaginatedData] params :", JSON.stringify(err?.config?.params))
+        console.log("[fetchPaginatedData] body   :", JSON.stringify(err?.response?.data))
         return { success: false, results: [], count: 0, next: null, message: "Request failed" }
     }
 }

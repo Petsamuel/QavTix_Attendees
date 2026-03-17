@@ -135,7 +135,7 @@ export default function DataDisplayTableWrapper({
                 )}
 
                 {/* Active filter chips — only renders when a filter has a value */}
-                {filters && setFilters && (
+                {filters && setFilters && filterOptions && (
                     <ActiveFilterChips filters={filters} categories={categories} setFilters={setFilters} />
                 )}
             </div>

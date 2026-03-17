@@ -43,7 +43,7 @@ export default function CustomGlobalAlert() {
     const IconComponent = icon || variantIcons[variant as keyof typeof variantIcons]
 
     return (
-        <div className="fixed top-14 right-10 z-1000 w-full max-w-xs px-4">
+        <div className="fixed top-14 right-10 z-1000 w-fit max-w-xs px-4">
             <Alert
                 variant={variant === 'default' ? 'default' : 'destructive'}
                 className={cn(

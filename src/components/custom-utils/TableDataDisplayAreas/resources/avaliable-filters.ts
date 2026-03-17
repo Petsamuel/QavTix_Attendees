@@ -82,11 +82,7 @@ export const MarketplaceFiltersNTabsData = {
     ALL_FILTERS.dateRange,
     ALL_FILTERS.priceRange
   ] as const,
-  tabList: [
-    { value: "upcoming", label: "Upcoming"},
-    { value: "past", label: "Past"},
-    { value: "cancelled", label: "Cancelled"}
-  ] as const
+  tabList: [] as const
 }
 
 export const FavouritesPageFiltersNTabsData = {

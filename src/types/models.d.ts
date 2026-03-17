@@ -80,30 +80,6 @@ interface AffiliateEarnings {
     created_at: string
 }
 
-// interface FavoriteEvent {
-//     id:         string  // UUID
-//     user:       number  // FK → User.id
-//     event:      string  // FK → Event.id (UUID)
-//     created_at: string
-// }
-
-// Favourites
-
-interface FavouriteEvent {
-    id:              string  // UUID
-    event_name:      string
-    category:        string
-    event_datetime:  string
-    end_datetime:    string
-    event_location:  EventLocation
-    event_image:     string
-    host:            string
-    event_status:    string
-    attendees_count: number
-    event_description: string
-    price:           string
-}
-
 
 
 

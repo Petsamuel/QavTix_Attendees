@@ -72,3 +72,21 @@ interface EventMedia {
     video_url:   string | null
     is_featured: boolean
 }
+
+
+interface EventTicket {
+    sn:             number
+    id:             string
+    qrcode_token:   string
+    event_name:     string
+    event_image:    string
+    category:       string
+    payment:        "Completed" | "Pending" | "Failed" | "Refunded"
+    event_status:   "active" | "cancelled" | "postponed" | "completed"
+    ticket_status:  "Active" | "Used" | "Cancelled" | "Expired"
+    ticket_type:    string
+    event_datetime: string
+    original_price: string
+    host:           string
+    event_location: EventLocation
+}

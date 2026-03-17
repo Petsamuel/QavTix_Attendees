@@ -15,6 +15,7 @@ export interface EventCardProps {
     status:        string | null   // displayed as a badge
     attendees?:    EventCardAttendee[]
     isFavourite?:   boolean,
+    is_mine?:       boolean
 }
 
 export interface EventCardAttendee {
@@ -81,6 +82,37 @@ export function fromIEvent(e: IEvent & {
         isFavourite:   false,
     }
 }
-// Add more adapters here as new models arrive, e.g.:
-// export function fromMarketplaceEvent(e: MarketplaceEvent): EventCardProps { ... }
-// export function fromSearchResult(e: EventSearchResult): EventCardProps { ... }
+
+
+export function fromMarketplaceEvent(e: MarketplaceEvent): EventCardProps {
+    return {
+        id:            e.id,
+        title:         e.event_name,
+        category:      e.category,
+        host:          e.host,
+        date:          e.event_datetime,
+        location:      formatLocation(e.event_location),
+        image:         e.event_image ?? null,
+        price:         e.price != null ? String(e.price) : null,
+        originalPrice: null,
+        status:        e.status,
+        isFavourite:   e.is_favorite,
+        is_mine:       e.is_mine
+    }
+}
+
+export function fromAffiliateEvent(e: AffiliateEvent): EventCardProps {
+    return {
+        id:            e.id,
+        title:         e.event_name,
+        category:      e.category,
+        host:          e.host,
+        date:          e.event_datetime,
+        location:      [e.event_location?.venue_name, e.event_location?.city].filter(Boolean).join(', '),
+        image:         e.event_image ?? null,
+        price:         e.price != null ? String(e.price) : null,
+        originalPrice: null,
+        status:        e.event_status,
+        isFavourite:   false,
+    }
+}

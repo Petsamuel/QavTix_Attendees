@@ -1,23 +1,25 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { format } from "date-fns"
 import { fetchPaginatedData } from "@/actions/paginated-data"
 
 // Types
 
 export interface PageData<T> {
-    results:  T[]
-    count:    number
-    next:     string | null
-    previous: string | null
+    results:     T[]
+    count:       number
+    next:        number | null
+    previous:    number | null
+    total_pages?: number
 }
 
 export interface TabSlice<T> {
-    results:  T[]
-    count:    number
-    next:     string | null
-    previous: string | null
+    results:     T[]
+    count:       number
+    next:        number | null
+    previous:    number | null
+    total_pages?: number
 }
 
 export interface TabConfig<T> {
@@ -32,17 +34,15 @@ export interface UseDataDisplayConfig<T> {
     activeTab?: string
 }
 
-// Single status field replaces isLoading / isLoadingMore / isError / isEmpty booleans.
-// Only one status is ever true at a time — no impossible combinations, no flash.
 type FetchStatus = "idle" | "loading" | "loadingMore" | "error" | "empty"
 
 export interface TabState<T> {
     items:         T[]
     cachedItems:   T[]
     count:         number
+    totalPages:    number
     hasNext:       boolean
     status:        FetchStatus
-    // Convenience aliases so consumers don't have to switch on status themselves
     isLoading:     boolean
     isLoadingMore: boolean
     isError:       boolean
@@ -66,7 +66,6 @@ const buildFilterParams = (filters: Partial<FilterValues>): Record<string, strin
     return params
 }
 
-// Whether any real filter is active (not counting search — that's separate)
 const hasActiveFilters = (filters: Partial<FilterValues>): boolean =>
     !!(
         filters.categories?.length ||
@@ -89,15 +88,24 @@ const useTabState = <T>(
     const [items,       setItems]       = useState<T[]>(config.initialData.results)
     const [cachedItems, setCachedItems] = useState<T[]>(config.initialData.results)
     const [count,       setCount]       = useState(config.initialData.count)
+    const [totalPages,  setTotalPages]  = useState(config.initialData.total_pages ?? 1)
     const [hasNext,     setHasNext]     = useState(!!config.initialData.next)
     const [search,      setSearch]      = useState("")
-    const [page,        setPage]        = useState(1)
     const [status,      setStatus]      = useState<FetchStatus>("idle")
 
-    const filtersRef = useRef(filters)
-    filtersRef.current = filters
+    const filtersRef      = useRef(filters)
+    filtersRef.current    = filters
 
-    const initialized = useRef(false)
+    const cachedItemsRef  = useRef(cachedItems)
+    cachedItemsRef.current = cachedItems
+
+    const searchRef       = useRef(search)
+    searchRef.current     = search
+
+    const initialized     = useRef(false)
+    const isFetching      = useRef(false)
+    const pageRef         = useRef(1)
+    const debounceTimer   = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     const filterKey = [
         filters.categories?.join(',')       ?? '',
@@ -111,69 +119,52 @@ const useTabState = <T>(
 
     const prevFilterKey = useRef(filterKey)
 
-    // Single fetch trigger — one state drives one effect, no effect races
-    const [fetchTrigger, setFetchTrigger] = useState<{
-        page:   number
-        search: string
-        append: boolean
-        nonce:  number
-    }>({ page: 1, search: "", append: false, nonce: 0 })
+    // fetchData in a ref — identity never changes, no stale closures
+    // reads all live values through refs
+    const fetchData = useRef(async (p: number, s: string, append: boolean) => {
+        if (isFetching.current) return
+        isFetching.current = true
 
-    // Core fetch effect — single dependency, stale-fetch cancellation
-    useEffect(() => {
-        if (!initialized.current) return
+        setStatus(append ? "loadingMore" : "loading")
 
-        const { page, search, append } = fetchTrigger
-        let cancelled = false
+        const result = await fetchPaginatedData<T>({
+            endpoint,
+            staticParams: config.staticParams,
+            filterParams: buildFilterParams(filtersRef.current),
+            page:   p,
+            search: s,
+        })
 
-        const run = async () => {
-            // Set status atomically before fetch starts — no intermediate states
-            setStatus(append ? "loadingMore" : "loading")
+        isFetching.current = false
 
-            const result = await fetchPaginatedData<T>({
-                endpoint,
-                staticParams: config.staticParams,
-                filterParams: buildFilterParams(filtersRef.current),
-                page,
-                search,
-            })
-
-            if (cancelled) return  // discard stale responses entirely
-
-            if (!result.success) {
-                // Set items and status together — one render, no flash
-                setItems([])
-                setStatus("error")
-                return
-            }
-
-            const newItems = result.results as T[]
-
-            if (newItems.length === 0 && !append) {
-                // Set items and status together — one render, no flash
-                setItems([])
-                setCount(0)
-                setHasNext(false)
-                setStatus("empty")
-                return
-            }
-
-            // Success path
-            setItems(prev => append ? [...prev, ...newItems] : newItems)
-            setCount(result.count)
-            setHasNext(!!result.next)
-            setStatus(append ? "idle" : "idle")
-
-            // Cache only when no search and no active filters — pure unfiltered results
-            if (!search && !hasActiveFilters(filtersRef.current)) {
-                setCachedItems(newItems)
-            }
+        if (!result.success) {
+            setItems([])
+            setStatus("error")
+            return
         }
 
-        run()
-        return () => { cancelled = true }
+        const newItems = result.results as T[]
 
-    }, [fetchTrigger])
+        if (newItems.length === 0 && !append) {
+            setItems([])
+            setCount(0)
+            setHasNext(false)
+            setTotalPages(0)
+            setStatus("empty")
+            return
+        }
+
+        setItems(prev => append ? [...prev, ...newItems] : newItems)
+        setCount(result.count)
+        setHasNext(!!result.next)
+        setTotalPages(result.total_pages ?? 1)
+        setStatus("idle")
+
+        // Only cache unfiltered, unsearched results — pure baseline data
+        if (!s && !hasActiveFilters(filtersRef.current)) {
+            setCachedItems(newItems)
+        }
+    })
 
     // Filter changes
     useEffect(() => {
@@ -181,58 +172,67 @@ const useTabState = <T>(
         if (prevFilterKey.current === filterKey) return
         prevFilterKey.current = filterKey
 
-        const filtersCleared = !hasActiveFilters(filters)
-
-        if (filtersCleared && !search) {
-            // All filters removed and no search — restore cache immediately, no fetch
-            setItems(cachedItems)
-            setCount(cachedItems.length)
+        if (!hasActiveFilters(filters) && !searchRef.current) {
+            pageRef.current = 1
+            setItems(cachedItemsRef.current)
+            // Use the real server count from cache, not items.length
+            setCount(cachedItemsRef.current.length)
             setHasNext(false)
+            setTotalPages(1)
             setStatus("idle")
             return
         }
 
+        // Reset search when filter changes
         setSearch("")
-        setPage(1)
-        setFetchTrigger({ page: 1, search: "", append: false, nonce: Date.now() })
+        searchRef.current = ""
+        pageRef.current = 1
+        fetchData.current(1, "", false)
     }, [filterKey])
 
-    // Init — must be last so all effects above see initialized=false on first flush
+    // Init — must be last so filter effect sees initialized=false on mount
     useEffect(() => {
         initialized.current = true
         return () => { initialized.current = false }
     }, [])
 
-    // Handlers
-
-    const handleSearch = (query: string) => {
+    const handleSearch = useCallback((query: string) => {
         const trimmed = query.trim()
 
+        if (debounceTimer.current) clearTimeout(debounceTimer.current)
+
         if (!trimmed) {
-            // Search cleared — restore cache immediately, no fetch
             setSearch("")
-            setPage(1)
-            setItems(cachedItems)
-            setCount(cachedItems.length)
+            searchRef.current = ""
+            pageRef.current = 1
+            setItems(cachedItemsRef.current)
+            setCount(cachedItemsRef.current.length)
             setHasNext(false)
-            setStatus(cachedItems.length === 0 ? "empty" : "idle")
+            setTotalPages(1)
+            setStatus(cachedItemsRef.current.length === 0 ? "empty" : "idle")
             return
         }
 
         setSearch(trimmed)
-        setPage(1)
-        setFetchTrigger({ page: 1, search: trimmed, append: false, nonce: Date.now() })
-    }
+        searchRef.current = trimmed
+        debounceTimer.current = setTimeout(() => {
+            pageRef.current = 1
+            fetchData.current(1, trimmed, false)
+        }, 400)
+    }, [])
 
-    const loadMore = () => {
-        if (!hasNext || status === "loadingMore") return
-        const nextPage = page + 1
-        setPage(nextPage)
-        setFetchTrigger(prev => ({ ...prev, page: nextPage, append: true }))
-    }
+
+    const loadMore = useCallback(() => {
+        if (!hasNext || status === "loadingMore" || isFetching.current) return
+        const nextPage = pageRef.current + 1
+        pageRef.current = nextPage
+        // searchRef.current always has the live search value — never stale
+        fetchData.current(nextPage, searchRef.current, true)
+    }, [hasNext, status])
+
 
     return {
-        items, cachedItems, count, hasNext,
+        items, cachedItems, count, totalPages, hasNext,
         status,
         isLoading:     status === "loading",
         isLoadingMore: status === "loadingMore",
