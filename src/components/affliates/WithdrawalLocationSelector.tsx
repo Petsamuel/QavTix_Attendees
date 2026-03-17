@@ -1,30 +1,29 @@
 "use client"
 
-import React, { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Icon } from "@iconify/react";
-import { space_grotesk } from "@/lib/fonts";
 import { Button } from "../ui/button";
 import BankAccountsList from "./BankAccountList";
-import WalletPreview from "./WalletPreview";
+// import WalletPreview from "./WalletPreview";
 import { AnimatedDialog } from "../custom-utils/dialogs/AnimatedDialog";
 import { DialogDescription, DialogTitle } from "../ui/dialog";
 
-type LocationType = 'wallet' | 'bank';
+type LocationType = 'bank';
 
 export default function WithdrawalLocationSelector({ setOpen, open }: { open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
 
     const [activeTab, setActiveTab] = useState<LocationType>('bank')
 
     const content = {
-        wallet: {
-            gradient: 'bg-brand-primary-6',
-            checkColor: 'text-brand-primary-6',
-            bgActive: 'bg-brand-primary-1',
-            title: 'To Wallet',
-            subtitle: 'Withdraw to your Wallet',
-            icon: 'ph:wallet-fill'
-        },
+        // wallet: {
+        //     gradient: 'bg-brand-primary-6',
+        //     checkColor: 'text-brand-primary-6',
+        //     bgActive: 'bg-brand-primary-1',
+        //     title: 'To Wallet',
+        //     subtitle: 'Withdraw to your Wallet',
+        //     icon: 'ph:wallet-fill'
+        // },
         bank: {
             gradient: 'bg-brand-primary-6',
             checkColor: 'text-brand-primary-6',
@@ -83,10 +82,8 @@ export default function WithdrawalLocationSelector({ setOpen, open }: { open: bo
                 </div>
 
                 <div className="min-h-35 flex flex-col gap-3">
-                    {activeTab === 'bank' ? (
+                    {activeTab === 'bank' && (
                         <BankAccountsList />
-                    ) : (
-                        <WalletPreview />
                     )}
                 </div>
 
