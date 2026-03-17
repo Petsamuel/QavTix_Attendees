@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react"
+import Image from "next/image"
 
 interface IActionButton1Props {
   className?: string
@@ -29,18 +30,17 @@ export default function ActionButton1({
             disabled={isButtonDisabled}
             onClick={action}
             className={`
-                text-xs
-                md:text-sm
+                text-sm
                 bg-brand-primary
                 hover:bg-brand-primary-7
                 active:bg-brand-primary-8
-                disabled:bg-brand-neutral-5
+                disabled:bg-brand-primary-5
                 disabled:cursor-not-allowed
                 text-white
                 py-3.5
                 px-6
                 rounded-[3em]
-                h-12 md:h-14
+                h-14
                 font-medium
                 transition-colors
                 inline-flex
@@ -50,10 +50,9 @@ export default function ActionButton1({
                 ${className}
             `}
             >
-            {isLoading === true ? (
+            {isLoading ? (
                 <span className="flex items-center gap-2">
-                <span className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                Loading...
+                    <Image src="/images/vectors/Interwind@1x-1.0s-259px-259px.svg" priority alt="loading" width={80} height={80} />
                 </span>
             ) : (
                 <>

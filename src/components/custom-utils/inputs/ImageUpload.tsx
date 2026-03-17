@@ -24,7 +24,12 @@ export default function ProfileImageUploader({
     // Update preview if initialImage changes from props
     useEffect(() => {
         if (initialImage) setPreviewUrl(initialImage);
-    }, [initialImage]);
+    }, [initialImage])
+
+
+    useEffect(() => {
+        if (!isEditing) setPreviewUrl(initialImage || null)
+    }, [isEditing])
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

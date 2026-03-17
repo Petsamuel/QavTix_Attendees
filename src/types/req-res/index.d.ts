@@ -53,3 +53,32 @@ interface AttendeeDashboardResponseData extends PaginatedResponse<EventTicket> {
 }
 
 type AttendeeDashboardResponse = ApiResponse<AttendeeDashboardResponseData>
+
+
+
+interface UserProfile {
+    id:               number
+    full_name:        string
+    email:            string
+    email_verified:   boolean
+    phone_number:     string
+    dob:              string | null
+    gender:           string
+    country:          string
+    state:            string
+    city:             string
+    profile_picture:  string | null
+    role:             string
+}
+
+interface UpdateProfilePayload {
+    full_name?:       string
+    phone_number?:    string
+    dob?:             string | null
+    gender?:          string
+    country?:         string
+    state?:           string
+    city?:            string
+    profile_picture?: string | null
+    role?:            string
+}
