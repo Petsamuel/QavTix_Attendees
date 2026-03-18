@@ -30,5 +30,13 @@ export const PAYMENT_ACCOUNTS_ENDPOINT = "attendee/payment/list"
 
 
 export const UPDATE_PROFILE_ENDPOINT = "attendee/profile/update/"
-export const TWO_FACTOR_ENDPOINT = "attendee/profile/twofactor"
+export const TWO_FACTOR_ENDPOINT = "attendee/profile/twofactor/"
 export const CHANGE_PASSWORD_ENDPOINT = "attendee/profile/change-password/"
+export const NOTIFICATION_SETTINGS_ENDPOINT = "attendee/profile/notifications/settings/"
+
+
+export const GET_GROUPS_ENDPOINT = "attendee/groups"
+export const CREATE_GROUP_ENDPOINT = "attendee/groups/create/"
+export const EDIT_GROUP_ENDPOINT = "attendee/groups/[group_id]/update/"
+export const DELETE_GROUP_ENDPOINT = "attendee/groups/[group_id]/delete/"
+export const DELETE_GROUP_MEMBER_ENDPOINT = "attendee/groups/[group_id]/remove-member/"

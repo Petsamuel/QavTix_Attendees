@@ -13,7 +13,8 @@ import PasswordInput from "@/components/custom-utils/inputs/PasswordInput"
 import PasswordStrengthIndicator from "@/components/custom-utils/security/PasswordStrengthIndicator"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
-import { changePassword, toggle2FAProvider, TwoFactorProvider } from "@/actions/settings/security"
+import { changePassword, toggle2FAProvider } from "@/actions/settings/security"
+import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
 
 interface Props {
     initialProviders: TwoFactorProvider[]
@@ -51,7 +52,7 @@ export default function SecurityPageForm({ initialProviders }: Props) {
                     : p
             ))
             dispatch(showAlert({
-                variant:     "default",
+                variant:     "success",
                 title:       enabling ? `${provider.name} enabled` : `${provider.name} disabled`,
                 description: enabling
                     ? `Two-factor authentication via ${provider.name} is now active.`
@@ -75,7 +76,7 @@ export default function SecurityPageForm({ initialProviders }: Props) {
         if (result.success) {
             reset()
             dispatch(showAlert({
-                variant:     "default",
+                variant:     "success",
                 title:       "Password updated",
                 description: "Your password has been changed successfully.",
             }))
@@ -153,7 +154,7 @@ export default function SecurityPageForm({ initialProviders }: Props) {
                                         {isToggling ? (
                                             <Icon
                                                 icon="eos-icons:three-dots-loading"
-                                                className="size-6 text-brand-primary-6"
+                                                className="size-10 text-brand-primary-6"
                                             />
                                         ) : (
                                             <Switch
@@ -206,20 +207,15 @@ export default function SecurityPageForm({ initialProviders }: Props) {
 
                         <PasswordStrengthIndicator password={newPassword} />
 
-                        <button
-                            type="submit"
-                            disabled={isSubmitting || !isDirty}
-                            className="px-6 py-4 w-full mt-7 rounded-md bg-brand-primary hover:bg-brand-primary-7 active:bg-brand-primary-8 hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 text-white font-medium text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 transition-all duration-150 flex items-center justify-center gap-2"
-                        >
-                            {isSubmitting ? (
-                                <Icon icon="eos-icons:three-dots-loading" className="size-5" />
-                            ) : (
-                                <>
-                                    <span>Update Password</span>
-                                    <Icon icon="lets-icons:arrow-right" width="24" height="24" />
-                                </>
-                            )}
-                        </button>
+                        <ActionButton1
+                            buttonText={isSubmitting ? "Updating..." : "Update Password"}
+                            className="rounded-lg w-full"
+                            iconPosition="right"
+                            buttonType="submit"
+                            icon={isSubmitting ? "eos-icons:three-dots-loading" : "gravity-ui:arrow-right"}
+                            isDisabled={isSubmitting}
+                            isLoading={isSubmitting}
+                        />
                     </form>
                 </div>
             </div>

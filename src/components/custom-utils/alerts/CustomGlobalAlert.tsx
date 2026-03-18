@@ -8,7 +8,7 @@ import { hideAlert } from '@/lib/redux/slices/alertSlice'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 const variantStyles = {
-  default: 'bg-secondary-6 border-border text-white',
+  default: 'bg-brand-secondary-6 border-border text-white',
   destructive: 'bg-gray-100 border-destructive/50 text-destructive',
   success: 'bg-green-50 border-green-500/50 text-green-800',
   warning: 'bg-yellow-50 border-yellow-500/50 text-yellow-800',
@@ -43,7 +43,7 @@ export default function CustomGlobalAlert() {
     const IconComponent = icon || variantIcons[variant as keyof typeof variantIcons]
 
     return (
-        <div className="fixed top-14 right-10 z-1000 w-fit max-w-xs px-4">
+        <div className="fixed top-24 md:top-14 right-2 md:right-10 z-1000 w-fit max-w-xs px-4">
             <Alert
                 variant={variant === 'default' ? 'default' : 'destructive'}
                 className={cn(

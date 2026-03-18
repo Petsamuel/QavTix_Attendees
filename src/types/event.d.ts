@@ -90,3 +90,20 @@ interface EventTicket {
     host:           string
     event_location: EventLocation
 }
+
+
+
+interface TicketGroup {
+    id:         string  // UUID
+    name:       string
+    owner:      number  // FK → User.id
+    members:    number[]  // M2M through GroupMember
+    created_at: string
+}
+
+interface GroupMember {
+    id:        number
+    group:     string  // FK → TicketGroup.id (UUID)
+    user:      number  // FK → User.id
+    joined_at: string
+}

@@ -13,10 +13,11 @@ import { useAppSelector } from "@/lib/redux/hooks"
 
 interface Props {
     account_balance?:  number
+    income_this_week?:  number
     withdrawalHistory: PaginatedResponse<WithdrawalHistoryItem>
 }
 
-export default function WithdrawalTabContent({ account_balance, withdrawalHistory }: Props) {
+export default function WithdrawalTabContent({ account_balance, income_this_week, withdrawalHistory }: Props) {
 
     const [showHistory,         setShowHistory]         = useState(true)
     const [showWithdrawalModal, setShowWithdrawalModal] = useState(false)
@@ -38,7 +39,10 @@ export default function WithdrawalTabContent({ account_balance, withdrawalHistor
                 <div className="w-full p-5 mt-6 shadow-[0px_5px_20px_0px_#3326AE14] bg-white rounded-lg border border-brand-neutral-2">
                     <div className="text-[11px] flex justify-between items-center">
                         <span className="text-brand-secondary-8">Amount in Naira</span>
-                        <span className="text-[#5F9F7D] font-medium">+N6200 This Week</span>
+                        {
+                            income_this_week &&
+                            <span className="text-[#5F9F7D] font-medium">{`+${income_this_week} This Week`}</span>
+                        }
                     </div>
 
                     <strong className={cn(space_grotesk.className, "block my-3 text-brand-secondary-8 font-bold text-2xl md:text-[40px]")}>

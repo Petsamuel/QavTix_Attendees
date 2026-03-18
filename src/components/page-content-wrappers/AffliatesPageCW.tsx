@@ -149,7 +149,7 @@ export default function AffliatesPageCW({ metrics, affiliateLinks, earningsHisto
                     )}
 
                     {activeTab === "withdrawal" && (
-                        <WithdrawalTabContent account_balance={metrics?.available_to_withdraw} withdrawalHistory={withdrawalHistory} />
+                        <WithdrawalTabContent income_this_week={metrics?.earnings_this_week} account_balance={metrics?.available_to_withdraw} withdrawalHistory={withdrawalHistory} />
                     )}
                 </DataDisplayTableWrapper>
             </section>

@@ -4,14 +4,6 @@ import { TWO_FACTOR_ENDPOINT, CHANGE_PASSWORD_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
 
-export interface TwoFactorProvider {
-    id:     string
-    name:   string
-    icon:   string
-    status: "connected" | "disconnected" | "not_connected"
-    email?: string
-}
-
 interface Get2FAResult {
     success:  boolean
     data?:    TwoFactorProvider[]
@@ -41,12 +33,12 @@ export async function get2FASettings(): Promise<Get2FAResult> {
 }
 
 export async function toggle2FAProvider(
-    providerId: string,
+    providerID: string,
     enable:     boolean,
 ): Promise<Toggle2FAResult> {
     try {
         const axiosInstance = await getServerAxios()
-        await axiosInstance.patch(`${TWO_FACTOR_ENDPOINT}/${providerId}`, { enabled: enable })
+        await axiosInstance.patch(`${TWO_FACTOR_ENDPOINT}`, { [providerID]: enable })
         return { success: true }
     } catch (error: any) {
         console.log("[toggle2FAProvider] status:", error?.response?.status)
