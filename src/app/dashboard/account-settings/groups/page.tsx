@@ -5,7 +5,7 @@ export default async function GroupSettingsPage() {
     const result = await getGroups()
 
     const groups = result.success && result.data
-        && result.data.results ? result.data.results 
+        && result.data ? result.data 
         : []
 
     return <GroupSettingsCW initialGroups={groups} />

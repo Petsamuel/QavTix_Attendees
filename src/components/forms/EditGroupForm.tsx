@@ -56,14 +56,14 @@ export default function EditGroupForm({ groupID, initialData }: Props) {
     }
 
     const onSubmit = async (values: EditGroupFormValues) => {
-        const result = await updateGroup(groupId, values)
+        const result = await updateGroup(groupID, values)
 
         if (result.success) {
             reset(values)   // update baseline so isDirty resets
             dispatch(showAlert({
                 variant:     "default",
                 title:       "Group updated",
-                description: `"${values.name}" has been saved.`,
+                description: `"${values.name}" has been updated.`,
             }))
         } else {
             dispatch(showAlert({

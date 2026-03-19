@@ -1,10 +1,11 @@
 "use server"
 
 import {
-    PRIVACY_SETTINGS_ENDPOINT,
     DOWNLOAD_DATA_ENDPOINT,
     DELETE_ACCOUNT_ENDPOINT,
-} from "@/endpoints"
+    GET_PRIVACY_SETTINGS_ENDPOINT,
+    SET_PRIVACY_SETTINGS_ENDPOINT
+} from "@/endpoints";
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
 import { cookies } from "next/headers"
@@ -20,7 +21,7 @@ interface PrivacyResult {
 export async function getPrivacySettings(): Promise<PrivacyResult> {
     try {
         const axiosInstance = await getServerAxios()
-        const { data } = await axiosInstance.get(PRIVACY_SETTINGS_ENDPOINT)
+        const { data } = await axiosInstance.get(GET_PRIVACY_SETTINGS_ENDPOINT)
         return { success: true, data: data.data ?? data }
     } catch (error: any) {
         console.log("[getPrivacySettings] status:", error?.response?.status)
@@ -34,7 +35,7 @@ export async function updatePrivacySettings(
 ): Promise<{ success: boolean; message?: string }> {
     try {
         const axiosInstance = await getServerAxios()
-        await axiosInstance.patch(PRIVACY_SETTINGS_ENDPOINT, payload)
+        await axiosInstance.patch(SET_PRIVACY_SETTINGS_ENDPOINT, payload)
         return { success: true }
     } catch (error: any) {
         console.log("[updatePrivacySettings] status:", error?.response?.status)

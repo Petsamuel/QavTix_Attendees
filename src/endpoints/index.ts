@@ -43,6 +43,13 @@ export const DELETE_GROUP_MEMBER_ENDPOINT = "attendee/groups/[group_id]/remove-m
 
 
 
-export const PRIVACY_SETTINGS_ENDPOINT = "attendee/privacy/activity/sharing"
-export const DOWNLOAD_DATA_ENDPOINT = "attendee/privacy/data/download"
+export const GET_PRIVACY_SETTINGS_ENDPOINT = "attendee/privacy/settings"
+export const SET_PRIVACY_SETTINGS_ENDPOINT = "attendee/privacy/activity/sharing"
+export const DOWNLOAD_DATA_ENDPOINT = "attendee/privacy/data/download/"
 export const DELETE_ACCOUNT_ENDPOINT = "attendee/privacy/account/delete"
+
+
+export const PAYOUT_ACCOUNTS_ENDPOINT = "attendee/payout/"
+
+
+export const PAYMENT_METHODS_ENDPOINT = "payments/cards/"

@@ -43,8 +43,8 @@ export default function GroupSettingsCW({ initialGroups }: Props) {
                             onClick={() => setIsCreating(true)}
                             className="flex items-center md:bg-brand-primary-1 p-2 rounded-lg justify-between text-xs font-bold gap-2 transition-opacity text-brand-primary-5 hover:text-brand-primary-7"
                         >
-                            <span className="size-11 md:size-7 aspect-square rounded-md flex justify-center items-center text-white bg-brand-primary-3">
-                                <Icon icon="hugeicons:add-01" width="30" className="md:w-4.5" />
+                            <span className="size-9 md:size-7 aspect-square rounded-md flex justify-center items-center text-white bg-brand-primary-3">
+                                <Icon icon="hugeicons:add-01" width="25" className="md:w-4.5" />
                             </span>
                             <span className="sr-only md:not-sr-only">New Group</span>
                         </button>

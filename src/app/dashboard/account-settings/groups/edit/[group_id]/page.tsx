@@ -17,7 +17,7 @@ export default async function EditGroupPage({ params }: Props) {
         notFound()
     }
 
-    const group = result.data.results.find(v => v.id === group_id)
+    const group = result.data.find(v => v.id === group_id)
 
     if (!group) {
         notFound()

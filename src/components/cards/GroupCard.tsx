@@ -46,7 +46,7 @@ export default function GroupCard({ group, onDelete }: Props) {
 
     return (
         <div className={cn(
-            "bg-white shadow-[0px_5.8px_23.17px_0px_#3326AE14] rounded-2xl p-5 border border-gray-100 flex flex-col gap-4 transition-opacity",
+            "bg-white shadow-[0px_5.8px_23.17px_0px_#3326AE14] rounded-xl p-5 border border-gray-100 flex flex-col gap-4 transition-opacity",
             isDeleting && "opacity-50 pointer-events-none"
         )}>
             <div className="flex items-start justify-between text-brand-secondary-9">
@@ -85,7 +85,7 @@ export default function GroupCard({ group, onDelete }: Props) {
             </div>
 
             <Badge className="text-brand-accent-4 bg-brand-accent-1 rounded-sm font-medium border-[0.8px] border-brand-accent-2 w-fit">
-                {group.members.length} member{group.members.length !== 1 ? "s" : ""}
+                Total Contribution Percentage Split = 100%
             </Badge>
         </div>
     )

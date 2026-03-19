@@ -8,7 +8,7 @@ export default async function AccountSettingsPage() {
     if (!result.success || !result.data) {
         throw new Error(result.message ?? "Failed to load profile.")
     }
-
+    
     return (
         <ProfileInformationForm profile={result.data} />
     )

@@ -27,7 +27,7 @@ const toFormValues = (profile: UserProfile): ProfileFormValues => ({
     email:        profile.email,
     phoneNumber:  profile.phone_number,
     gender:       profile.gender,
-    country:      countries.find(v => v.label.toLowerCase() === profile.country.toLowerCase() || v.value.toLowerCase() === profile.country.toLowerCase() || v.label.toLowerCase().trim().match(profile.country.toLocaleLowerCase().trim()))?.label || profile.country,
+    country:      countries.find(v => v.label.toLowerCase() === profile.country.toLowerCase() || v.value.toLowerCase() === profile.country.toLowerCase() || v.label.toLowerCase().trim().match(profile.country.toLocaleLowerCase().trim()))?.value || profile.country,
     state:        profile.state,
     city:         profile.city,
     dob:          profile.dob ? new Date(profile.dob) : undefined,
@@ -44,7 +44,7 @@ const toPayload = (values: ProfileFormValues): UpdateProfilePayload => {
         full_name:       values.fullName,
         phone_number:    values.phoneNumber,
         gender:          values.gender,
-        country:         values.country,
+        country:         countries.find(v => v.value.toLowerCase() === values.country.toLowerCase())?.label,
         state:           values.state,
         city:            values.city,
         dob:             values.dob

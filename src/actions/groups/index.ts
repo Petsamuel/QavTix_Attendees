@@ -19,7 +19,7 @@ export interface Group {
 
 interface GroupsResult {
     success:  boolean
-    data?:    PaginatedResponse<Group>
+    data?:    Group[]
     message?: string
 }
 

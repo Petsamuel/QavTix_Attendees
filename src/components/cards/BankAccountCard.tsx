@@ -1,39 +1,109 @@
-import { space_grotesk } from "@/lib/fonts";
-import { cn } from "@/lib/utils";
-import { Icon } from "@iconify/react";
-import Image from "next/image";
+"use client"
 
-export default function BankAccountCard(){
+import { useState } from "react"
+import { Icon } from "@iconify/react"
+import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
+import Image from "next/image"
+import { PayoutAccount, deletePayoutAccount } from "@/actions/payout"
+import { useAppDispatch } from "@/lib/redux/hooks"
+import { showAlert } from "@/lib/redux/slices/alertSlice"
+import { getBankLogoUrl } from "@/helper-fns/bankLogos"
+
+interface Props {
+    account:  PayoutAccount
+    onDelete: (id: string) => void
+}
+
+const BankLogo = ({ bankName }: { bankName: string }) => {
+    const logoUrl = getBankLogoUrl(bankName)
+    const [imgError, setImgError] = useState(false)
+
+    if (!logoUrl || imgError) {
+        return (
+            <div className="w-full h-full flex items-center justify-center bg-brand-neutral-2">
+                <Icon icon="ph:bank-fill" className="size-5 text-brand-neutral-6" />
+            </div>
+        )
+    }
+
+    return (
+        <Image
+            src={logoUrl}
+            width={40}
+            height={40}
+            alt={bankName}
+            className="object-contain w-full h-full"
+            onError={() => setImgError(true)}
+        />
+    )
+}
+
+
+
+export default function BankAccountCard({ account, onDelete }: Props) {
+
+    const dispatch    = useAppDispatch()
+    const [isDeleting, setIsDeleting] = useState(false)
+
+    const handleDelete = async () => {
+        if (isDeleting) return
+        setIsDeleting(true)
+
+        const result = await deletePayoutAccount(account.id)
+
+        if (result.success) {
+            onDelete(account.id)
+            dispatch(showAlert({
+                variant:     "default",
+                title:       "Account removed",
+                description: `${account.bank_name} ···· ${account.account_number.slice(-4)} has been removed.`,
+            }))
+        } else {
+            setIsDeleting(false)
+            dispatch(showAlert({
+                variant:     "destructive",
+                title:       "Could not remove account",
+                description: result.message ?? "Please try again.",
+            }))
+        }
+    }
+
     return (
         <div className={cn(
-            "w-full sm:w-75", 
-            "flex flex-col gap-4 p-6",
-            
-            "bg-white rounded-2xl border border-gray-100",
-            "shadow-[0px_6px_24px_rgba(51,38,174,0.08)]",
-            
-            "transition-all duration-300 ease-out",
-            "hover:shadow-[0px_12px_32px_rgba(51,38,174,0.12)]", 
-            "hover:-translate-y-1 hover:scale-[1.02]",
-            
-            "focus-within:ring-2 focus-within:ring-brand-primary-6/20"
-        )}>            
-            <div className="flex items-center gap-2">
-                <Image 
-                    src="/images/demo-images/bank-logo.png"
-                    width={50}
-                    height={50}
-                    className="size-6"
-                    alt=""
-                />
-                <p className="text-xs md:text-sm font-medium text-brand-secondary-9">First Bank Nigeria</p>
-            </div>
-            <h2 className={cn(space_grotesk.className, "text-2xl md:text-[30px] font-medium text-brand-secondary-9")}>0987654321</h2>
+            "bg-white shadow-[0px_5.8px_23.17px_0px_#3326AE14] rounded-2xl p-5 border border-gray-100 flex flex-col gap-3 w-full max-w-[18rem] transition-opacity",
+            isDeleting && "opacity-50 pointer-events-none"
+        )}>
+            <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-sm border border-gray-100 shrink-0 overflow-hidden">
+                    <BankLogo bankName={account.bank_name} />
+                </div>
 
-            <div className="flex items-center gap-2">
-                <Icon icon="bxs:user" width="24" height="24" className="text-brand-primary-4" />
-                <p className="text-xs text-brand-secondary-5 md:text-sm">Dominic Evans Onyebuchi</p>
+                <button
+                    type="button"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    aria-label="Remove account"
+                    className="p-2 rounded-full hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                >
+                    {isDeleting
+                        ? <Icon icon="eos-icons:three-dots-loading" className="size-5" />
+                        : <Icon icon="heroicons:trash" className="size-4" />
+                    }
+                </button>
             </div>
+
+            <div className="space-y-0.5">
+                <p className="text-sm font-bold text-brand-secondary-9">{account.account_number}</p>
+                <p className="text-xs text-brand-secondary-7">{account.account_name}</p>
+                <p className="text-[11px] text-brand-secondary-5">{account.bank_name}</p>
+            </div>
+
+            {account.is_default && (
+                <Badge className="w-fit text-[10px] bg-brand-primary-1 text-brand-primary-6 border border-brand-primary-2 shadow-none px-2 py-0.5 rounded-full font-semibold">
+                    Default
+                </Badge>
+            )}
         </div>
     )
 }

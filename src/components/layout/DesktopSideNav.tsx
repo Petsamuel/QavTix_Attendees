@@ -47,13 +47,17 @@ function DesktopSideNav() {
                                 >
                                     <Icon icon={v.icon || ""} width="20" height="20" />
                                     <span>{v.label}</span>
+
+                                    {
+                                        isActive &&
+                                        <Icon 
+                                            icon="basil:caret-right-outline" 
+                                            width="24" 
+                                            height="24" 
+                                            className={cn(isActive && isSettingsLink && isSettingsActive && "rotate-90" , "absolute right-1")} 
+                                        />
+                                    }
                                     
-                                    <Icon 
-                                        icon="basil:caret-right-outline" 
-                                        width="24" 
-                                        height="24" 
-                                        className={cn(isActive && isSettingsLink && isSettingsActive && "rotate-90" , "absolute right-1")} 
-                                    />
                                 </Link>
 
                                 {/* Dropdown Menu: Only renders/expands if isSettingsActive is true */}
