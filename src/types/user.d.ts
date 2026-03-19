@@ -10,3 +10,8 @@ type AuthUser = {
     email: string,
     phone: string
 }
+
+interface PrivacySettings {
+    show_events:    boolean
+    show_favorites: boolean
+}

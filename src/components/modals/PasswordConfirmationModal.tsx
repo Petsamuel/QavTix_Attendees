@@ -1,25 +1,32 @@
-"use client";
+"use client"
 
-import { FormEvent, useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { AnimatedDialog } from '../custom-utils/dialogs/AnimatedDialog';
-import { cn } from '@/lib/utils';
-import { closePasswordModal, resetPasswordStatus, setPasswordStatus, verifyPasswordSuccess } from '@/lib/redux/slices/passwordModalConfirmationSlice';
-import { usePathname } from 'next/navigation';
-import { Icon } from '@iconify/react';
-import ActionButton1 from '../custom-utils/buttons/ActionBtn1';
+import { FormEvent, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks"
+import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { AnimatedDialog } from "../custom-utils/dialogs/AnimatedDialog"
+import { cn } from "@/lib/utils"
+import { closePasswordModal, resetPasswordStatus, setPasswordStatus } from "@/lib/redux/slices/passwordModalConfirmationSlice"
+import { openSuccessModal } from "@/lib/redux/slices/successModalSlice"
+import { usePathname } from "next/navigation"
+import { Icon } from "@iconify/react"
+import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
+import { deleteAccount } from "@/actions/privacy"
+import { logOut, verifyPassword } from "@/actions/auth"
 
 export default function PasswordModal() {
 
+    const dispatch     = useAppDispatch()
+    const router       = useRouter()
+    const pathName     = usePathname()
+    const [password,      setPassword]      = useState("")
+    const [showPassword,  setShowPassword]  = useState(false)
+    const [isProcessing,  setIsProcessing]  = useState(false)
 
-    const dispatch = useAppDispatch()
-    const [password, setPassword] = useState("")
-    const pathName = usePathname()
-    const [showPassword, setShowPassword] = useState(false)
-    
-    const { isOpen, status } = useAppSelector((state) => state.passwordModal);
+    const { isOpen, status, lastVerifiedAction } = useAppSelector(state => state.passwordModal)
+    const { user } = useAppSelector(state => state.authUser)
 
+    // Close on route change
     useEffect(() => {
         if (isOpen) {
             dispatch(closePasswordModal())
@@ -29,27 +36,53 @@ export default function PasswordModal() {
 
     const handleConfirm = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if (!password) return;
+        if (!password || !user?.email) return
 
-        dispatch(setPasswordStatus('submitting'))
-        
-        try {
-            console.log("Password Verified");
-            
-            // This records the success and the actionType into lastVerifiedAction
-            dispatch(verifyPasswordSuccess())
-            setPassword("")
-        } catch (error) {
-            dispatch(setPasswordStatus('error'))
+        setIsProcessing(true)
+        dispatch(setPasswordStatus("submitting"))
+
+        const verifyResult = await verifyPassword(user.email, password)
+
+        if (!verifyResult.success) {
+            dispatch(setPasswordStatus("error"))
+            setIsProcessing(false)
+            return
         }
+
+        if (lastVerifiedAction === "delete_account") {
+            const deleteResult = await deleteAccount()
+
+            if (deleteResult.success) {
+                dispatch(closePasswordModal())
+                dispatch(openSuccessModal({
+                    title:       "Deletion Complete",
+                    description: "Your account has been permanently removed. Thank you for being with us.",
+                    variant:     "account_deleted",
+                    autoClose:   true,
+                    autoCloseDelay: 3000,
+                }))
+                setTimeout(async () => {
+                    await logOut()
+                }, 3200)
+            } else {
+                dispatch(setPasswordStatus("error"))
+                setIsProcessing(false)
+            }
+        }
+
+        setPassword("")
+        setIsProcessing(false)
     }
 
     return (
-        <AnimatedDialog 
-            open={isOpen} 
-            onOpenChange={() => dispatch(closePasswordModal())}
-            showCloseButton={false} 
-            className='md:max-w-sm py-4'
+        <AnimatedDialog
+            open={isOpen}
+            onOpenChange={() => {
+                dispatch(closePasswordModal())
+                setPassword("")
+            }}
+            showCloseButton={false}
+            className="md:max-w-sm py-4"
         >
             <DialogHeader className="flex flex-col items-center justify-center text-center mb-6">
                 <DialogTitle className="text-xl font-bold text-brand-secondary-9">
@@ -69,12 +102,12 @@ export default function PasswordModal() {
                         <input
                             type={showPassword ? "text" : "password"}
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={e => setPassword(e.target.value)}
                             placeholder="Enter password"
                             className={cn(
                                 "w-full h-12 px-4 rounded-md border-[1.4px] transition-all outline-none",
                                 "border-brand-primary-4 bg-brand-secondary-1 focus:border-brand-primary-6 focus:bg-white",
-                                status === 'error' && "border-red-500"
+                                status === "error" && "border-red-500"
                             )}
                         />
                         <button
@@ -85,13 +118,14 @@ export default function PasswordModal() {
                             <Icon icon={showPassword ? "hugeicons:view-off-slash" : "hugeicons:view"} width="20" />
                         </button>
                     </div>
-                    {status === 'error' && (
+                    {status === "error" && (
                         <p className="text-xs text-red-500 mt-2 text-center">Incorrect password. Please try again.</p>
                     )}
-                </div>           
+                </div>
 
                 <DialogFooter className="mt-8 flex flex-row gap-3">
                     <button
+                        type="button"
                         onClick={() => {
                             dispatch(closePasswordModal())
                             setPassword("")
@@ -100,11 +134,12 @@ export default function PasswordModal() {
                     >
                         Cancel
                     </button>
-                    <ActionButton1 
-                        buttonText='Yes, I am'
-                        buttonType='submit'
+                    <ActionButton1
+                        buttonText="Yes, I am"
+                        buttonType="submit"
                         isDisabled={!password}
-                        className='w-[55%]'
+                        isLoading={isProcessing}
+                        className="w-[55%]"
                     />
                 </DialogFooter>
             </form>

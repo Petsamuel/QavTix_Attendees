@@ -40,3 +40,9 @@ export const CREATE_GROUP_ENDPOINT = "attendee/groups/create/"
 export const EDIT_GROUP_ENDPOINT = "attendee/groups/[group_id]/update/"
 export const DELETE_GROUP_ENDPOINT = "attendee/groups/[group_id]/delete/"
 export const DELETE_GROUP_MEMBER_ENDPOINT = "attendee/groups/[group_id]/remove-member/"
+
+
+
+export const PRIVACY_SETTINGS_ENDPOINT = "attendee/privacy/activity/sharing"
+export const DOWNLOAD_DATA_ENDPOINT = "attendee/privacy/data/download"
+export const DELETE_ACCOUNT_ENDPOINT = "attendee/privacy/account/delete"
