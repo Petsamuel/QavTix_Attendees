@@ -30,7 +30,7 @@ export default function PaymentCard({ method, variant = "default", className }: 
     const { user }  = useAppSelector(store => store.authUser)
 
     return (
-        <div className={cn("w-[320px] shrink-0", className)}>
+        <div className={cn("max-w-77.5 sm:w-77.5 shrink-0", className)}>
             <div className="relative w-full rounded-2xl overflow-hidden select-none aspect-16/10">
 
                 {isDefault ? (
