@@ -13,6 +13,7 @@ export type FilterKey =
   | 'performance'
   | 'sortBy'
   | 'priceRange'
+  | 'isMineFilter'
 
 
 export const ALL_FILTERS = {
@@ -55,6 +56,11 @@ export const ALL_FILTERS = {
     value: 'priceRange',
     label: 'Price Range',
     icon: "hugeicons:dollar-square"
+  },
+  isMineFilter: {
+    value: 'isMineFilter',
+    label: 'Listing Types',
+    icon: "hugeicons:dollar-square"
   }
 } as const satisfies Record<FilterKey, TableDataDisplayFilter>
 
@@ -80,7 +86,8 @@ export const MarketplaceFiltersNTabsData = {
   filterOptions: [
     ALL_FILTERS.categories,
     ALL_FILTERS.dateRange,
-    ALL_FILTERS.priceRange
+    ALL_FILTERS.priceRange,
+    ALL_FILTERS.isMineFilter,
   ] as const,
   tabList: [] as const
 }

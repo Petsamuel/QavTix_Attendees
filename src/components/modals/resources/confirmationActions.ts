@@ -4,6 +4,7 @@ export const CONFIRMATION_ACTION_TYPES = {
     REACTIVATE_USER: 'REACTIVATE_USER',
     TRANSFER_TICKET: 'TRANSFER_TICKET',
     RESELL_TICKET: 'RESELL_TICKET',    
+    DELETE_GROUP: 'DELETE_GROUP',    
 } as const;
 
 export type ConfirmationActionType = keyof typeof CONFIRMATION_ACTION_TYPES;

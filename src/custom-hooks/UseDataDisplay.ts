@@ -4,21 +4,19 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { format } from "date-fns"
 import { fetchPaginatedData } from "@/actions/paginated-data"
 
-// Types
-
 export interface PageData<T> {
-    results:     T[]
-    count:       number
-    next:        number | null
-    previous:    number | null
+    results:      T[]
+    count:        number
+    next:         number | null
+    previous:     number | null
     total_pages?: number
 }
 
 export interface TabSlice<T> {
-    results:     T[]
-    count:       number
-    next:        number | null
-    previous:    number | null
+    results:      T[]
+    count:        number
+    next:         number | null
+    previous:     number | null
     total_pages?: number
 }
 
@@ -52,8 +50,6 @@ export interface TabState<T> {
     loadMore:      () => void
 }
 
-// Filter param builder
-
 const buildFilterParams = (filters: Partial<FilterValues>): Record<string, string> => {
     const params: Record<string, string> = {}
     if (filters.categories?.length)                                    params.category    = filters.categories.join(',')
@@ -63,6 +59,7 @@ const buildFilterParams = (filters: Partial<FilterValues>): Record<string, strin
     if (filters.priceRange?.max != null)                               params.max_price   = String(filters.priceRange.max)
     if (filters.status)                                                params.status      = filters.status
     if (filters.ticketType?.length)                                    params.ticket_type = filters.ticketType.join(',')
+    if (filters.isMineFilter != null)                                  params.is_mine     = String(filters.isMineFilter)
     return params
 }
 
@@ -74,10 +71,9 @@ const hasActiveFilters = (filters: Partial<FilterValues>): boolean =>
         filters.priceRange?.min ||
         filters.priceRange?.max ||
         filters.status ||
-        filters.ticketType?.length
+        filters.ticketType?.length ||
+        filters.isMineFilter != null
     )
-
-// Single tab hook
 
 const useTabState = <T>(
     config:   TabConfig<T>,
@@ -93,19 +89,19 @@ const useTabState = <T>(
     const [search,      setSearch]      = useState("")
     const [status,      setStatus]      = useState<FetchStatus>("idle")
 
-    const filtersRef      = useRef(filters)
-    filtersRef.current    = filters
+    const filtersRef       = useRef(filters)
+    filtersRef.current     = filters
 
-    const cachedItemsRef  = useRef(cachedItems)
+    const cachedItemsRef   = useRef(cachedItems)
     cachedItemsRef.current = cachedItems
 
-    const searchRef       = useRef(search)
-    searchRef.current     = search
+    const searchRef        = useRef(search)
+    searchRef.current      = search
 
-    const initialized     = useRef(false)
-    const isFetching      = useRef(false)
-    const pageRef         = useRef(1)
-    const debounceTimer   = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const initialized  = useRef(false)
+    const isFetching   = useRef(false)
+    const pageRef      = useRef(1)
+    const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     const filterKey = [
         filters.categories?.join(',')       ?? '',
@@ -115,12 +111,11 @@ const useTabState = <T>(
         filters.ticketType?.join(',')       ?? '',
         String(filters.priceRange?.min      ?? ''),
         String(filters.priceRange?.max      ?? ''),
+        String(filters.isMineFilter         ?? ''),   // was missing — caused mismatch
     ].join('|')
 
     const prevFilterKey = useRef(filterKey)
 
-    // fetchData in a ref — identity never changes, no stale closures
-    // reads all live values through refs
     const fetchData = useRef(async (p: number, s: string, append: boolean) => {
         if (isFetching.current) return
         isFetching.current = true
@@ -160,45 +155,57 @@ const useTabState = <T>(
         setTotalPages(result.total_pages ?? 1)
         setStatus("idle")
 
-        // Only cache unfiltered, unsearched results — pure baseline data
         if (!s && !hasActiveFilters(filtersRef.current)) {
             setCachedItems(newItems)
         }
     })
 
-    // Filter changes
+    // Filter effect with debug logs
     useEffect(() => {
-        if (!initialized.current) return
-        if (prevFilterKey.current === filterKey) return
+        console.log("[useDataDisplay] filter effect | initialized:", initialized.current)
+        console.log("[useDataDisplay] filterKey:", filterKey)
+        console.log("[useDataDisplay] prevFilterKey:", prevFilterKey.current)
+        console.log("[useDataDisplay] same?", prevFilterKey.current === filterKey)
+
+        if (!initialized.current) {
+            console.log("[useDataDisplay] skipping — not initialized yet")
+            return
+        }
+
+        if (prevFilterKey.current === filterKey) {
+            console.log("[useDataDisplay] skipping — filterKey unchanged")
+            return
+        }
+
         prevFilterKey.current = filterKey
+        console.log("[useDataDisplay] filter changed — hasActiveFilters:", hasActiveFilters(filters), "search:", searchRef.current)
 
         if (!hasActiveFilters(filters) && !searchRef.current) {
             pageRef.current = 1
             setItems(cachedItemsRef.current)
-            // Use the real server count from cache, not items.length
             setCount(cachedItemsRef.current.length)
             setHasNext(false)
             setTotalPages(1)
             setStatus("idle")
+            console.log("[useDataDisplay] restored cache, items:", cachedItemsRef.current.length)
             return
         }
 
-        // Reset search when filter changes
         setSearch("")
         searchRef.current = ""
         pageRef.current = 1
         fetchData.current(1, "", false)
     }, [filterKey])
 
-    // Init — must be last so filter effect sees initialized=false on mount
+    // INIT — must be LAST so filter effect sees initialized=false on mount
     useEffect(() => {
+        console.log("[useDataDisplay] INIT effect — setting initialized=true")
         initialized.current = true
         return () => { initialized.current = false }
     }, [])
 
     const handleSearch = useCallback((query: string) => {
         const trimmed = query.trim()
-
         if (debounceTimer.current) clearTimeout(debounceTimer.current)
 
         if (!trimmed) {
@@ -221,15 +228,12 @@ const useTabState = <T>(
         }, 400)
     }, [])
 
-
     const loadMore = useCallback(() => {
         if (!hasNext || status === "loadingMore" || isFetching.current) return
         const nextPage = pageRef.current + 1
         pageRef.current = nextPage
-        // searchRef.current always has the live search value — never stale
         fetchData.current(nextPage, searchRef.current, true)
     }, [hasNext, status])
-
 
     return {
         items, cachedItems, count, totalPages, hasNext,
@@ -241,8 +245,6 @@ const useTabState = <T>(
         search, handleSearch, loadMore,
     }
 }
-
-// Main hook
 
 export function useDataDisplay<T>(
     config:  UseDataDisplayConfig<T>,

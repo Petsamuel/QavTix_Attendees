@@ -75,7 +75,7 @@ export default function EventsCard(card: EventCardProps) {
                             >
                                 <span className="flex justify-center items-center rounded-full aspect-square size-7 bg-brand-primary-2">
                                     {isDelisting
-                                        ? <Icon icon="eos-icons:three-dots-loading" width="18" height="18" className="text-brand-primary-6" />
+                                        ? <Icon icon="eos-icons:three-dots-loading" width="22" height="22" className="text-brand-primary-6" />
                                         : <Icon icon="bytesize:trash" width="18" height="18" className="text-brand-primary-6" />
                                     }
                                 </span>

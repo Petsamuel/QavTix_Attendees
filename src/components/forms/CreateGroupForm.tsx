@@ -115,6 +115,7 @@ export default function CreateGroupForm({ onCreated, onCancel }: Props) {
                 {errors.members && <p className="text-xs text-red-500 mt-1">{errors.members.message}</p>}
             </div>
 
+
             <div className="flex gap-3 pt-2">
                 <button
                     type="button"

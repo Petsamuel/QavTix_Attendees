@@ -5,6 +5,7 @@ interface FilterValues {
     status: StatusOption["value"] | null
     categories: Category["value"][]
     ticketType: string[],
+    isMineFilter: boolean,
     priceRange?: PriceRange
     purchaseDate?: Date | null
 }

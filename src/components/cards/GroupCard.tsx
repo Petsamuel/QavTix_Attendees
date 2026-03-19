@@ -1,14 +1,21 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Icon } from "@iconify/react"
 import { Badge } from "../ui/badge"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { EDIT_GROUP } from "@/enums/navigation"
 import { Group, deleteGroup } from "@/actions/groups"
-import { useAppDispatch } from "@/lib/redux/hooks"
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
+import {
+    openConfirmation,
+    finishConfirmAction,
+    resetConfirmationStatus,
+    parseConfirmationSession,
+} from "@/lib/redux/slices/confirmationSlice"
+import { CONFIRMATION_ACTION_TYPES } from "@/components/modals/resources/confirmationActions"
 
 interface Props {
     group:    Group
@@ -19,29 +26,58 @@ export default function GroupCard({ group, onDelete }: Props) {
 
     const router   = useRouter()
     const dispatch = useAppDispatch()
+
     const [isDeleting, setIsDeleting] = useState(false)
 
-    const handleDelete = async () => {
-        if (isDeleting) return
-        setIsDeleting(true)
+    const { isConfirmed, sessionId } = useAppSelector(s => s.confirmation)
 
-        const result = await deleteGroup(group.id)
+    useEffect(() => {
+        if (!isConfirmed || !sessionId) return
 
-        if (result.success) {
-            onDelete(group.id)  // optimistic remove from parent list
-            dispatch(showAlert({
-                variant:     "default",
-                title:       "Group deleted",
-                description: `"${group.name}" has been removed.`,
-            }))
-        } else {
-            setIsDeleting(false)
-            dispatch(showAlert({
-                variant:     "destructive",
-                title:       "Could not delete group",
-                description: result.message ?? "Please try again.",
-            }))
+        const { actionType, parsedTargetId } = parseConfirmationSession(sessionId)
+
+        if (
+            actionType     !== CONFIRMATION_ACTION_TYPES.DELETE_GROUP ||
+            parsedTargetId !== group.id
+        ) return
+
+        const run = async () => {
+            setIsDeleting(true)
+            dispatch(finishConfirmAction())
+
+            const result = await deleteGroup(group.id)
+
+            if (result.success) {
+                onDelete(group.id)
+                dispatch(showAlert({
+                    variant:     "default",
+                    title:       "Group deleted",
+                    description: `"${group.name}" has been removed.`,
+                }))
+            } else {
+                setIsDeleting(false)
+                dispatch(showAlert({
+                    variant:     "destructive",
+                    title:       "Could not delete group",
+                    description: result.message ?? "Please try again.",
+                }))
+            }
+
+            dispatch(resetConfirmationStatus())
         }
+
+        run()
+    }, [isConfirmed, sessionId])
+
+    const handleDeleteClick = () => {
+        dispatch(openConfirmation({
+            actionType:  CONFIRMATION_ACTION_TYPES.DELETE_GROUP,
+            targetId:    group.id,
+            title:       "Delete Group",
+            description: `Are you sure you want to delete "${group.name}"? This cannot be undone.`,
+            confirmText: "Yes, delete it",
+            cancelText:  "Cancel",
+        }))
     }
 
     return (
@@ -69,14 +105,14 @@ export default function GroupCard({ group, onDelete }: Props) {
 
                     <button
                         type="button"
-                        onClick={handleDelete}
+                        onClick={handleDeleteClick}
                         disabled={isDeleting}
                         aria-label="Delete group"
                         className="group relative flex items-center justify-center bg-red-100 p-2.5 rounded-full transition-all duration-200 hover:bg-red-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <span className="size-6 p-1 aspect-square rounded-md flex justify-center items-center text-white bg-red-500 group-hover:bg-red-600 shadow-sm">
                             {isDeleting
-                                ? <Icon icon="eos-icons:three-dots-loading" width="18" height="18" />
+                                ? <Icon icon="eos-icons:three-dots-loading" width="22" height="22" />
                                 : <Icon icon="heroicons:trash" width="18" height="18" />
                             }
                         </span>

@@ -4,6 +4,7 @@ import CategoryFilter from "./CategoryFilter"
 import DateFilter from "./DateFilter"
 import { StatusFilter } from "./StatusFilter"
 import PriceFilter from "./PriceFilter"
+import { IsMineFilter } from "./IsMineFilter"
 
 type FilterComponentProps<T> = {
   value: T
@@ -34,5 +35,9 @@ export const filterRegistry: Partial<Record<FilterKey, FilterRegistryEntry<any>>
   priceRange: {
     component: PriceFilter,
     stateKey: 'priceRange'
+  },
+  isMineFilter: {
+    component: IsMineFilter,
+    stateKey: 'isMineFilter'
   },
 }
