@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader, DialogFooter } from "@/components/ui/dialog"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Icon } from "@iconify/react"
@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils"
 import { setDefaultPaymentMethod } from "@/actions/payment"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
+import { AnimatedDialog } from "../custom-utils/dialogs/AnimatedDialog"
+import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
 
 
 const BrandIcon = ({ brand }: { brand: string }) => {
@@ -82,21 +84,25 @@ export default function ChangeDefaultCardModal({ open, onOpenChange, methods, on
     }
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-88 rounded-2xl p-6">
-                <div className="text-center mb-6">
-                    <DialogTitle className="text-brand-secondary-9 font-bold text-base">
+        <AnimatedDialog
+                open={open}
+                showCloseButton={false}
+                onOpenChange={onOpenChange}
+                className='md:max-w-xs! py-2'
+            >
+                <DialogHeader className="text-center flex justify-center items-center">
+                    <DialogTitle className="text-base font-bold text-brand-secondary-9">
                         Select Default Card
                     </DialogTitle>
-                    <DialogDescription className="text-xs text-brand-secondary-5 mt-1">
+                    <DialogDescription className="text-xs text-center text-brand-secondary-6">
                         Choose your default card for quick payments
                     </DialogDescription>
-                </div>
+                </DialogHeader>
 
                 <RadioGroup
                     value={selectedId}
                     onValueChange={setSelectedId}
-                    className="space-y-3"
+                    className="space-y-3 mt-6"
                 >
                     {methods.map(method => {
                         const expiry = `${String(method.exp_month).padStart(2, "0")}/${method.exp_year}`
@@ -107,7 +113,8 @@ export default function ChangeDefaultCardModal({ open, onOpenChange, methods, on
                                 key={method.id}
                                 htmlFor={String(method.id)}
                                 className={cn(
-                                    "flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer",
+                                    "flex items-center gap-4 p-4 rounded-lg border transition-all cursor-pointer",
+                                    "shadow-[0px_5.02px_20.08px_0px_#3326AE14]",
                                     isSelected
                                         ? "border-brand-primary-4 bg-brand-primary-1/30"
                                         : "border-brand-neutral-3 hover:bg-brand-neutral-1"
@@ -117,7 +124,7 @@ export default function ChangeDefaultCardModal({ open, onOpenChange, methods, on
 
                                 <div className="flex-1 min-w-0">
                                     <p className="text-xs font-bold text-brand-secondary-9 font-mono tracking-wider">
-                                        •••• •••• •••• {method.last4}
+                                        **** **** **** {method.last4}
                                     </p>
                                     <p className="text-[10px] text-brand-secondary-5 mt-0.5">{expiry}</p>
                                 </div>
@@ -131,18 +138,17 @@ export default function ChangeDefaultCardModal({ open, onOpenChange, methods, on
                         )
                     })}
                 </RadioGroup>
-
-                <button
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className="mt-6 w-full h-12 rounded-full bg-brand-primary-6 hover:bg-brand-primary-7 text-white font-semibold text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                    {isSaving
-                        ? <Icon icon="eos-icons:three-dots-loading" className="size-6" />
-                        : "Save Changes"
-                    }
-                </button>
-            </DialogContent>
-        </Dialog>
+    
+                <DialogFooter className="mt-6 justify-center flex-row gap-3 sm:gap-3">
+                    <ActionButton1 
+                        action={handleSave}
+                        isDisabled={isSaving}
+                        isLoading={isSaving}
+                        buttonText="Save Changes"
+                        buttonType="button"
+                        className="w-full"
+                    />
+                </DialogFooter>
+            </AnimatedDialog>
     )
 }

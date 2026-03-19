@@ -13,8 +13,6 @@ interface ShareModalProps {
     title?:   string;
 }
 
-// ── Consts ────────────────────────────────────────────────────────────────────
-
 type SocialPlatform = {
     name:       string
     icon:       string
@@ -43,7 +41,6 @@ const buildShareHref = (name: string, encodedUrl: string, encodedFullText: strin
 const buildShareText = (title: string | undefined, shareUrl: string) =>
     encodeURIComponent(title ? `Check out ${title}! 🎉 Get your tickets now: ${shareUrl}` : `Check out this event! Get your tickets now: ${shareUrl}`)
 
-// ─────────────────────────────────────────────────────────────────────────────
 
 export default function ShareEventModal({ isOpen, onClose, shareUrl, title }: ShareModalProps) {
     const [copied, setCopied] = useState(false)
