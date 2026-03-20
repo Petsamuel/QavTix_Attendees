@@ -66,7 +66,7 @@ export function IsMineFilter({ value, onChange, icon }: IsMineFilterProps) {
                     "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:duration-400 data-[state=closed]:ease-in data-[state=closed]:zoom-out-90 data-[state=closed]:slide-out-to-top-4"
                 )}
             >
-                <p className="px-2 py-1.5 text-[10px] uppercase tracking-wider font-bold text-brand-neutral-5">
+                <p className="px-2 py-1.5 text-[10px] uppercase tracking-wider font-bold text-brand-neutral-7">
                     Filter By Owner
                 </p>
 
@@ -78,6 +78,7 @@ export function IsMineFilter({ value, onChange, icon }: IsMineFilterProps) {
                             onSelect={e => {
                                 e.preventDefault()
                                 onChange(option.value)
+                                setIsOpen(false)
                             }}
                             className={cn(
                                 "flex items-center gap-2.5 px-2 py-2.5 rounded-lg cursor-pointer transition-colors outline-none",
@@ -87,7 +88,7 @@ export function IsMineFilter({ value, onChange, icon }: IsMineFilterProps) {
                         >
                             <div className={cn(
                                 "size-8 rounded-lg flex items-center justify-center shrink-0",
-                                isSelected ? "bg-brand-primary-6" : "bg-brand-neutral-2"
+                                isSelected ? "bg-brand-primary-6" : "bg-brand-neutral-3"
                             )}>
                                 <Icon
                                     icon={option.icon}
