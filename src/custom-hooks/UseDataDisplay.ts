@@ -111,7 +111,7 @@ const useTabState = <T>(
         filters.ticketType?.join(',')       ?? '',
         String(filters.priceRange?.min      ?? ''),
         String(filters.priceRange?.max      ?? ''),
-        String(filters.isMineFilter         ?? ''),   // was missing — caused mismatch
+        String(filters.isMineFilter         ?? ''),
     ].join('|')
 
     const prevFilterKey = useRef(filterKey)
@@ -162,23 +162,16 @@ const useTabState = <T>(
 
     // Filter effect with debug logs
     useEffect(() => {
-        console.log("[useDataDisplay] filter effect | initialized:", initialized.current)
-        console.log("[useDataDisplay] filterKey:", filterKey)
-        console.log("[useDataDisplay] prevFilterKey:", prevFilterKey.current)
-        console.log("[useDataDisplay] same?", prevFilterKey.current === filterKey)
-
         if (!initialized.current) {
             console.log("[useDataDisplay] skipping — not initialized yet")
             return
         }
 
         if (prevFilterKey.current === filterKey) {
-            console.log("[useDataDisplay] skipping — filterKey unchanged")
             return
         }
 
         prevFilterKey.current = filterKey
-        console.log("[useDataDisplay] filter changed — hasActiveFilters:", hasActiveFilters(filters), "search:", searchRef.current)
 
         if (!hasActiveFilters(filters) && !searchRef.current) {
             pageRef.current = 1
@@ -187,7 +180,6 @@ const useTabState = <T>(
             setHasNext(false)
             setTotalPages(1)
             setStatus("idle")
-            console.log("[useDataDisplay] restored cache, items:", cachedItemsRef.current.length)
             return
         }
 
@@ -199,7 +191,6 @@ const useTabState = <T>(
 
     // INIT — must be LAST so filter effect sees initialized=false on mount
     useEffect(() => {
-        console.log("[useDataDisplay] INIT effect — setting initialized=true")
         initialized.current = true
         return () => { initialized.current = false }
     }, [])

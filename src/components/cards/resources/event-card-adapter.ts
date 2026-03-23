@@ -33,12 +33,6 @@ function formatLocation(loc: EventLocation): string {
     return parts.join(', ')
 }
 
-function formatDatetime(iso: string): string {
-    const d = new Date(iso)
-    return d.toLocaleDateString(undefined, {
-        weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
-    }) + ' · ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-}
 
 // From FavouriteEvent
 export function fromFavouriteEvent(e: FavouriteEvent): EventCardProps {
@@ -47,7 +41,7 @@ export function fromFavouriteEvent(e: FavouriteEvent): EventCardProps {
         title:         e.event_name,
         category:      e.category,
         host:          e.host,
-        date:          formatDatetime(e.event_datetime),
+        date:          e.event_datetime,
         location:      formatLocation(e.event_location),
         image:         e.event_image,
         price:         e.price,
@@ -72,7 +66,7 @@ export function fromIEvent(e: IEvent & {
         title:         e.title ?? '',
         category:      e.resolvedCategory ?? '',
         host:          e.organizer_display_name,
-        date:          formatDatetime(e.start_datetime),
+        date:          e.start_datetime,
         location:      e.resolvedLocation ?? '',
         image:         "",
         price:         e.resolvedPrice ?? null,

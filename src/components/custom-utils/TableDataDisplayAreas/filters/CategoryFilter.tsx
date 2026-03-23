@@ -19,22 +19,10 @@ interface CategoryFilterProps {
     categories?: Category[]
 }
 
-const defaultCategories: Category[] = [
-    { id: 1, name: 'all', value: 'all', label: 'All Events', count: 30 },
-    { id: 2, name: 'concerts', value: 'concerts', label: 'Concerts & Music', count: 30 },
-    { id: 3, name: 'sports', value: 'sports', label: 'Sport & Fitness', count: 30 },
-    { id: 4, name: 'arts', value: 'arts', label: 'Arts & Theater', count: 30 },
-    { id: 5, name: 'food', value: 'food', label: 'Food & Dining', count: 30 },
-    { id: 6, name: 'festivals', value: 'festivals', label: 'Festivals', count: 30 },
-    { id: 7, name: 'business', value: 'business', label: 'Business & Networking', count: 30 },
-    { id: 8, name: 'travel', value: 'travel', label: 'Travel & Tours', count: 30 },
-    { id: 9, name: 'nightlife', value: 'nightlife', label: 'Nightlife & Parties', count: 30 },
-]
-
 export default function CategoryFilter({
     value = [],
     onChange,
-    categories = defaultCategories,
+    categories = [],
 }: CategoryFilterProps) {
 
     
