@@ -104,7 +104,7 @@ export default function FavouritesPageCW({ initialData, categories }: Props) {
 
 
         if (displayType === "grid") return (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(14em,1fr))] md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,minmax(16em,1fr))] gap-y-6 gap-x-4 justify-items-center md:justify-items-start">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(14em,1fr))] p-1 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,minmax(16em,1fr))] gap-y-6 gap-x-4 justify-items-center md:justify-items-start">
                 {items.map((event) => (
                     <EventsCard key={event.id} {...fromFavouriteEvent(event)} />
                 ))}

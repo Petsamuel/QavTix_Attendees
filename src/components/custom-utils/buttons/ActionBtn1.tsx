@@ -36,10 +36,10 @@ export default function ActionButton1({
             className={`
                 text-sm
                 md:text-base
-                bg-primary
-                hover:bg-primary-7
-                active:bg-primary-8
-                disabled:bg-primary-5
+                bg-brand-primary
+                hover:bg-brand-primary-7
+                active:bg-brand-primary-8
+                disabled:bg-brand-primary-5
                 disabled:cursor-not-allowed
                 text-white
                 py-3.5

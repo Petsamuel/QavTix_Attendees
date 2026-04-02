@@ -9,6 +9,9 @@ type AuthUser = {
     role: UserRole
     email: string,
     phone: string
+    currency: string
+    subscription_status: "active" | "inactive" | "cancelled" | "trialing" | null
+    plan_expires_at: string | null
 }
 
 interface PrivacySettings {

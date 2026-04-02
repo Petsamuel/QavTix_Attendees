@@ -11,7 +11,7 @@ import { openSuccessModal } from "@/lib/redux/slices/successModalSlice"
 import { usePathname } from "next/navigation"
 import { Icon } from "@iconify/react"
 import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
-import { deleteAccount } from "@/actions/privacy"
+import { cancelPlan, deleteAccount } from "@/actions/privacy"
 import { logOut, verifyPassword } from "@/actions/auth"
 
 export default function PasswordModal() {
@@ -69,6 +69,24 @@ export default function PasswordModal() {
                 setIsProcessing(false)
             }
         }
+
+        else if (lastVerifiedAction === "cancel_plan") {
+            const cancelResult = await cancelPlan()
+
+            if (cancelResult.success) {
+                dispatch(closePasswordModal())
+                dispatch(openSuccessModal({
+                    title:          "Plan Cancelled",
+                    description:    "Your subscription has been cancelled. You'll retain access until the end of your billing period.",
+                    variant:        "success",
+                    autoClose:      true,
+                }))
+            } else {
+                dispatch(setPasswordStatus("error"))
+                setIsProcessing(false)
+            }
+        }
+
 
         setPassword("")
         setIsProcessing(false)

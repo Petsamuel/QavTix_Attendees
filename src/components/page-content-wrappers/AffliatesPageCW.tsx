@@ -18,6 +18,8 @@ import { AFFILIATE_EARNINGS_ENDPOINT, AFFILIATE_LINKS_ENDPOINT } from "@/endpoin
 import { useAppSelector } from "@/lib/redux/hooks"
 import { ApiCategory } from "@/actions/filters"
 import { deriveCategories } from "@/helper-fns/deriveCategories"
+import { PLATFORM_CURRENCY } from "@/components-data/currencies"
+import { useIsMounted } from "@/custom-hooks/UseIsMounted"
 
 interface Props {
     metrics:           AffiliateDashboardMetrics | null
@@ -33,7 +35,12 @@ export default function AffliatesPageCW({ metrics, affiliateLinks, earningsHisto
     const { filterOptions, tabList } = AffliatesPageFiltersNTabsData
     const [filters,   setFilters]   = useState<Partial<FilterValues>>({})
     const [activeTab, setActiveTab] = useState<typeof tabList[number]["value"]>("affiliate-links")
-    const { currency }              = useAppSelector(store => store.settings)
+    const { user } = useAppSelector(store => store.authUser)
+    const isMounted = useIsMounted()
+
+    const currency = isMounted
+        ? (user?.currency || PLATFORM_CURRENCY)
+        : PLATFORM_CURRENCY
 
     const { activeTabState: linksState } = useDataDisplay<AffiliateEvent>(
         {

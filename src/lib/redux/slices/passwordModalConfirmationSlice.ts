@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export type PasswordModalStateActionType = "delete_account" | "change_email" | "update_security";
+export type PasswordModalStateActionType = "delete_account" | "change_email" | "update_security" | "cancel_plan";
 
 interface PasswordModalState {
     isOpen: boolean;

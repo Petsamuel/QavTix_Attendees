@@ -47,9 +47,11 @@ export const GET_PRIVACY_SETTINGS_ENDPOINT = "attendee/privacy/settings"
 export const SET_PRIVACY_SETTINGS_ENDPOINT = "attendee/privacy/activity/sharing"
 export const DOWNLOAD_DATA_ENDPOINT = "attendee/privacy/data/download/"
 export const DELETE_ACCOUNT_ENDPOINT = "attendee/privacy/account/delete"
+export const CANCEL_PLAN_ENDPOINT = "payments/plans/cancel/"
 
 
-export const PAYOUT_ACCOUNTS_ENDPOINT = "attendee/payout/"
+export const PAYOUT_ACCOUNTS_ENDPOINT = "attendee/payouts/list"
+export const ADD_PAYOUT_ACCOUNT_ENDPOINT = "attendee/payouts/add/"
 
 
 export const PAYMENT_METHODS_ENDPOINT = "payments/cards/"

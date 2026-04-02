@@ -18,6 +18,7 @@ import {
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
 import SearchableSelect from "../custom-utils/inputs/CustomSearchableSelect"
+import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
 
 const addAccountSchema = z.object({
     bank_code:      z.string().min(1, "Select a bank"),
@@ -152,7 +153,7 @@ export default function AddBankAccountForm({ open, onOpenChange, banks, onAdded 
                         <div className="h-6 flex items-center px-1">
                             {verifyState === "verifying" && (
                                 <span className="flex items-center gap-1.5 text-xs text-brand-secondary-5">
-                                    <Icon icon="eos-icons:three-dots-loading" className="size-5 text-brand-primary-6" />
+                                    <Icon icon="eos-icons:three-dots-loading" className="size-8 text-brand-primary-6" />
                                     Verifying account...
                                 </span>
                             )}
@@ -182,16 +183,14 @@ export default function AddBankAccountForm({ open, onOpenChange, banks, onAdded 
                             Cancel
                         </button>
 
-                        <button
-                            type="submit"
-                            disabled={verifyState !== "verified" || isSubmitting}
-                            className="flex-1 px-6 py-3.5 rounded-[30px] bg-brand-primary hover:bg-brand-primary-7 active:bg-brand-primary-8 hover:shadow-md active:scale-[0.98] disabled:bg-brand-neutral-5 disabled:cursor-not-allowed disabled:opacity-60 text-white font-medium text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 transition-all duration-150 flex items-center justify-center gap-2"
-                        >
-                            {isSubmitting
-                                ? <Icon icon="eos-icons:three-dots-loading" className="size-5" />
-                                : "Confirm"
-                            }
-                        </button>
+
+                        <ActionButton1 
+                            isLoading={isSubmitting}
+                            isDisabled={verifyState !== "verified" || isSubmitting}
+                            className="flex-1"
+                            buttonType="submit"
+                            buttonText="Confirm"
+                        />
                     </div>
                 </form>
             </div>

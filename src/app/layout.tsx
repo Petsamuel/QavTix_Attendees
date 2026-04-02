@@ -1,5 +1,5 @@
-import { DEFAULT_LOCATION } from "@/components-data/settings.data"
 import "./globals.css"
+import { DEFAULT_LOCATION } from "@/components-data/settings.data"
 import DesktopHeaderSection from "@/components/layout/DesktopHeaderSection"
 import DesktopSideNav from "@/components/layout/DesktopSideNav"
 import MobileHeaderSection from "@/components/layout/MobileHeaderSection"

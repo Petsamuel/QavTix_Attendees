@@ -10,5 +10,6 @@ interface FavouriteEvent {
     event_status:    string
     attendees_count: number
     event_description: string
+    currency :      string
     price:           string
 }

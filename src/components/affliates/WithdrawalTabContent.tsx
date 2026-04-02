@@ -10,6 +10,7 @@ import WithdrawalHistoryTable from "../custom-utils/TableDataDisplayAreas/tables
 import WithdrawalLocationSelector from "./WithdrawalLocationSelector"
 import { formatPrice } from "@/helper-fns/formatPrice"
 import { useAppSelector } from "@/lib/redux/hooks"
+import { MIN_WITHDRAWAL } from "@/components-data/currencies"
 
 interface Props {
     account_balance?:  number
@@ -22,7 +23,7 @@ export default function WithdrawalTabContent({ account_balance, income_this_week
     const [showHistory,         setShowHistory]         = useState(true)
     const [showWithdrawalModal, setShowWithdrawalModal] = useState(false)
     const [amount,              setAmount]              = useState("")
-    const { currency } = useAppSelector(store => store.settings)
+    const { user } = useAppSelector(store => store.authUser)
 
     const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
         setAmount(e.target.value.replace(/[^0-9]/g, ""))
@@ -46,11 +47,11 @@ export default function WithdrawalTabContent({ account_balance, income_this_week
                     </div>
 
                     <strong className={cn(space_grotesk.className, "block my-3 text-brand-secondary-8 font-bold text-2xl md:text-[40px]")}>
-                        {account_balance ? formatPrice(account_balance, currency) : "---"}
+                        {account_balance ? formatPrice(account_balance, user?.currency) : "---"}
                     </strong>
 
                     <Badge className="bg-brand-accent-1 text-brand-accent-7 font-medium py-1 px-2 rounded-sm text-xs border-[0.86px] border-brand-accent-2 shadow-none">
-                        Minimum Withdrawal: N500,000
+                        Minimum Withdrawal: {formatPrice(MIN_WITHDRAWAL[user?.currency as keyof typeof MIN_WITHDRAWAL] || 1000, user?.currency)}
                     </Badge>
                 </div>
 
@@ -74,7 +75,7 @@ export default function WithdrawalTabContent({ account_balance, income_this_week
                         disabled={!amount}
                         className="h-12 bg-brand-primary-6 hover:bg-brand-primary-7 text-white shadow-sm w-full font-semibold"
                     >
-                        Withdraw {amount ? `₦${Number(amount).toLocaleString()}` : ""}
+                        Withdraw {amount ? `${formatPrice(Number(amount), user?.currency)}` : ""}
                     </Button>
                 </div>
             </div>

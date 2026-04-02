@@ -14,20 +14,33 @@ import { statusStyles, StatusStylesRecord } from './resources/event-status-style
 import { EventIconActionButton } from '../buttons/EventIconActionButton'
 import ShareEventModal from '@/components/modals/ShareEventModal'
 import { EventCardProps } from './resources/event-card-adapter'
-import { formatPrice } from '@/helper-fns/formatPrice'
+import { formatPrice, parsePrice } from '@/helper-fns/formatPrice'
 import { useAppSelector } from '@/lib/redux/hooks'
 import { useFavourite } from '@/custom-hooks/UseFavourite'
 import { usePathname } from 'next/navigation'
 import { formatEventDate } from '@/helper-fns/date-utils'
 import { delistTicket } from '@/actions/marketplace'
+import { mockAttendees } from '@/components-data/mock-attendees'
+import { EVENT_DETAILS_LINK, MARKETPLACE_EVENT_DETAILS_LINK } from '@/enums/navigation'
+import Link from 'next/link'
+import { useIsMounted } from '@/custom-hooks/UseIsMounted'
 
-export default function EventsCard(card: EventCardProps) {
+export default function EventsCard(card: EventCardProps & { eventCardFor?: "marketplace" | "global"}) {
 
-    const { currency } = useAppSelector(store => store.settings)
+    const { user }  = useAppSelector(store => store.authUser)
+    const isMounted = useIsMounted()
+
+    // Use undefined (platform default) until client has hydrated.
+    // This keeps server output and first client render identical,
+    // then updates to the user's real currency after mount.
+    const currency = isMounted ? user?.currency : undefined
+
     const [imageError,  setImageError]  = useState(false)
     const [showShare,   setShowShare]   = useState(false)
     const [isDelisting, setIsDelisting] = useState(false)
     const pathName = usePathname()
+
+    const displayCount = Math.min(card.attendees || 0, 3)
 
     const { isFavourite, toggle: toggleFavourite, feedbackMsg } = useFavourite(card.id, card.isFavourite)
 
@@ -53,34 +66,42 @@ export default function EventsCard(card: EventCardProps) {
 
     return (
         <>
-            <div
+            <Link
+                href={(card.eventCardFor === "marketplace" ? MARKETPLACE_EVENT_DETAILS_LINK : EVENT_DETAILS_LINK).replace("[event_id]", card.id)}
+                target="_blank"
                 className="block w-full max-w-72 p-3 relative min-h-[25em] rounded-[32px] border border-brand-neutral-6 bg-white hover:bg-brand-secondary-1 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-[1.5px] focus:ring-brand-accent-5 focus:ring-offset-[1.5px] group"
                 aria-label={`View event: ${card.title}`}
             >
                 <div className="flex flex-col h-full">
                     <div className="relative shrink-0">
-                        {!pathName.includes("marketplace") && card.status ?
-                            <span className={cn(
-                                "absolute top-2 shadow-sm left-2 z-10 py-1 px-2 rounded-2xl text-center text-xs font-medium capitalize",
-                                statusStyles[card.status as keyof StatusStylesRecord]?.bg,
-                                statusStyles[card.status as keyof StatusStylesRecord]?.text,
-                            )}>
-                                {card.status}
-                            </span>
-                            :
-                            <button
-                                onClick={handleDelist}
-                                disabled={isDelisting}
-                                className="absolute top-3 shadow-sm left-3 z-10 flex justify-center rounded-lg items-center p-2 h-9.5 bg-white text-xs gap-1.5 font-medium text-brand-secondary-9 disabled:opacity-70 disabled:cursor-not-allowed transition-opacity"
-                            >
-                                <span className="flex justify-center items-center rounded-full aspect-square size-7 bg-brand-primary-2">
-                                    {isDelisting
-                                        ? <Icon icon="eos-icons:three-dots-loading" width="22" height="22" className="text-brand-primary-6" />
-                                        : <Icon icon="bytesize:trash" width="18" height="18" className="text-brand-primary-6" />
-                                    }
+                        {!pathName.includes("marketplace") ?
+                            (
+                                card.status && 
+                                <span className={cn(
+                                    "absolute top-2 shadow-sm left-2 z-10 py-1 px-2 rounded-2xl text-center text-xs font-medium capitalize",
+                                    statusStyles[card.status as keyof StatusStylesRecord]?.bg,
+                                    statusStyles[card.status as keyof StatusStylesRecord]?.text,
+                                )}>
+                                    {card.status}
                                 </span>
-                                <span>{isDelisting ? "Delisting..." : "Delist Ticket"}</span>
-                            </button>
+                            )
+                            :
+                            (
+                                card.is_mine &&
+                                <button
+                                    onClick={handleDelist}
+                                    disabled={isDelisting}
+                                    className="absolute top-3 shadow-sm left-3 z-10 flex justify-center rounded-lg items-center p-2 h-9.5 bg-white text-xs gap-1.5 font-medium text-brand-secondary-9 disabled:opacity-70 disabled:cursor-not-allowed transition-opacity"
+                                >
+                                    <span className="flex justify-center items-center rounded-full aspect-square size-7 bg-brand-primary-2">
+                                        {isDelisting
+                                            ? <Icon icon="eos-icons:three-dots-loading" width="22" height="22" className="text-brand-primary-6" />
+                                            : <Icon icon="bytesize:trash" width="18" height="18" className="text-brand-primary-6" />
+                                        }
+                                    </span>
+                                    <span>{isDelisting ? "Delisting..." : "Delist Ticket"}</span>
+                                </button>
+                            )
                         }
 
                         <figure className="relative w-full aspect-4/3 h-40 rounded-4xl overflow-hidden">
@@ -153,21 +174,21 @@ export default function EventsCard(card: EventCardProps) {
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between pt-2">
-                            {(card.attendees?.length ?? 0) > 0 && (
-                                <div className="flex -space-x-2">
-                                    {card.attendees!.slice(0, 6).map((user) => (
+                        <div className="flex items-center flex-wrap justify-between pt-2 gap-2">
+                            {(card.attendees ?? 0) > 0 && (
+                                <div className="flex -space-x-1.5 shrink-0">
+                                    {mockAttendees.slice(displayCount).map((user) => (
                                         <Avatar key={user.id} className="ring-2 ring-background size-8">
                                             {user.profile_picture && <AvatarImage src={user.profile_picture} alt={user.full_name} />}
-                                            <AvatarFallback className={`${getAvatarColor(user.id.toString())} text-white font-medium text-xs`}>
+                                            <AvatarFallback className={`${getAvatarColor(user.id.toString())} text-white font-medium text-[10px]`}>
                                                 {getInitialsFromName(user.full_name)}
                                             </AvatarFallback>
                                         </Avatar>
                                     ))}
-                                    {card.attendees!.length > 4 && (
+                                    {card.attendees && card.attendees > 3 && (
                                         <Avatar className="ring-2 ring-background size-8">
-                                            <AvatarFallback className="bg-brand-primary-1 font-medium text-brand-secondary-7 text-xs">
-                                                +{card.attendees!.length - 4}
+                                            <AvatarFallback className="bg-primary-1 font-medium text-secondary-7 text-xs">
+                                                +{card.attendees - 3}
                                             </AvatarFallback>
                                         </Avatar>
                                     )}
@@ -175,19 +196,21 @@ export default function EventsCard(card: EventCardProps) {
                             )}
 
                             <div className="text-right shrink-0 ml-auto">
-                                {card.originalPrice && (
-                                    <p className="text-xs text-brand-neutral-6 line-through">{formatPrice(parseInt(card.originalPrice), currency)}</p>
+                                {card.originalPrice && parsePrice(card.originalPrice) != null && (
+                                    <p className="text-xs text-neutral-6 line-through">
+                                        {formatPrice(parsePrice(card.originalPrice)!, currency)}
+                                    </p>
                                 )}
-                                {card.price && (
-                                    <p className={`${space_grotesk.className} font-medium text-lg text-brand-secondary-9`}>
-                                        {formatPrice(parseInt(card.price), currency)}
+                                {card.price && parsePrice(card.price) != null && (
+                                    <p className={`${space_grotesk.className} font-semibold text-lg text-secondary-9`}>
+                                        {formatPrice(parsePrice(card.price)!, currency)}
                                     </p>
                                 )}
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </Link>
 
             <ShareEventModal
                 isOpen={showShare}

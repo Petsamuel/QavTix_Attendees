@@ -19,7 +19,7 @@ export default function TicketResellFormModal({ open, setOpen, ticket, onResell 
     const [rawValue,     setRawValue]     = useState("")  // numeric string sent to API: "1500000"
     const [error,        setError]        = useState("")
 
-    const { currency } = useAppSelector(state => state.settings)
+    const { user } = useAppSelector(state => state.authUser)
 
     const handleClose = () => {
         setDisplayValue("")
@@ -64,7 +64,7 @@ export default function TicketResellFormModal({ open, setOpen, ticket, onResell 
                     <div className="text-right">
                         <p className="text-[11px] text-brand-secondary-4">Orig. Price</p>
                         <p className="font-bold text-sm text-brand-secondary-9">
-                            {formatPrice(parseInt(ticket.original_price), currency)}
+                            {formatPrice(parseInt(ticket.original_price), user?.currency)}
                         </p>
                     </div>
                 </div>

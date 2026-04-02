@@ -1,6 +1,6 @@
 "use server"
 
-import { PAYOUT_ACCOUNTS_ENDPOINT } from "@/endpoints"
+import { ADD_PAYOUT_ACCOUNT_ENDPOINT, PAYOUT_ACCOUNTS_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
 
@@ -12,11 +12,6 @@ export interface PayoutAccount {
     is_default:     boolean
 }
 
-interface PayoutResult {
-    success:  boolean
-    data?:    PayoutAccount[]
-    message?: string
-}
 
 interface MutateResult {
     success:  boolean
@@ -102,7 +97,7 @@ export async function addPayoutAccount(payload: {
 }): Promise<MutateResult> {
     try {
         const axiosInstance = await getServerAxios()
-        const { data } = await axiosInstance.post(PAYOUT_ACCOUNTS_ENDPOINT, payload)
+        const { data } = await axiosInstance.post(ADD_PAYOUT_ACCOUNT_ENDPOINT, payload)
         return { success: true, data: data.data ?? data }
     } catch (error: any) {
         console.log("[addPayoutAccount] status:", error?.response?.status)

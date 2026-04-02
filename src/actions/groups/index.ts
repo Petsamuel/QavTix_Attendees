@@ -33,7 +33,11 @@ export async function getGroups(): Promise<GroupsResult> {
     try {
         const axiosInstance = await getServerAxios()
         const { data } = await axiosInstance.get(GET_GROUPS_ENDPOINT)
-        return { success: true, data: data.data ?? data }
+
+        const raw = data.data ?? data
+        const groups = Array.isArray(raw) ? raw : []
+
+        return { success: true, data: groups }
     } catch (error: any) {
         console.log("[getGroups] status:", error?.response?.status)
         console.log("[getGroups] body:", JSON.stringify(error?.response?.data))

@@ -54,3 +54,5 @@ export type NavigationKey = keyof typeof NAVIGATION_LINKS;
 
 export const HOST_PROFILE_LINK = `${process.env.NEXT_PUBLIC_APP_DOMAIN}/host/profile/[host_id]` as const;
 export const EXPLORE_EVENT_LINK = `${process.env.NEXT_PUBLIC_APP_DOMAIN}/events` as const;
+export const EVENT_DETAILS_LINK = `${process.env.NEXT_PUBLIC_APP_DOMAIN}/events/details/[event_id]/` as const;
+export const MARKETPLACE_EVENT_DETAILS_LINK = `${process.env.NEXT_PUBLIC_APP_DOMAIN}/events/marketplace/[event_id]/` as const;

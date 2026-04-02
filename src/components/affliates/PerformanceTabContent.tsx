@@ -10,6 +10,8 @@ import { getAffiliatePerformanceAll } from "@/actions/affiliates"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { buildAffiliateMetricStats } from "@/helper-fns/buildMetricsConfig"
 import ChartLoader from "../loaders/ChartLoader"
+import { PLATFORM_CURRENCY } from "@/components-data/currencies"
+import { useIsMounted } from "@/custom-hooks/UseIsMounted"
 
 type TimeFilter = "week" | "month" | "year"
 
@@ -22,11 +24,16 @@ interface Props {
 
 export default function PerformanceTabContent({ initialData }: Props) {
 
-    const { currency }    = useAppSelector(store => store.settings)
+    const { user }    = useAppSelector(store => store.authUser)
     const [allData,       setAllData]       = useState<AllPerformanceData>(initialData)
     const [activeFilter,  setActiveFilter]  = useState<TimeFilter>("year")
     const [selectedYear,  setSelectedYear]  = useState(String(CURRENT_YEAR))
     const [isPending,     startTransition]  = useTransition()
+    const isMounted = useIsMounted()
+
+    const currency = isMounted
+        ? (user?.currency || PLATFORM_CURRENCY)
+        : PLATFORM_CURRENCY
 
     // Active data for stat cards — always the currently visible filter
     const activeData = allData[activeFilter]
