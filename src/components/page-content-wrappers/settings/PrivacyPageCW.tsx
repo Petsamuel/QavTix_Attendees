@@ -1,12 +1,12 @@
 "use client"
 
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { ToggleItem } from "@/components/custom-utils/inputs/CustomToggleItem"
 import { cn } from "@/lib/utils"
 import { space_grotesk } from "@/lib/fonts"
 import { useForm } from "react-hook-form"
 import ActionButton1 from "@/components/custom-utils/buttons/ActionBtn1"
-import { useAppDispatch } from "@/lib/redux/hooks"
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks"
 import { openPasswordModal } from "@/lib/redux/slices/passwordModalConfirmationSlice"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
 import {
@@ -18,23 +18,43 @@ interface Props {
     initialSettings: PrivacySettings
 }
 
+const PLAN_STATUS_STYLES: Record<string, string> = {
+    active:    "bg-green-50  text-green-700  border-green-200",
+    trialing:  "bg-blue-50   text-blue-700   border-blue-200",
+    cancelled: "bg-neutral-100 text-neutral-500 border-neutral-200",
+    expired:   "bg-red-50    text-red-600    border-red-200",
+}
+
+const PLAN_STATUS_LABEL: Record<string, string> = {
+    active:    "Active",
+    trialing:  "Trial",
+    cancelled: "Cancelled",
+    expired:   "Expired",
+}
+
 export default function PrivacySettingsPageCW({ initialSettings }: Props) {
 
-    const dispatch      = useAppDispatch()
-    const [anyLoading,  setAnyLoading]  = useState(false)
+    const dispatch = useAppDispatch()
+    const [anyLoading,    setAnyLoading] = useState(false)
     const [isDownloading, setIsDownloading] = useState(false)
+
+    const activePlan = useAppSelector(state => state.authUser.user?.subscription_status ?? null)
+    const planExpiresAt = useAppSelector(state => state.authUser.user?.plan_expires_at ?? null)
+
+    const hasCancellablePlan =
+        activePlan === "active" || activePlan === "trialing"
 
     const { control, getValues } = useForm({
         defaultValues: {
             showEvents:     initialSettings.show_events,
             allowFavorites: initialSettings.show_favorites,
-        },
+        }
     })
 
     const save = useCallback(async () => {
         setAnyLoading(true)
-        const values  = getValues()
-        const result  = await updatePrivacySettings({
+        const values = getValues()
+        const result = await updatePrivacySettings({
             show_events:    values.showEvents,
             show_favorites: values.allowFavorites,
         })
@@ -64,6 +84,14 @@ export default function PrivacySettingsPageCW({ initialSettings }: Props) {
         }))
     }
 
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    if (!mounted) return null;
+
     return (
         <main className="w-full pt-8 pb-16">
             <h2 className={cn(space_grotesk.className, "text-lg font-bold text-brand-secondary-9 mb-12")}>
@@ -71,7 +99,6 @@ export default function PrivacySettingsPageCW({ initialSettings }: Props) {
             </h2>
 
             <div className="space-y-14">
-                {/* Activity Sharing */}
                 <section className="space-y-6">
                     <header>
                         <h3 className="text-base font-bold text-brand-secondary-9">Activity Sharing:</h3>
@@ -98,7 +125,61 @@ export default function PrivacySettingsPageCW({ initialSettings }: Props) {
                     </div>
                 </section>
 
-                {/* Download Data */}
+                <section className="space-y-6">
+                    <header>
+                        <h3 className="text-base font-bold text-brand-secondary-9">Subscription Plan</h3>
+                        <p className="text-sm text-brand-secondary-9 font-medium">
+                            Your current plan and billing status
+                        </p>
+                    </header>
+                    <div className="w-full border-t-[1.5px] border-dashed border-brand-secondary-2" />
+
+                    {activePlan ? (
+                        <div className="flex flex-col gap-4 max-w-[15em]">
+                            {/* Plan card */}
+                            <div className="flex items-center justify-between rounded-xl border border-brand-secondary-2 bg-brand-secondary-1/40 px-4 py-3">
+                                <div className="flex flex-col gap-0.5">
+                                    {planExpiresAt && activePlan === "active" && (
+                                        <span className="text-xs text-brand-secondary-5">
+                                            Expires {new Date(planExpiresAt).toLocaleDateString("en-US", {
+                                                month: "long", day: "numeric", year: "numeric",
+                                            })}
+                                        </span>
+                                    )}
+                                    {activePlan === "cancelled" && (
+                                        <span className="text-xs text-brand-secondary-5">
+                                            No longer renewing
+                                        </span>
+                                    )}
+                                </div>
+                                <span className={cn(
+                                    "text-xs font-semibold px-2.5 py-1 rounded-full border",
+                                    PLAN_STATUS_STYLES[activePlan] ?? PLAN_STATUS_STYLES.expired
+                                )}>
+                                    {PLAN_STATUS_LABEL[activePlan] ?? activePlan}
+                                </span>
+                            </div>
+
+                            {hasCancellablePlan && (
+                                <ActionButton1
+                                    action={() => dispatch(openPasswordModal("cancel_plan"))}
+                                    buttonText="Cancel Plan"
+                                    buttonType="button"
+                                    icon="hugeicons:cancel-circle"
+                                    className="h-12! text-sm! rounded-md font-semibold bg-transparent border border-red-300 text-red-600! hover:bg-red-50! active:bg-red-100 focus:ring-2! focus:ring-red-300! focus:outline-0"
+                                    iconPosition="left"
+                                />
+                            )}
+                        </div>
+                    ) : (
+                        <div className="flex items-center rounded-xl border border-dashed border-brand-secondary-3 bg-brand-secondary-1/20 px-4 py-3 max-w-sm">
+                            <span className="text-xs text-brand-secondary-5">
+                                You don't have an active subscription plan.
+                            </span>
+                        </div>
+                    )}
+                </section>
+
                 <section className="space-y-6">
                     <header>
                         <h3 className="text-base font-bold text-brand-secondary-9">Download My Data</h3>
@@ -118,7 +199,6 @@ export default function PrivacySettingsPageCW({ initialSettings }: Props) {
                     />
                 </section>
 
-                {/* Delete Account */}
                 <section className="space-y-6">
                     <header>
                         <h3 className="text-base font-bold text-brand-secondary-9">Delete My Account</h3>
@@ -136,6 +216,7 @@ export default function PrivacySettingsPageCW({ initialSettings }: Props) {
                         iconPosition="left"
                     />
                 </section>
+
             </div>
         </main>
     )

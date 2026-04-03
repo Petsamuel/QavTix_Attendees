@@ -3,6 +3,9 @@
 import { PAYMENT_ACCOUNTS_ENDPOINT, PAYMENT_METHODS_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
+import { revalidateTag } from "next/cache"
+import { CACHE_TAGS } from "@/cache-tags"
+import { cookies } from "next/headers"
 
 interface GetPaymentAccountsResult {
     success:  boolean
@@ -12,16 +15,33 @@ interface GetPaymentAccountsResult {
 
 export async function getPaymentAccounts(): Promise<GetPaymentAccountsResult> {
     try {
-        const axiosInstance = await getServerAxios()
-        const { data } = await axiosInstance.get(PAYMENT_ACCOUNTS_ENDPOINT)
-        return { success: true, data: data.data }
+        const cookieStore = await cookies()
+        const accessToken = cookieStore.get("access_token")?.value
+
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/${PAYMENT_ACCOUNTS_ENDPOINT}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                },
+                next: { tags: [CACHE_TAGS.PAYMENT_ACCOUNTS] },
+            }
+        )
+
+        if (!res.ok) {
+            const json = await res.json()
+            return { success: false, message: handleApiError(json) }
+        }
+
+        const json = await res.json()
+        return { success: true, data: json.data }
+
     } catch (error: any) {
-        console.log("[getPaymentAccounts] status:", error?.response?.status)
-        console.log("[getPaymentAccounts] body:", JSON.stringify(error?.response?.data))
-        return { success: false, message: handleApiError(error?.response?.data) }
+        console.log("[getPaymentAccounts] error:", error)
+        return { success: false, message: "Failed to load payment accounts." }
     }
 }
-
 
 interface PaymentMethodsResult {
     success:  boolean
@@ -36,14 +56,32 @@ interface MutateResult {
 
 export async function getPaymentMethods(): Promise<PaymentMethodsResult> {
     try {
-        const axiosInstance = await getServerAxios()
-        const { data } = await axiosInstance.get(PAYMENT_METHODS_ENDPOINT)
-        const results = data.data?.results ?? data.results ?? data.data ?? data
+        const cookieStore = await cookies()
+        const accessToken = cookieStore.get("access_token")?.value
+
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/${PAYMENT_METHODS_ENDPOINT}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                },
+                next: { tags: [CACHE_TAGS.PAYMENT_METHODS] },
+            }
+        )
+
+        if (!res.ok) {
+            const json = await res.json()
+            return { success: false, message: handleApiError(json) }
+        }
+
+        const json = await res.json()
+        const results = json.data?.results ?? json.results ?? json.data ?? json
         return { success: true, data: Array.isArray(results) ? results : [] }
+
     } catch (error: any) {
-        console.log("[getPaymentMethods] status:", error?.response?.status)
-        console.log("[getPaymentMethods] body:", JSON.stringify(error?.response?.data))
-        return { success: false, message: handleApiError(error?.response?.data) }
+        console.log("[getPaymentMethods] error:", error)
+        return { success: false, message: "Failed to load payment methods." }
     }
 }
 
@@ -51,6 +89,7 @@ export async function setDefaultPaymentMethod(methodID: number): Promise<MutateR
     try {
         const axiosInstance = await getServerAxios()
         await axiosInstance.patch(`${PAYMENT_METHODS_ENDPOINT}/${methodID}/default/`)
+        revalidateTag(CACHE_TAGS.PAYMENT_METHODS, "max")
         return { success: true }
     } catch (error: any) {
         console.log("[setDefaultPaymentMethod] status:", error?.response?.status)
@@ -63,6 +102,7 @@ export async function deletePaymentMethod(methodId: number): Promise<MutateResul
     try {
         const axiosInstance = await getServerAxios()
         await axiosInstance.delete(`${PAYMENT_METHODS_ENDPOINT}/${methodId}/`)
+        revalidateTag(CACHE_TAGS.PAYMENT_METHODS, "max")
         return { success: true }
     } catch (error: any) {
         console.log("[deletePaymentMethod] status:", error?.response?.status)

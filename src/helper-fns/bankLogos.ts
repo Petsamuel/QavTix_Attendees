@@ -1,6 +1,3 @@
-// Maps common Nigerian bank names (lowercase) to their official domain
-// Used to fetch logos via a public logo API
-
 const NIGERIAN_BANK_DOMAINS: Record<string, string> = {
     // Tier 1
     "access bank":               "accessbankplc.com",
@@ -57,21 +54,21 @@ const NIGERIAN_BANK_DOMAINS: Record<string, string> = {
     "suntrust bank":             "suntrustng.com",
 }
 
+const FAVICON_URL = (domain: string) =>
+    `https://www.google.com/s2/favicons?sz=64&domain=${domain}`
 
 export function getBankLogoUrl(bankName: string): string | null {
-    const key    = bankName.toLowerCase().trim()
-    const domain = NIGERIAN_BANK_DOMAINS[key]
+    const key = bankName.toLowerCase().trim()
 
     // Exact match
-    if (domain) return `https://logo.clearbit.com/${domain}`
+    const exact = NIGERIAN_BANK_DOMAINS[key]
+    if (exact) return FAVICON_URL(exact)
 
-    // Partial match — find the first key that the bank name contains or is contained by
+    // Partial match — stored key is a substring of the bank name, or vice versa
     const partialKey = Object.keys(NIGERIAN_BANK_DOMAINS).find(
         k => key.includes(k) || k.includes(key)
     )
-    if (partialKey) return `https://logo.clearbit.com/${NIGERIAN_BANK_DOMAINS[partialKey]}`
+    if (partialKey) return FAVICON_URL(NIGERIAN_BANK_DOMAINS[partialKey])
 
-    // Unknown bank — Clearbit may still have it by guessing the domain
-    // Return null so caller shows placeholder
     return null
 }

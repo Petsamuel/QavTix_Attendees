@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
                 { status: res.status }
             )
         }
-
+        
         return NextResponse.json({ user: json.data }, { status: 200 })
 
     } catch {

@@ -8,10 +8,10 @@ interface EventLocation {
 }
 
 
-type EventType         = "single" | "recurring"
+type EventType = "single" | "recurring"
 type EventLocationType = "physical" | "online" | "tba"
-type EventStatus       = "draft" | "active" | "sold-out" | "new" | "ended" | "cancelled" | "banned" | "filling-fast" | "selling-fast" | "near-capacity" | "starts-soon"
-type RefundPolicy      = "no" | "partial" | "full" | "custom"
+type EventStatus  = "draft" | "active" | "sold-out" | "new" | "ended" | "cancelled" | "banned" | "filling-fast" | "selling-fast" | "near-capacity" | "starts-soon"
+type RefundPolicy = "no" | "partial" | "full" | "custom"
 
 interface Tag {
     id:   number
@@ -49,6 +49,7 @@ interface IEvent {
     host:                    number  // FK → Host.id
     status:                  EventStatus
     created_at:              string
+    currency:                string
     updated_at:              string
     views_count:             number
     saves_count:             number
@@ -87,6 +88,7 @@ interface EventTicket {
     ticket_type:    string
     event_datetime: string
     original_price: string
+    currency:       string
     host:           string
     event_location: EventLocation
 }

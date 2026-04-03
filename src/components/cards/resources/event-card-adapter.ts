@@ -1,7 +1,5 @@
 // Add fields here as the card grows. Never put raw API models in the card.
 
-import { mockAttendees } from "@/components-data/mock-attendees"
-
 export interface EventCardProps {
     id:            string
     title:         string
@@ -13,9 +11,10 @@ export interface EventCardProps {
     price:         string | null
     originalPrice: string | null
     status:        string | null   // displayed as a badge
-    attendees?:    EventCardAttendee[]
-    isFavourite?:   boolean,
-    is_mine?:       boolean
+    attendees?:    number
+    isFavourite?:  boolean
+    is_mine?:      boolean
+    currency?:     string          // ISO code e.g. "NGN", "USD", "GBP"
 }
 
 export interface EventCardAttendee {
@@ -24,17 +23,12 @@ export interface EventCardAttendee {
     profile_picture: string | null
 }
 
-// Adapters
-// One function per source type. Each one maps its own shape → EventCardProps.
-// The card only ever receives EventCardProps — it never touches raw models.
-
 function formatLocation(loc: EventLocation): string {
     const parts = [loc.venue_name, loc.city, loc.state].filter(Boolean)
     return parts.join(', ')
 }
 
 
-// From FavouriteEvent
 export function fromFavouriteEvent(e: FavouriteEvent): EventCardProps {
     return {
         id:            e.id,
@@ -47,19 +41,17 @@ export function fromFavouriteEvent(e: FavouriteEvent): EventCardProps {
         price:         e.price,
         originalPrice: null,
         status:        e.event_status,
-        attendees:     mockAttendees
+        attendees:     e.attendees_count,
+        currency:      e.currency ?? undefined,
     }
 }
 
-// From IEvent
 export function fromIEvent(e: IEvent & {
-    // IEvent is the host-side model — it doesn't carry display-ready price/location.
-    // Caller passes resolved extras rather than duplicating lookup logic here.
-    resolvedCategory?: string
-    resolvedLocation?: string
-    resolvedPrice?:    string
+    resolvedCategory?:      string
+    resolvedLocation?:      string
+    resolvedPrice?:         string
     resolvedOriginalPrice?: string
-    attendees?: EventCardAttendee[]
+    attendees?:             number
 }): EventCardProps {
     return {
         id:            e.id,
@@ -68,15 +60,15 @@ export function fromIEvent(e: IEvent & {
         host:          e.organizer_display_name,
         date:          e.start_datetime,
         location:      e.resolvedLocation ?? '',
-        image:         "",
+        image:         '',
         price:         e.resolvedPrice ?? null,
         originalPrice: e.resolvedOriginalPrice ?? null,
         status:        e.status ?? null,
-        attendees:     mockAttendees,
+        attendees:     e.attendees,
         isFavourite:   false,
+        currency:      e.currency ?? undefined,
     }
 }
-
 
 export function fromMarketplaceEvent(e: MarketplaceEvent): EventCardProps {
     return {
@@ -91,7 +83,9 @@ export function fromMarketplaceEvent(e: MarketplaceEvent): EventCardProps {
         originalPrice: null,
         status:        e.status,
         isFavourite:   e.is_favorite,
-        is_mine:       e.is_mine
+        is_mine:       e.is_mine,
+        attendees:     e.attendees_count,
+        currency:      e.currency ?? undefined,
     }
 }
 
@@ -108,5 +102,6 @@ export function fromAffiliateEvent(e: AffiliateEvent): EventCardProps {
         originalPrice: null,
         status:        e.event_status,
         isFavourite:   false,
+        currency:      e.currency ?? undefined,
     }
 }

@@ -5,7 +5,7 @@ import { getServerAxios } from "@/lib/axios"
 export interface FetchParams {
     endpoint:     string
     staticParams: Record<string, string>
-    filterParams: Record<string, string>
+    filterParams: Record<string, string | string[]>
     page:         number
     search:       string
 }
@@ -23,7 +23,7 @@ export async function fetchPaginatedData<T>(params: FetchParams): Promise<FetchR
     try {
         const axiosInstance = await getServerAxios()
 
-        const requestParams = {
+        const requestParams: Record<string, any> = {
             ...params.staticParams,
             ...params.filterParams,
             page: params.page,

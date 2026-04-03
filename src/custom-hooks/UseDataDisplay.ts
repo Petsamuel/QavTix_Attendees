@@ -50,16 +50,16 @@ export interface TabState<T> {
     loadMore:      () => void
 }
 
-const buildFilterParams = (filters: Partial<FilterValues>): Record<string, string> => {
-    const params: Record<string, string> = {}
-    if (filters.categories?.length)                                    params.category    = filters.categories.join(',')
-    if (filters.dateRange?.from)                                       params.start_date  = format(new Date(filters.dateRange.from), 'yyyy-MM-dd')
-    if (filters.dateRange?.to)                                         params.end_date    = format(new Date(filters.dateRange.to),   'yyyy-MM-dd')
-    if (filters.priceRange?.min != null && filters.priceRange.min > 0) params.min_price   = String(filters.priceRange.min)
-    if (filters.priceRange?.max != null)                               params.max_price   = String(filters.priceRange.max)
-    if (filters.status)                                                params.status      = filters.status
-    if (filters.ticketType?.length)                                    params.ticket_type = filters.ticketType.join(',')
-    if (filters.isMineFilter != null)                                  params.is_mine     = String(filters.isMineFilter)
+const buildFilterParams = (filters: Partial<FilterValues>): Record<string, string | string[]> => {
+    const params: Record<string, string | string[]> = {}
+    if (filters.categories?.length)                                    params.category     = filters.categories
+    if (filters.dateRange?.from)                                       params.start_date   = format(new Date(filters.dateRange.from), 'yyyy-MM-dd')
+    if (filters.dateRange?.to)                                         params.end_date     = format(new Date(filters.dateRange.to),   'yyyy-MM-dd')
+    if (filters.priceRange?.min != null && filters.priceRange.min > 0) params.min_price    = String(filters.priceRange.min)
+    if (filters.priceRange?.max != null)                               params.max_price    = String(filters.priceRange.max)
+    if (filters.status)                                                params.status       = filters.status
+    if (filters.ticketType?.length)                                    params.ticket_type  = filters.ticketType
+    if (filters.isMineFilter != null)                                  params.is_mine      = String(filters.isMineFilter)
     return params
 }
 
@@ -160,10 +160,8 @@ const useTabState = <T>(
         }
     })
 
-    // Filter effect with debug logs
     useEffect(() => {
         if (!initialized.current) {
-            console.log("[useDataDisplay] skipping — not initialized yet")
             return
         }
 
@@ -189,7 +187,6 @@ const useTabState = <T>(
         fetchData.current(1, "", false)
     }, [filterKey])
 
-    // INIT — must be LAST so filter effect sees initialized=false on mount
     useEffect(() => {
         initialized.current = true
         return () => { initialized.current = false }

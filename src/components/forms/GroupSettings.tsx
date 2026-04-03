@@ -14,7 +14,7 @@ interface Props {
 
 export default function GroupSettingsCW({ initialGroups }: Props) {
 
-    const [groups,setGroups]     = useState<Group[]>(initialGroups)
+    const [groups,setGroups]  = useState<Group[]>(initialGroups)
     const [isCreating, setIsCreating] = useState(false)
 
     const handleCreated = (newGroup: Group) => {

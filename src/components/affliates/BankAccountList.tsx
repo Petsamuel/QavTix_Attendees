@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group"
@@ -41,17 +41,19 @@ const BankLogo = ({ bankName }: { bankName: string }) => {
 
 interface Props {
     onSelect?: (account: PaymentAccount) => void
+    isLoading: boolean
+    setIsLoading: Dispatch<SetStateAction<boolean>>
 }
 
-export default function BankAccountsList({ onSelect }: Props) {
+export default function BankAccountsList({ onSelect, isLoading, setIsLoading }: Props) {
 
     const [accounts,    setAccounts]    = useState<PaymentAccount[]>([])
-    const [isLoading,   setIsLoading]   = useState(true)
     const [isError,     setIsError]     = useState(false)
     const [selectedId,  setSelectedId]  = useState<string>("")
 
     useEffect(() => {
         const load = async () => {
+            setIsLoading(true)
             const res = await getPaymentAccounts()
             if (res.success && res.data) {
                 setAccounts(res.data.results)

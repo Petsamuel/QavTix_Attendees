@@ -1,5 +1,5 @@
 import { formatPrice } from "@/helper-fns/formatPrice"
-import { Currency } from "@/lib/redux/slices/settingsSlice"
+
 
 export interface MetricConfig {
     id:              string
@@ -7,7 +7,7 @@ export interface MetricConfig {
     description:     string
     icon:            string
     iconColor:       string
-    valueFormatter?: (value: number, currency: Currency) => string
+    valueFormatter?: (value: number, currency: string) => string
 }
 
 // My Tickets
@@ -148,25 +148,25 @@ export const AFFILIATE_METRICS_CONFIG = [
         id:             "clicks",
         label:          "Total Clicks",
         iconPath:       "/images/vectors/aff-mtc1.svg",
-        valueFormatter: (v: number, _currency?: Currency) => v.toLocaleString(),
+        valueFormatter: (v: number, _currency?: string) => v.toLocaleString(),
     },
     {
         id:             "sales",
         label:          "Total Sales",
         iconPath:       "/images/vectors/aff-mtc2.svg",
-        valueFormatter: (v: number, _currency?: Currency) => v.toLocaleString(),
+        valueFormatter: (v: number, _currency?: string) => v.toLocaleString(),
     },
     {
         id:             "rate",
         label:          "Conversion Rate",
         iconPath:       "/images/vectors/aff-mtc3.svg",
-        valueFormatter: (v: number, _currency?: Currency) => `${v.toFixed(1)}%`,
+        valueFormatter: (v: number, _currency?: string) => `${v.toFixed(1)}%`,
     },
     {
         id:             "earnings",
         label:          "Total Earnings",
         iconPath:       "/images/vectors/dollar-in.svg",
-        valueFormatter: (v: number, currency?: Currency) => formatPrice(v, currency!),
+        valueFormatter: (v: number, currency?: string) => formatPrice(v, currency!),
     },
 ] as const
 

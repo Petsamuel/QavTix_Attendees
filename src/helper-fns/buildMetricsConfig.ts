@@ -1,10 +1,10 @@
 import { AffiliateMetricId, MetricConfig } from "@/components/cards/resources/metrics-config"
-import { Currency } from "@/lib/redux/slices/settingsSlice"
+
 
 export function buildMetricsFromConfig(
     config:   Record<string, MetricConfig>,
     apiData:  Record<string, any>,
-    currency: Currency,
+    currency: string,
 ) {
     return Object.keys(config).map(key => {
         const metricConfig = config[key]

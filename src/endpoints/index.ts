@@ -24,13 +24,15 @@ export const AFFILIATE_LINKS_ENDPOINT       = "attendee/affliate/event"
 export const AFFILIATE_EARNINGS_ENDPOINT    = "attendee/affliate/earning/history"
 export const AFFILIATE_PERFORMANCE_ENDPOINT = "attendee/affliate/graph"
 export const WITHDRAWAL_HISTORY_ENDPOINT = "attendee/withdrawal/history"
+export const WITHDRAWAL_REQUEST_ENDPOINT = "attendee/withdrawal/request/"
 
 
 export const PAYMENT_ACCOUNTS_ENDPOINT = "attendee/payment/list"
 
 
 export const UPDATE_PROFILE_ENDPOINT = "attendee/profile/update/"
-export const TWO_FACTOR_ENDPOINT = "attendee/profile/twofactor/"
+export const UPDATE_TWO_FACTOR_ENDPOINT = "attendee/profile/twofactor/"
+export const GET_TWO_FACTOR_ENDPOINT = "attendee/profile/twofactor/info/"
 export const CHANGE_PASSWORD_ENDPOINT = "attendee/profile/change-password/"
 export const NOTIFICATION_SETTINGS_ENDPOINT = "attendee/profile/notifications/settings/"
 
@@ -47,9 +49,11 @@ export const GET_PRIVACY_SETTINGS_ENDPOINT = "attendee/privacy/settings"
 export const SET_PRIVACY_SETTINGS_ENDPOINT = "attendee/privacy/activity/sharing"
 export const DOWNLOAD_DATA_ENDPOINT = "attendee/privacy/data/download/"
 export const DELETE_ACCOUNT_ENDPOINT = "attendee/privacy/account/delete"
+export const CANCEL_PLAN_ENDPOINT = "payments/attendee-plans/cancel/"
 
 
-export const PAYOUT_ACCOUNTS_ENDPOINT = "attendee/payout/"
+export const PAYOUT_ACCOUNTS_ENDPOINT = "attendee/payouts/list"
+export const ADD_PAYOUT_ACCOUNT_ENDPOINT = "attendee/payouts/add/"
 
 
 export const PAYMENT_METHODS_ENDPOINT = "payments/cards/"

@@ -21,10 +21,10 @@ export const INITIAL_PROVIDERS: AuthProvider[] = [
         status: "disconnected",
         icon: "/images/vectors/facebook.svg",
     },
-    {
-        id: "apple",
-        name: "Apple",
-        status: "not_connected",
-        icon: "/images/vectors/apple.svg",
-    },
+    // {
+    //     id: "apple",
+    //     name: "Apple",
+    //     status: "not_connected",
+    //     icon: "/images/vectors/apple.svg",
+    // },
 ]

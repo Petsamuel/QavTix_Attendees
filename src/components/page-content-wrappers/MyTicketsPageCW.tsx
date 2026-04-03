@@ -17,52 +17,64 @@ import { ATTENDEE_DASHBOARD_ENDPOINT } from "@/endpoints"
 import { TabSlice, useDataDisplay } from "@/custom-hooks/UseDataDisplay"
 import { deriveCategories } from "@/helper-fns/deriveCategories"
 import { ApiCategory } from "@/actions/filters"
-
+import { PLATFORM_CURRENCY } from "@/components-data/currencies"
+import { useIsMounted } from "@/custom-hooks/UseIsMounted"
 
 
 interface MyTicketsPageCWProps {
-    metrics:   AttendeeDashboardMetrics
+    metrics:    AttendeeDashboardMetrics
     categories: ApiCategory[]
-    upcoming:  TabSlice<EventTicket>
-    past:      TabSlice<EventTicket>
-    cancelled: TabSlice<EventTicket>
+    upcoming:   TabSlice<EventTicket>
+    past:       TabSlice<EventTicket>
+    cancelled:  TabSlice<EventTicket>
 }
 
 export default function MyTicketsPageCW({ metrics, categories, upcoming, past, cancelled }: MyTicketsPageCWProps) {
 
     const { filterOptions, tabList } = MyTicketsFiltersNTabsData
-    const [filters,   setFilters]   = useState<Partial<FilterValues>>({
+    const [filters, setFilters] = useState<Partial<FilterValues>>({
         dateRange:  { from: undefined, to: undefined },
         categories: [],
     })
     const [activeTab, setActiveTab] = useState<typeof tabList[number]["value"]>("upcoming")
-    const { currency } = useAppSelector(store => store.settings)
+
+    const { user }    = useAppSelector(store => store.authUser)
+    const isMounted   = useIsMounted()
+
+    const currency = isMounted
+        ? (user?.currency || PLATFORM_CURRENCY)
+        : PLATFORM_CURRENCY
 
     const { tabStates, activeTabState } = useDataDisplay<EventTicket>(
         {
             endpoint: ATTENDEE_DASHBOARD_ENDPOINT,
             tabs: [
-                { key: "upcoming",  initialData: upcoming,  staticParams: { event_status: "active"   } },
-                { key: "past",      initialData: past,      staticParams: { past:         "true"      } },
-                { key: "cancelled", initialData: cancelled, staticParams: { event_status: "cancelled" } },
+                { key: "upcoming",  initialData: upcoming,  staticParams: { event_status: "active"    } },
+                { key: "past",      initialData: past,      staticParams: { past:          "true"      } },
+                { key: "cancelled", initialData: cancelled, staticParams: { event_status: "cancelled"  } },
             ],
             activeTab,
         },
         filters,
     )
 
-    // Enrich API categories with counts from the active tab's cached items
     const availableCategories = useMemo(
         () => deriveCategories(categories, activeTabState.cachedItems),
         [categories, activeTabState.cachedItems]
     )
 
-    const analyticsMetrics = buildMetricsFromConfig(myTicketsMetricsConfig, {
-        "total-earnings":   metrics.total_earnings,
-        "total-spent":      metrics.total_spent,
-        "ticket-purchased": metrics.tickets_purchased,
-        "upcoming-events":  metrics.upcoming_events,
-    }, currency)
+    // currency is stable on the server (PLATFORM_CURRENCY) and only updates
+    // after mount — so formatPrice will never produce a server/client mismatch.
+    const analyticsMetrics = useMemo(
+        () => buildMetricsFromConfig(myTicketsMetricsConfig, {
+            "total-earnings":   metrics.total_earnings,
+            "total-spent":      metrics.total_spent,
+            "ticket-purchased": metrics.tickets_purchased,
+            "upcoming-events":  metrics.upcoming_events,
+        }, currency),
+        // Re-format whenever the real currency arrives post-mount
+        [metrics, currency]
+    )
 
     return (
         <main className="mt-6 pb-12">
@@ -70,10 +82,17 @@ export default function MyTicketsPageCW({ metrics, categories, upcoming, past, c
                 <h2 className={cn(space_grotesk.className, "text-brand-secondary-8 font-bold text-lg")}>Overview</h2>
                 <div className="flex gap-6 items-center">
                     <button className="text-brand-primary-6 font-bold text-sm hidden md:inline-block">Complete Profile</button>
-                    <ExportButton1 showFormatSelector={false} />
+                    <ExportButton1
+                        data={activeTabState.cachedItems}
+                        filename={`my-tickets-${activeTab}`}
+                        showFormatSelector={false}
+                    />
                 </div>
             </div>
-            <button className="text-brand-primary-6 font-bold text-sm mb-4 md:hidden">Complete Profile</button>
+            {
+                !user?.is_completed && 
+                <button className="text-brand-primary-6 font-bold text-sm mb-4 md:hidden">Complete Profile</button>
+            }
 
             <AnalyticsMetricsCardsContainer metrics={analyticsMetrics} />
 

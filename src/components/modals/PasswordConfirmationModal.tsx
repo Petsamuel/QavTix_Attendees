@@ -11,27 +11,33 @@ import { openSuccessModal } from "@/lib/redux/slices/successModalSlice"
 import { usePathname } from "next/navigation"
 import { Icon } from "@iconify/react"
 import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
-import { deleteAccount } from "@/actions/privacy"
+import { cancelPlan, deleteAccount } from "@/actions/privacy"
 import { logOut, verifyPassword } from "@/actions/auth"
+import { showAlert } from "@/lib/redux/slices/alertSlice"
 
 export default function PasswordModal() {
 
-    const dispatch     = useAppDispatch()
-    const router       = useRouter()
-    const pathName     = usePathname()
+    const dispatch    = useAppDispatch()
+    const pathName    = usePathname()
+
     const [password,      setPassword]      = useState("")
     const [showPassword,  setShowPassword]  = useState(false)
     const [isProcessing,  setIsProcessing]  = useState(false)
+    const [errorMessage,  setErrorMessage]  = useState("")
 
-    const { isOpen, status, lastVerifiedAction } = useAppSelector(state => state.passwordModal)
+    const { isOpen, status, actionType } = useAppSelector(state => state.passwordModal)
     const { user } = useAppSelector(state => state.authUser)
+
+    const closeAndReset = () => {
+        dispatch(closePasswordModal())
+        dispatch(resetPasswordStatus())
+        setPassword("")
+        setErrorMessage("")
+    }
 
     // Close on route change
     useEffect(() => {
-        if (isOpen) {
-            dispatch(closePasswordModal())
-            dispatch(resetPasswordStatus())
-        }
+        if (isOpen) closeAndReset()
     }, [pathName])
 
     const handleConfirm = async (e: FormEvent<HTMLFormElement>) => {
@@ -39,48 +45,75 @@ export default function PasswordModal() {
         if (!password || !user?.email) return
 
         setIsProcessing(true)
+        setErrorMessage("")
         dispatch(setPasswordStatus("submitting"))
 
         const verifyResult = await verifyPassword(user.email, password)
 
         if (!verifyResult.success) {
             dispatch(setPasswordStatus("error"))
+            setErrorMessage(verifyResult.message ?? "Incorrect password. Please try again.")
             setIsProcessing(false)
             return
         }
 
-        if (lastVerifiedAction === "delete_account") {
+        if (actionType === "delete_account") {
             const deleteResult = await deleteAccount()
 
             if (deleteResult.success) {
-                dispatch(closePasswordModal())
+                closeAndReset()
                 dispatch(openSuccessModal({
-                    title:       "Deletion Complete",
-                    description: "Your account has been permanently removed. Thank you for being with us.",
-                    variant:     "account_deleted",
-                    autoClose:   true,
-                    autoCloseDelay: 3000,
+                    title:          "Deletion Complete",
+                    description:    "Your account has been permanently removed. Thank you for being with us.",
+                    variant:        "account_deleted",
+                    autoClose:      true,
+                    autoCloseDelay: 6000,
                 }))
                 setTimeout(async () => {
                     await logOut()
                 }, 3200)
             } else {
-                dispatch(setPasswordStatus("error"))
+                dispatch(showAlert({
+                    title:       "Deletion Failed",
+                    description: deleteResult.message ?? "An error occurred while deleting your account. Please try again.",
+                    variant:     "destructive",
+                }))
                 setIsProcessing(false)
             }
         }
 
-        setPassword("")
-        setIsProcessing(false)
+        else if (actionType === "cancel_plan") {
+            const cancelResult = await cancelPlan()
+
+            if (cancelResult.success) {
+                closeAndReset()
+                dispatch(openSuccessModal({
+                    title:       "Plan Cancelled",
+                    description: "Your subscription has been cancelled. You'll retain access until the end of your billing period.",
+                    variant:     "success",
+                    autoClose:   true,
+                    autoCloseDelay: 6000,
+                }))
+            } else {
+                dispatch(showAlert({
+                    title:       "Cancellation Failed",
+                    description: cancelResult.message ?? "An error occurred while cancelling your plan. Please try again.",
+                    variant:     "destructive",
+                }))
+                setIsProcessing(false)
+            }
+        }
+
+        else {
+            console.warn("[PasswordModal] Unknown actionType:", actionType)
+            setIsProcessing(false)
+        }
     }
 
     return (
         <AnimatedDialog
             open={isOpen}
-            onOpenChange={() => {
-                dispatch(closePasswordModal())
-                setPassword("")
-            }}
+            onOpenChange={closeAndReset}
             showCloseButton={false}
             className="md:max-w-sm py-4"
         >
@@ -89,7 +122,7 @@ export default function PasswordModal() {
                     Enter Password
                 </DialogTitle>
                 <DialogDescription className="text-sm text-brand-secondary-5 mt-1">
-                    Enter password to confirm
+                    Enter your password to confirm
                 </DialogDescription>
             </DialogHeader>
 
@@ -118,28 +151,26 @@ export default function PasswordModal() {
                             <Icon icon={showPassword ? "hugeicons:view-off-slash" : "hugeicons:view"} width="20" />
                         </button>
                     </div>
-                    {status === "error" && (
-                        <p className="text-xs text-red-500 mt-2 text-center">Incorrect password. Please try again.</p>
+                    {status === "error" && errorMessage && (
+                        <p className="text-xs text-red-500 mt-2 text-center">{errorMessage}</p>
                     )}
                 </div>
 
                 <DialogFooter className="mt-8 flex flex-row gap-3">
                     <button
                         type="button"
-                        onClick={() => {
-                            dispatch(closePasswordModal())
-                            setPassword("")
-                        }}
-                        className="flex-1 h-12 md:h-14 rounded-full border border-brand-secondary-6 text-brand-secondary-8 font-semibold text-sm hover:bg-brand-neutral-3 transition-all"
+                        disabled={isProcessing}
+                        onClick={closeAndReset}
+                        className="flex-1 h-12 md:h-14 rounded-full border border-brand-secondary-6 text-brand-secondary-8 font-semibold text-sm hover:bg-brand-neutral-3 transition-all disabled:opacity-50"
                     >
                         Cancel
                     </button>
                     <ActionButton1
-                        buttonText="Yes, I am"
+                        buttonText="Confirm"
                         buttonType="submit"
                         isDisabled={!password}
                         isLoading={isProcessing}
-                        className="w-[55%]"
+                        className="w-[55%] text-sm!"
                     />
                 </DialogFooter>
             </form>
