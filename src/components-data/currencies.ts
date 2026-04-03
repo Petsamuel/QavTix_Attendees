@@ -37,3 +37,19 @@ export const MIN_WITHDRAWAL = {
   KES: 15000,    // Kenya (~$100)
   GHS: 1300      // Ghana (~$100)
 }
+
+
+export const CURRENCY_SYMBOL_MAP: Record<string, string> = {
+    NGN: "₦",
+    USD: "$",
+    GHS: "₵",
+    KES: "KSh",
+    ZAR: "R",
+    EUR: "€",
+    GBP: "£",
+}
+
+export function getCurrencySymbol(code?: string): string {
+    if (!code) return "$"
+    return CURRENCY_SYMBOL_MAP[code.toUpperCase()] ?? code.toUpperCase()
+}

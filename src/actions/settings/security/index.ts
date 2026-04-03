@@ -3,6 +3,9 @@
 import { TWO_FACTOR_ENDPOINT, CHANGE_PASSWORD_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
+import { revalidateTag } from "next/cache"
+import { CACHE_TAGS } from "@/cache-tags"
+import { cookies } from "next/headers"
 
 interface Get2FAResult {
     success:  boolean
@@ -22,13 +25,31 @@ interface ChangePasswordResult {
 
 export async function get2FASettings(): Promise<Get2FAResult> {
     try {
-        const axiosInstance = await getServerAxios()
-        const { data } = await axiosInstance.get(TWO_FACTOR_ENDPOINT)
-        return { success: true, data: data.data ?? data }
+        const cookieStore = await cookies()
+        const accessToken = cookieStore.get("access_token")?.value
+
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/${TWO_FACTOR_ENDPOINT}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                },
+                next: { tags: [CACHE_TAGS.TWO_FACTOR] },
+            }
+        )
+
+        if (!res.ok) {
+            const json = await res.json()
+            return { success: false, message: handleApiError(json) }
+        }
+
+        const json = await res.json()
+        return { success: true, data: json.data ?? json }
+
     } catch (error: any) {
-        console.log("[get2FASettings] status:", error?.response?.status)
-        console.log("[get2FASettings] body:", JSON.stringify(error?.response?.data))
-        return { success: false, message: handleApiError(error?.response?.data) }
+        console.log("[get2FASettings] error:", error)
+        return { success: false, message: "Failed to load 2FA settings." }
     }
 }
 
@@ -38,7 +59,8 @@ export async function toggle2FAProvider(
 ): Promise<Toggle2FAResult> {
     try {
         const axiosInstance = await getServerAxios()
-        await axiosInstance.patch(`${TWO_FACTOR_ENDPOINT}`, { [providerID]: enable })
+        await axiosInstance.patch(TWO_FACTOR_ENDPOINT, { [providerID]: enable })
+        revalidateTag(CACHE_TAGS.TWO_FACTOR, "max")
         return { success: true }
     } catch (error: any) {
         console.log("[toggle2FAProvider] status:", error?.response?.status)
@@ -57,6 +79,7 @@ export async function changePassword(
             old_password: oldPassword,
             new_password: newPassword,
         })
+        // No revalidation needed — password change doesn't affect cached data
         return { success: true }
     } catch (error: any) {
         console.log("[changePassword] status:", error?.response?.status)

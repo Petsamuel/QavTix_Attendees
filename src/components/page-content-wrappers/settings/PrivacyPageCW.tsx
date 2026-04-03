@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { ToggleItem } from "@/components/custom-utils/inputs/CustomToggleItem"
 import { cn } from "@/lib/utils"
 import { space_grotesk } from "@/lib/fonts"
@@ -84,6 +84,14 @@ export default function PrivacySettingsPageCW({ initialSettings }: Props) {
         }))
     }
 
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    if (!mounted) return null;
+
     return (
         <main className="w-full pt-8 pb-16">
             <h2 className={cn(space_grotesk.className, "text-lg font-bold text-brand-secondary-9 mb-12")}>
@@ -117,7 +125,6 @@ export default function PrivacySettingsPageCW({ initialSettings }: Props) {
                     </div>
                 </section>
 
-                {/* ── Subscription Plan ────────────────────────────────── */}
                 <section className="space-y-6">
                     <header>
                         <h3 className="text-base font-bold text-brand-secondary-9">Subscription Plan</h3>
@@ -128,7 +135,7 @@ export default function PrivacySettingsPageCW({ initialSettings }: Props) {
                     <div className="w-full border-t-[1.5px] border-dashed border-brand-secondary-2" />
 
                     {activePlan ? (
-                        <div className="flex flex-col gap-4 max-w-sm">
+                        <div className="flex flex-col gap-4 max-w-[15em]">
                             {/* Plan card */}
                             <div className="flex items-center justify-between rounded-xl border border-brand-secondary-2 bg-brand-secondary-1/40 px-4 py-3">
                                 <div className="flex flex-col gap-0.5">
@@ -159,7 +166,7 @@ export default function PrivacySettingsPageCW({ initialSettings }: Props) {
                                     buttonText="Cancel Plan"
                                     buttonType="button"
                                     icon="hugeicons:cancel-circle"
-                                    className="h-12! rounded-md font-semibold bg-transparent border border-red-300 text-red-600 hover:bg-red-50 active:bg-red-100 focus:ring-2 focus:ring-red-300 focus:outline-0"
+                                    className="h-12! text-sm! rounded-md font-semibold bg-transparent border border-red-300 text-red-600! hover:bg-red-50! active:bg-red-100 focus:ring-2! focus:ring-red-300! focus:outline-0"
                                     iconPosition="left"
                                 />
                             )}

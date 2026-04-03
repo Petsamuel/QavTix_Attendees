@@ -24,6 +24,7 @@ export const AFFILIATE_LINKS_ENDPOINT       = "attendee/affliate/event"
 export const AFFILIATE_EARNINGS_ENDPOINT    = "attendee/affliate/earning/history"
 export const AFFILIATE_PERFORMANCE_ENDPOINT = "attendee/affliate/graph"
 export const WITHDRAWAL_HISTORY_ENDPOINT = "attendee/withdrawal/history"
+export const WITHDRAWAL_REQUEST_ENDPOINT = "attendee/withdrawal/request/"
 
 
 export const PAYMENT_ACCOUNTS_ENDPOINT = "attendee/payment/list"
@@ -47,7 +48,7 @@ export const GET_PRIVACY_SETTINGS_ENDPOINT = "attendee/privacy/settings"
 export const SET_PRIVACY_SETTINGS_ENDPOINT = "attendee/privacy/activity/sharing"
 export const DOWNLOAD_DATA_ENDPOINT = "attendee/privacy/data/download/"
 export const DELETE_ACCOUNT_ENDPOINT = "attendee/privacy/account/delete"
-export const CANCEL_PLAN_ENDPOINT = "payments/plans/cancel/"
+export const CANCEL_PLAN_ENDPOINT = "payments/attendee-plans/cancel/"
 
 
 export const PAYOUT_ACCOUNTS_ENDPOINT = "attendee/payouts/list"

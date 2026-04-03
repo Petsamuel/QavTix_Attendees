@@ -10,7 +10,7 @@ import WithdrawalHistoryTable from "../custom-utils/TableDataDisplayAreas/tables
 import WithdrawalLocationSelector from "./WithdrawalLocationSelector"
 import { formatPrice } from "@/helper-fns/formatPrice"
 import { useAppSelector } from "@/lib/redux/hooks"
-import { MIN_WITHDRAWAL } from "@/components-data/currencies"
+import { getCurrencySymbol, MIN_WITHDRAWAL } from "@/components-data/currencies"
 
 interface Props {
     account_balance?:  number
@@ -41,8 +41,10 @@ export default function WithdrawalTabContent({ account_balance, income_this_week
                     <div className="text-[11px] flex justify-between items-center">
                         <span className="text-brand-secondary-8">Amount in Naira</span>
                         {
-                            income_this_week &&
+                            income_this_week ?
                             <span className="text-[#5F9F7D] font-medium">{`+${income_this_week} This Week`}</span>
+                            :
+                            null
                         }
                     </div>
 
@@ -60,8 +62,10 @@ export default function WithdrawalTabContent({ account_balance, income_this_week
                         Enter amount to withdraw
                     </label>
                     <div className="mb-6 rounded-md px-3 items-center h-12 bg-[#F2F2F2] flex gap-2 border-[1.5px] border-transparent focus-within:border-brand-primary-4 hover:border-brand-primary-4 transition-all">
-                        <Icon icon="mdi:currency-ngn" className="text-brand-secondary-7 text-lg" />
-                        <input
+                            <span className="text-brand-secondary-7 text-sm font-semibold shrink-0">
+                                {getCurrencySymbol(user?.currency)}
+                            </span>                        
+                            <input
                             type="text"
                             value={amount}
                             onChange={handleAmountChange}
@@ -111,7 +115,7 @@ export default function WithdrawalTabContent({ account_balance, income_this_week
                 </div>
             </div>
 
-            <WithdrawalLocationSelector open={showWithdrawalModal} setOpen={setShowWithdrawalModal} />
+            <WithdrawalLocationSelector amount={amount} open={showWithdrawalModal} setOpen={setShowWithdrawalModal} />
         </section>
     )
 }

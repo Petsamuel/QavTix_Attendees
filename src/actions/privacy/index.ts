@@ -9,7 +9,9 @@ import {
 } from "@/endpoints";
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
+import { revalidateTag } from "next/cache"
 import { cookies } from "next/headers"
+import { CACHE_TAGS } from "@/cache-tags"
 
 interface PrivacyResult {
     success:  boolean
@@ -19,13 +21,31 @@ interface PrivacyResult {
 
 export async function getPrivacySettings(): Promise<PrivacyResult> {
     try {
-        const axiosInstance = await getServerAxios()
-        const { data } = await axiosInstance.get(GET_PRIVACY_SETTINGS_ENDPOINT)
-        return { success: true, data: data.data ?? data }
+        const cookieStore = await cookies()
+        const accessToken = cookieStore.get("access_token")?.value
+
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/${GET_PRIVACY_SETTINGS_ENDPOINT}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                },
+                next: { tags: [CACHE_TAGS.PRIVACY_SETTINGS] },
+            }
+        )
+
+        if (!res.ok) {
+            const json = await res.json()
+            return { success: false, message: handleApiError(json) }
+        }
+
+        const json = await res.json()
+        return { success: true, data: json.data ?? json }
+
     } catch (error: any) {
-        console.log("[getPrivacySettings] status:", error?.response?.status)
-        console.log("[getPrivacySettings] body:", JSON.stringify(error?.response?.data))
-        return { success: false, message: handleApiError(error?.response?.data) }
+        console.log("[getPrivacySettings] error:", error)
+        return { success: false, message: "Failed to load privacy settings." }
     }
 }
 
@@ -35,6 +55,7 @@ export async function updatePrivacySettings(
     try {
         const axiosInstance = await getServerAxios()
         await axiosInstance.patch(SET_PRIVACY_SETTINGS_ENDPOINT, payload)
+        revalidateTag(CACHE_TAGS.PRIVACY_SETTINGS, "max")
         return { success: true }
     } catch (error: any) {
         console.log("[updatePrivacySettings] status:", error?.response?.status)
@@ -76,6 +97,7 @@ export async function cancelPlan(): Promise<{ success: boolean; message?: string
     try {
         const axiosInstance = await getServerAxios()
         await axiosInstance.post(CANCEL_PLAN_ENDPOINT)
+        revalidateTag(CACHE_TAGS.PROFILE, "max")
         return { success: true }
     } catch (error: any) {
         console.log("[cancelPlan] status:", error?.response?.status)
