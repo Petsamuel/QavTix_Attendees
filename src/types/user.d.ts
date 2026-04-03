@@ -12,6 +12,7 @@ type AuthUser = {
     currency: string
     subscription_status: "active" | "inactive" | "cancelled" | "trialing" | null
     plan_expires_at: string | null
+    is_completed: boolean
 }
 
 interface PrivacySettings {

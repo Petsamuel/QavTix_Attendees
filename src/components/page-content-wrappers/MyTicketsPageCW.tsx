@@ -82,10 +82,17 @@ export default function MyTicketsPageCW({ metrics, categories, upcoming, past, c
                 <h2 className={cn(space_grotesk.className, "text-brand-secondary-8 font-bold text-lg")}>Overview</h2>
                 <div className="flex gap-6 items-center">
                     <button className="text-brand-primary-6 font-bold text-sm hidden md:inline-block">Complete Profile</button>
-                    <ExportButton1 showFormatSelector={false} />
+                    <ExportButton1
+                        data={activeTabState.cachedItems}
+                        filename={`my-tickets-${activeTab}`}
+                        showFormatSelector={false}
+                    />
                 </div>
             </div>
-            <button className="text-brand-primary-6 font-bold text-sm mb-4 md:hidden">Complete Profile</button>
+            {
+                !user?.is_completed && 
+                <button className="text-brand-primary-6 font-bold text-sm mb-4 md:hidden">Complete Profile</button>
+            }
 
             <AnalyticsMetricsCardsContainer metrics={analyticsMetrics} />
 
