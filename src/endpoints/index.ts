@@ -31,7 +31,8 @@ export const PAYMENT_ACCOUNTS_ENDPOINT = "attendee/payment/list"
 
 
 export const UPDATE_PROFILE_ENDPOINT = "attendee/profile/update/"
-export const TWO_FACTOR_ENDPOINT = "attendee/profile/twofactor/"
+export const UPDATE_TWO_FACTOR_ENDPOINT = "attendee/profile/twofactor/"
+export const GET_TWO_FACTOR_ENDPOINT = "attendee/profile/twofactor/info/"
 export const CHANGE_PASSWORD_ENDPOINT = "attendee/profile/change-password/"
 export const NOTIFICATION_SETTINGS_ENDPOINT = "attendee/profile/notifications/settings/"
 

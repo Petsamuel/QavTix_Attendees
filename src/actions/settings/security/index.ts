@@ -1,6 +1,6 @@
 "use server"
 
-import { TWO_FACTOR_ENDPOINT, CHANGE_PASSWORD_ENDPOINT } from "@/endpoints"
+import { CHANGE_PASSWORD_ENDPOINT, GET_TWO_FACTOR_ENDPOINT, UPDATE_TWO_FACTOR_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
 import { revalidateTag } from "next/cache"
@@ -29,7 +29,7 @@ export async function get2FASettings(): Promise<Get2FAResult> {
         const accessToken = cookieStore.get("access_token")?.value
 
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/${TWO_FACTOR_ENDPOINT}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/${GET_TWO_FACTOR_ENDPOINT}`,
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -59,7 +59,7 @@ export async function toggle2FAProvider(
 ): Promise<Toggle2FAResult> {
     try {
         const axiosInstance = await getServerAxios()
-        await axiosInstance.patch(TWO_FACTOR_ENDPOINT, { [providerID]: enable })
+        await axiosInstance.patch(UPDATE_TWO_FACTOR_ENDPOINT, { [providerID]: enable })
         revalidateTag(CACHE_TAGS.TWO_FACTOR, "max")
         return { success: true }
     } catch (error: any) {
