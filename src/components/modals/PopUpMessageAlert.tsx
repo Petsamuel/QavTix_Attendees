@@ -68,7 +68,7 @@ export default function PopUpMessageAlertModal() {
                 <button
                     onClick={handleClose}
                     disabled={currentAlert.type === "profile_incomplete"}
-                    className="absolute right-4 size-7 flex justify-center items-center top-4 z-50 rounded-full p-1 bg-brand-neutral-6 hover:bg-brand-neutral-5 text-white transition-colors"
+                    className="absolute disabled:hidden right-4 size-7 flex justify-center disabled:cursor-not-allowed items-center top-4 z-50 rounded-full p-1 bg-brand-neutral-6 disabled:pointer-events-none hover:bg-brand-neutral-5 text-white transition-colors"
                 >
                     <Icon icon="iconamoon:close-duotone" width="24" height="24" className="size-7" />
                 </button>
