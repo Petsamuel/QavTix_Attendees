@@ -2,6 +2,12 @@ import { getCategories } from "@/actions/filters"
 import MyTicketsPageCW from "@/components/page-content-wrappers/MyTicketsPageCW"
 import { ATTENDEE_DASHBOARD_ENDPOINT } from "@/endpoints"
 import { getServerAxios } from "@/lib/axios"
+import { ATTENDEE_PAGE_METADATA } from "@/metadata"
+import type { Metadata } from "next"
+
+
+export const metadata: Metadata = ATTENDEE_PAGE_METADATA.MY_TICKETS
+
 
 async function getDashboardData() {
   const axiosInstance = await getServerAxios()

@@ -7,6 +7,13 @@ import {
     getWithdrawalHistory,
 } from "@/actions/affiliates"
 import { ApiCategory, getCategories } from "@/actions/filters"
+import { ATTENDEE_PAGE_METADATA } from "@/metadata"
+import type { Metadata } from "next"
+
+
+export const metadata: Metadata = ATTENDEE_PAGE_METADATA.AFFILIATES;
+
+
 
 const emptySlice = { results: [], count: 0, next: null, previous: null, total_pages: 1 }
 

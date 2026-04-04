@@ -1,6 +1,10 @@
 import { getMarketplace } from "@/actions/marketplace"
 import { getCategories } from "@/actions/filters"
 import MarketplaceCW from "@/components/page-content-wrappers/MarketplaceCW"
+import { ATTENDEE_PAGE_METADATA } from "@/metadata"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = ATTENDEE_PAGE_METADATA.MARKETPLACE;
 
 export default async function MarketplacePage() {
 

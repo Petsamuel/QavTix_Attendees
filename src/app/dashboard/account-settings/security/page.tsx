@@ -1,6 +1,12 @@
 import SecurityPageForm from "@/components/forms/SecurityPageForm"
 import { INITIAL_PROVIDERS } from "@/components-data/auth-providers"
 import { get2FASettings } from "@/actions/settings/security"
+import { ATTENDEE_PAGE_METADATA } from "@/metadata"
+import type { Metadata } from "next"
+
+
+export const metadata: Metadata = ATTENDEE_PAGE_METADATA.SECURITY;
+
 
 export default async function SecurityPage() {
     const result = await get2FASettings()
