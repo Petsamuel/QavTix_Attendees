@@ -35,6 +35,13 @@ export default async function Layout({ children }: { children: ReactNode }) {
 
     return (
         <html lang="en">
+            <head>
+                <link rel="icon" href="/favicon.ico" sizes="any" />
+                <link rel="icon" href="/favicon.png" type="image/png" />
+                <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />
+                <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
+                <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+            </head>
             <body className={`${inter.className} min-h-screen`}>
                 <ReduxStoreProvider>
                     <div className="flex justify-end min-h-screen bg-gray-100/80">
