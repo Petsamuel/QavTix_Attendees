@@ -107,7 +107,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                         <figure className="relative w-full aspect-4/3 h-40 rounded-4xl overflow-hidden">
                             {!imageError && card.image ? (
                                 <Image
-                                    src={"/images/demo-images/event-detail-img.png"}
+                                    src={card.image}
                                     alt={card.title}
                                     fill
                                     sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
