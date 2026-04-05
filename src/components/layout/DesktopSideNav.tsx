@@ -28,7 +28,7 @@ function DesktopSideNav() {
     return (
         <nav className="hidden lg:flex fixed left-0 top-0 h-screen w-60 flex-col justify-between gap-8 bg-white p-4 py-6 text-sm font-medium text-brand-secondary-9 border-r border-gray-100 overflow-y-auto">
             <div>
-                <Logo width={120} />
+                <Logo width={105} />
                 <ul className="mt-8 flex flex-col gap-2">
                     {Object.values(NAVIGATION_LINKS).map((v) => {
                         const isActive = isActiveRoute(v.href)

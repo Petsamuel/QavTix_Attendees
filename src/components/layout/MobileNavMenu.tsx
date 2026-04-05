@@ -65,7 +65,7 @@ export default function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
                     >
                         <div>
                             <div className="flex items-center justify-between mb-8">
-                                <Logo width={100} />
+                                <Logo width={90} />
                                 <button 
                                     onClick={onClose}
                                     className="p-2 rounded-full bg-brand-primary-3/50 text-brand-secondary-9"
