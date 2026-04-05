@@ -4,6 +4,7 @@ import { space_grotesk } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
 import { getGroups } from "@/actions/groups"
 
+
 interface Props {
     params: Promise<{ group_id: string }>
 }

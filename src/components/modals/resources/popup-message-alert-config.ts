@@ -1,3 +1,5 @@
+import { NAVIGATION_LINKS, SETTINGS_SUB_LINKS } from "@/enums/navigation";
+
 export const POPUP_MESSAGE_ALERT_CONFIG = {
     verification: {
         icon: "noto:hourglass-with-flowing-sand",
@@ -37,9 +39,9 @@ export const PROFILE_INCOMPLETE_ALERT: PopUpMessageAlert = {
     type:        "profile_incomplete",
     title:       "Complete Your Profile",
     subtitle:    "You're almost there!",
-    description: "Your profile is incomplete. Add your details so others can find and connect with you easily.",
+    description: "Your profile is incomplete. Add your details so you can seamlessly access all features and enjoy a personalized experience.",
     buttonText:  "Update Profile",
-    navigateTo:  `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/account-settings/profile`,
+    navigateTo:  SETTINGS_SUB_LINKS.find(link => link.label === "Profile Information")?.href || NAVIGATION_LINKS.ACCOUNT_SETTINGS.href,
 }
 
 export type AlertType = keyof typeof POPUP_MESSAGE_ALERT_CONFIG;

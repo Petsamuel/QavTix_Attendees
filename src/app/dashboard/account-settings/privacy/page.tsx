@@ -1,5 +1,10 @@
 import { getPrivacySettings } from "@/actions/privacy"
 import PrivacySettingsPageCW from "@/components/page-content-wrappers/settings/PrivacyPageCW"
+import { ATTENDEE_PAGE_METADATA } from "@/metadata"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = ATTENDEE_PAGE_METADATA.PRIVACY;
+
 
 const DEFAULT_SETTINGS = {
     show_events:    true,

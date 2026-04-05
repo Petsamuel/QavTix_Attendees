@@ -90,9 +90,11 @@ export default function MyTicketsPageCW({ metrics, categories, upcoming, past, c
                 </div>
             </div>
             {
-                !user?.is_completed && 
-                <button className="text-brand-primary-6 font-bold text-sm mb-4 md:hidden">Complete Profile</button>
-            }
+                isMounted && !user?.is_completed && (
+                <button className="text-brand-primary-6 font-bold text-sm mb-4 md:hidden">
+                    Complete Profile
+                </button>
+            )}
 
             <AnalyticsMetricsCardsContainer metrics={analyticsMetrics} />
 

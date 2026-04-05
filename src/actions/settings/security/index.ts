@@ -9,7 +9,10 @@ import { cookies } from "next/headers"
 
 interface Get2FAResult {
     success:  boolean
-    data?:    TwoFactorProvider[]
+    data?:    {
+        "google": false,
+        "facebook": true
+    }
     message?: string
 }
 

@@ -1,5 +1,11 @@
 import { getNotificationSettings } from "@/actions/settings/notification"
 import NotificationSettingsPageForm from "@/components/forms/NotificationSettingsPageForm"
+import { ATTENDEE_PAGE_METADATA } from "@/metadata"
+import type { Metadata } from "next"
+
+
+export const metadata: Metadata = ATTENDEE_PAGE_METADATA.NOTIFICATIONS;
+
 
 const DEFAULT_SETTINGS = {
     id:                           0,
