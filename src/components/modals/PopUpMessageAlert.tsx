@@ -77,7 +77,7 @@ export default function PopUpMessageAlertModal() {
                 <button
                     onClick={handleClose}
                     disabled={isProfileIncomplete}
-                    className="absolute disabled:hidden right-4 size-7 flex justify-center disabled:cursor-not-allowed items-center top-4 z-50 rounded-full p-1 bg-brand-neutral-6 disabled:pointer-events-none hover:bg-brand-neutral-5 text-white transition-colors"
+                    className="absolute disabled:hidden right-4 size-7 flex justify-center disabled:cursor-not-allowed items-center top-4 z-50 rounded-full p-1 bg-brand-brand-neutral-6 disabled:pointer-events-none hover:bg-brand-neutral-5 text-white transition-colors"
                 >
                     <Icon icon="iconamoon:close-duotone" width="24" height="24" className="size-7" />
                 </button>
@@ -89,7 +89,7 @@ export default function PopUpMessageAlertModal() {
                             onClick={handlePrev}
                             disabled={isFirst}
                             className={cn(
-                                "absolute left-4 top-1/2 -translate-y-1/2 z-50 rounded-3xl w-16 h-fit p-2 bg-white border border-neutral-7 flex justify-center items-center hover:bg-gray-50 transition-all",
+                                "absolute left-4 top-1/2 -translate-y-1/2 z-50 rounded-3xl w-16 h-fit p-2 bg-white border border-brand-neutral-7 flex justify-center items-center hover:bg-gray-50 transition-all",
                                 isFirst && "opacity-40 cursor-not-allowed"
                             )}
                         >
@@ -99,7 +99,7 @@ export default function PopUpMessageAlertModal() {
                             onClick={handleNext}
                             disabled={isLast}
                             className={cn(
-                                "absolute right-4 top-1/2 -translate-y-1/2 z-50 rounded-3xl w-16 h-fit p-2 bg-white border border-neutral-7 flex justify-center items-center hover:bg-gray-50 transition-all",
+                                "absolute right-4 top-1/2 -translate-y-1/2 z-50 rounded-3xl w-16 h-fit p-2 bg-white border border-brand-neutral-7 flex justify-center items-center hover:bg-gray-50 transition-all",
                                 isLast && "opacity-40 cursor-not-allowed"
                             )}
                         >
@@ -117,27 +117,27 @@ export default function PopUpMessageAlertModal() {
                             direction === "right" ? "slide-in-from-right-10" : "slide-in-from-left-10"
                         )}
                     >
-                        <div className="flex justify-center items-center mt-7 mb-4">
+                       <div className="flex justify-center items-center mt-7 mb-4">
                             {
                                 currentAlert.type === "profile_incomplete" ?
-                                <Image width={80} height={100} src="/images/vectors/setup-profile.png" alt="profile-icon" className="size-20 aspect-square pointer-events-none" />
+                                <Image width={80} height={100} src="/images/vectors/setup-profile.png" alt="profile-icon" className="w-20 object-contain h-20 aspect-square pointer-events-none" />
                                 :
                                 <Icon icon={iconSrc} className="size-24" strokeWidth={2} />
                             }
                         </div>
 
                         <div className="pb-8 px-4 text-center">
-                            <h2 className={cn(space_grotesk.className, "text-xl md:text-3xl font-bold text-secondary-9 mb-2")}>
+                            <h2 className={cn(space_grotesk.className, "text-xl md:text-3xl font-bold text-brand-secondary-9 mb-2")}>
                                 {currentAlert.title}
                             </h2>
 
                             {currentAlert.subtitle && (
-                                <p className="text-sm text-secondary-6 mb-1">
+                                <p className="text-sm text-brand-secondary-6 mb-1">
                                     {currentAlert.subtitle}
                                 </p>
                             )}
 
-                            <p className="text-sm text-secondary-9 leading-relaxed mb-6 max-w-md mx-auto">
+                            <p className="text-sm text-brand-secondary-9 leading-relaxed mb-6 max-w-md mx-auto">
                                 {currentAlert.description}
                             </p>
 
@@ -145,7 +145,7 @@ export default function PopUpMessageAlertModal() {
                                 {currentAlert.buttonText && (
                                     <Button
                                         onClick={handlePrimaryAction}
-                                        className="text-white bg-primary-6 font-medium hover:bg-primary-7 hover:shadow-sm text-center px-8 py-3 rounded-lg hover:opacity-90 transition-opacity inline-flex items-center gap-1"
+                                        className="text-white bg-brand-primary-6 font-medium hover:bg-brand-primary-7 hover:shadow-sm text-center px-8 py-3 rounded-lg hover:opacity-90 transition-opacity inline-flex items-center gap-1"
                                     >
                                         {currentAlert.buttonText}
                                         <Icon icon="si:arrow-right-fill" width="24" height="24" />
@@ -161,7 +161,7 @@ export default function PopUpMessageAlertModal() {
                                         }}
                                         disabled={isLoggingOut}
                                         variant="outline"
-                                        className="border-neutral-6 text-secondary-7 hover:text-red-500 hover:bg-transparent hover:border-red-300 px-8 py-3 rounded-lg transition-colors inline-flex items-center gap-1.5 disabled:opacity-50"
+                                        className="border-brand-neutral-6 text-brand-secondary-7 hover:text-red-500 hover:bg-transparent hover:border-red-300 px-8 py-3 rounded-lg transition-colors inline-flex items-center gap-1.5 disabled:opacity-50"
                                     >
                                         <Icon icon="hugeicons:logout-01" width="18" height="18" />
                                         {isLoggingOut ? "Signing out..." : "Sign out"}
