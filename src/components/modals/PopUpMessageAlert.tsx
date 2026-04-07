@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useDispatch } from "react-redux"
 import { POPUP_MESSAGE_ALERT_CONFIG } from "./resources/popup-message-alert-config"
-import { Dialog, DialogContent } from "../ui/dialog"
+import { Dialog, DialogContent, DialogOverlay } from "../ui/dialog"
 import { DialogTitle } from "@radix-ui/react-dialog"
 import { Icon } from "@iconify/react"
 import { cn } from "@/lib/utils"
@@ -13,6 +13,7 @@ import { useAppSelector } from "@/lib/redux/hooks"
 import { closePopupAlertModal } from "@/lib/redux/slices/popupAlertSlice"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import { useLogOut } from "@/custom-hooks/UseLogout"
 
 export default function PopUpMessageAlertModal() {
     const dispatch = useDispatch()
@@ -22,6 +23,7 @@ export default function PopUpMessageAlertModal() {
 
     const [currentIndex, setCurrentIndex] = useState(0)
     const [direction,    setDirection]    = useState<"left" | "right">("right")
+    const { handleLogOut, isLoggingOut } = useLogOut()
 
     useEffect(() => {
         if (isOpen) setCurrentIndex(0)
@@ -42,7 +44,11 @@ export default function PopUpMessageAlertModal() {
 
     const handlePrimaryAction = () => {
         if (!currentAlert) return
-        if (currentAlert.navigateTo) router.push(currentAlert.navigateTo)
+        if (currentAlert.navigateTo) {
+            currentAlert.navigateTo.includes("http")
+                ? window.open(currentAlert.navigateTo)
+                : router.push(currentAlert.navigateTo)
+        }
         dispatch(closePopupAlertModal())
     }
 
@@ -53,14 +59,16 @@ export default function PopUpMessageAlertModal() {
 
     if (!isOpen || alerts.length === 0 || !currentAlert || !config || !iconSrc) return null
 
-    const isFirst = currentIndex === 0
-    const isLast  = currentIndex === alerts.length - 1
+    const isFirst             = currentIndex === 0
+    const isLast              = currentIndex === alerts.length - 1
+    const isProfileIncomplete = currentAlert.type === "profile_incomplete"
 
     return (
         <Dialog open={isOpen}>
+            <DialogOverlay className="z-999" />
             <DialogContent
                 showCloseButton={false}
-                className="sm:max-w-160 max-h-[30em] p-0 overflow-x-hidden overflow-y-auto border-none rounded-4xl"
+                className="sm:max-w-160 max-h-[30em] z-1000 p-0 overflow-x-hidden overflow-y-auto border-none rounded-4xl"
             >
                 <DialogTitle className="sr-only">{currentAlert.title}</DialogTitle>
 
@@ -68,7 +76,7 @@ export default function PopUpMessageAlertModal() {
 
                 <button
                     onClick={handleClose}
-                    disabled={currentAlert.type === "profile_incomplete"}
+                    disabled={isProfileIncomplete}
                     className="absolute disabled:hidden right-4 size-7 flex justify-center disabled:cursor-not-allowed items-center top-4 z-50 rounded-full p-1 bg-brand-neutral-6 disabled:pointer-events-none hover:bg-brand-neutral-5 text-white transition-colors"
                 >
                     <Icon icon="iconamoon:close-duotone" width="24" height="24" className="size-7" />
@@ -81,7 +89,7 @@ export default function PopUpMessageAlertModal() {
                             onClick={handlePrev}
                             disabled={isFirst}
                             className={cn(
-                                "absolute left-4 top-1/2 -translate-y-1/2 z-50 rounded-3xl w-16 h-fit p-2 bg-white border border-brand-neutral-7 flex justify-center items-center hover:bg-gray-50 transition-all",
+                                "absolute left-4 top-1/2 -translate-y-1/2 z-50 rounded-3xl w-16 h-fit p-2 bg-white border border-neutral-7 flex justify-center items-center hover:bg-gray-50 transition-all",
                                 isFirst && "opacity-40 cursor-not-allowed"
                             )}
                         >
@@ -91,7 +99,7 @@ export default function PopUpMessageAlertModal() {
                             onClick={handleNext}
                             disabled={isLast}
                             className={cn(
-                                "absolute right-4 top-1/2 -translate-y-1/2 z-50 rounded-3xl w-16 h-fit p-2 bg-white border border-brand-neutral-7 flex justify-center items-center hover:bg-gray-50 transition-all",
+                                "absolute right-4 top-1/2 -translate-y-1/2 z-50 rounded-3xl w-16 h-fit p-2 bg-white border border-neutral-7 flex justify-center items-center hover:bg-gray-50 transition-all",
                                 isLast && "opacity-40 cursor-not-allowed"
                             )}
                         >
@@ -109,39 +117,57 @@ export default function PopUpMessageAlertModal() {
                             direction === "right" ? "slide-in-from-right-10" : "slide-in-from-left-10"
                         )}
                     >
-                        <div className="flex justify-center mt-7 mb-4">
+                        <div className="flex justify-center items-center mt-7 mb-4">
                             {
                                 currentAlert.type === "profile_incomplete" ?
-                                <Image width={100} height={100} src="/images/vectors/setup-profile.png" alt="profile-icon" className="size-24 pointer-events-none" />
+                                <Image width={80} height={100} src="/images/vectors/setup-profile.png" alt="profile-icon" className="size-20 aspect-square pointer-events-none" />
                                 :
                                 <Icon icon={iconSrc} className="size-24" strokeWidth={2} />
                             }
                         </div>
 
                         <div className="pb-8 px-4 text-center">
-                            <h2 className={cn(space_grotesk.className, "text-xl md:text-3xl font-bold text-brand-secondary-9 mb-2")}>
+                            <h2 className={cn(space_grotesk.className, "text-xl md:text-3xl font-bold text-secondary-9 mb-2")}>
                                 {currentAlert.title}
                             </h2>
 
                             {currentAlert.subtitle && (
-                                <p className="text-sm text-brand-secondary-6 mb-1">
+                                <p className="text-sm text-secondary-6 mb-1">
                                     {currentAlert.subtitle}
                                 </p>
                             )}
 
-                            <p className="text-sm text-brand-secondary-9 leading-relaxed mb-6 max-w-md mx-auto">
+                            <p className="text-sm text-secondary-9 leading-relaxed mb-6 max-w-md mx-auto">
                                 {currentAlert.description}
                             </p>
 
-                            {currentAlert.buttonText && (
-                                <Button
-                                    onClick={handlePrimaryAction}
-                                    className="text-white bg-brand-primary-6 font-medium hover:bg-brand-primary-7 hover:shadow-sm text-center px-8 py-3 rounded-lg hover:opacity-90 transition-opacity inline-flex items-center gap-1"
-                                >
-                                    {currentAlert.buttonText}
-                                    <Icon icon="si:arrow-right-fill" width="24" height="24" />
-                                </Button>
-                            )}
+                            <div className={cn("flex items-center justify-center gap-3", isProfileIncomplete ? "flex-col sm:flex-row" : "")}>
+                                {currentAlert.buttonText && (
+                                    <Button
+                                        onClick={handlePrimaryAction}
+                                        className="text-white bg-primary-6 font-medium hover:bg-primary-7 hover:shadow-sm text-center px-8 py-3 rounded-lg hover:opacity-90 transition-opacity inline-flex items-center gap-1"
+                                    >
+                                        {currentAlert.buttonText}
+                                        <Icon icon="si:arrow-right-fill" width="24" height="24" />
+                                    </Button>
+                                )}
+
+                                {isProfileIncomplete && (
+                                    <Button
+                                        onClick={() => {
+                                            handleLogOut()
+                                            dispatch(closePopupAlertModal())
+                                            router.refresh()
+                                        }}
+                                        disabled={isLoggingOut}
+                                        variant="outline"
+                                        className="border-neutral-6 text-secondary-7 hover:text-red-500 hover:bg-transparent hover:border-red-300 px-8 py-3 rounded-lg transition-colors inline-flex items-center gap-1.5 disabled:opacity-50"
+                                    >
+                                        <Icon icon="hugeicons:logout-01" width="18" height="18" />
+                                        {isLoggingOut ? "Signing out..." : "Sign out"}
+                                    </Button>
+                                )}
+                            </div>
                         </div>
 
                         {/* Pagination dots */}
@@ -154,7 +180,7 @@ export default function PopUpMessageAlertModal() {
                                         className={cn(
                                             "h-2 rounded-full transition-all duration-300",
                                             index === currentIndex
-                                                ? "w-8 bg-brand-primary-6"
+                                                ? "w-8 bg-primary-6"
                                                 : "w-2 bg-gray-300 hover:bg-gray-400"
                                         )}
                                     />
