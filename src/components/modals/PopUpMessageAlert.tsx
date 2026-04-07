@@ -12,6 +12,7 @@ import { space_grotesk } from "@/lib/fonts"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { closePopupAlertModal } from "@/lib/redux/slices/popupAlertSlice"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 
 export default function PopUpMessageAlertModal() {
     const dispatch = useDispatch()
@@ -109,7 +110,12 @@ export default function PopUpMessageAlertModal() {
                         )}
                     >
                         <div className="flex justify-center mt-7 mb-4">
-                            <Icon icon={iconSrc} className="size-24" strokeWidth={2} />
+                            {
+                                currentAlert.type === "profile_incomplete" ?
+                                <Image width={100} height={100} src="/images/vectors/setup-profile.png" alt="profile-icon" className="size-24 pointer-events-none" />
+                                :
+                                <Icon icon={iconSrc} className="size-24" strokeWidth={2} />
+                            }
                         </div>
 
                         <div className="pb-8 px-4 text-center">

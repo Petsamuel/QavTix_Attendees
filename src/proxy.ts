@@ -13,17 +13,16 @@ const SKIP_PATHS = ['/api/auth', '/_next', '/favicon.ico']
 const isSkippedPath = (pathname: string) =>
   SKIP_PATHS.some(p => pathname.startsWith(p))
 
-const redirectToLogin = () => {
-  const res = NextResponse.redirect(LOGIN_URL)
+const redirectToLogin = (requestUrl?: string) => {
+  const loginUrl = new URL(LOGIN_URL)
+  if (requestUrl) {
+    loginUrl.searchParams.set('returnTo', requestUrl)
+  }
+  const res = NextResponse.redirect(loginUrl)
   res.cookies.delete('access_token')
   res.cookies.delete('refresh_token')
   return res
 }
-
-// Returns:
-//   "valid"          — token is good, let through
-//   "invalid"        — server confirmed token is bad (4xx)
-//   "network_error"  — couldn't reach server, treat as valid (benefit of the doubt)
 
 async function verifyToken(token: string): Promise<"valid" | "invalid" | "network_error"> {
   try {
@@ -34,7 +33,7 @@ async function verifyToken(token: string): Promise<"valid" | "invalid" | "networ
     })
     return res.ok ? "valid" : "invalid"
   } catch {
-      return "network_error"
+    return "network_error"
   }
 }
 
@@ -53,9 +52,9 @@ async function refreshAccessToken(
       return { success: true, accessToken: data.access }
     }
 
-    return { success: false, networkError: false }  // confirmed expired
+    return { success: false, networkError: false }
   } catch {
-    return { success: false, networkError: true }   // can't reach server
+    return { success: false, networkError: true }
   }
 }
 
@@ -74,14 +73,19 @@ export async function proxy(request: NextRequest) {
   const hasRegion   = request.cookies.has(COOKIE_KEYS.USER_REGION)
   const hasCurrency = request.cookies.has(COOKIE_KEYS.USER_CURRENCY)
 
-if (!hasRegion || !hasCurrency) {
+  if (!hasRegion || !hasCurrency) {
     const country =
       request.headers.get('x-vercel-ip-country') ||
       request.headers.get('cf-ipcountry') ||
       'NG'
 
     const detected = REGION_CURRENCY_MAP[country] || DEFAULT_LOCATION
-    const opts = { path: '/', maxAge: 365 * 24 * 60 * 60, sameSite: 'lax' as const, secure: process.env.NODE_ENV === 'production' }
+    const opts = {
+      path:     '/',
+      maxAge:   365 * 24 * 60 * 60,
+      sameSite: 'lax' as const,
+      secure:   process.env.NODE_ENV === 'production',
+    }
 
     if (!hasRegion)   response.cookies.set(COOKIE_KEYS.USER_REGION,   JSON.stringify(detected.region),   opts)
     if (!hasCurrency) response.cookies.set(COOKIE_KEYS.USER_CURRENCY, JSON.stringify(detected.currency), opts)
@@ -92,7 +96,7 @@ if (!hasRegion || !hasCurrency) {
 
   // No tokens — definitely not authenticated
   if (!accessToken && !refreshToken) {
-    return redirectToLogin()
+    return redirectToLogin(request.url)
   }
 
   // Verify access token
@@ -100,7 +104,7 @@ if (!hasRegion || !hasCurrency) {
     const status = await verifyToken(accessToken)
 
     if (status === "valid")         return response
-    if (status === "network_error") return response 
+    if (status === "network_error") return response
     // status === "invalid" — fall through to refresh
   }
 
@@ -113,16 +117,14 @@ if (!hasRegion || !hasCurrency) {
       return response
     }
 
-    if (result.networkError) {
-      return response
-    }
+    if (result.networkError) return response
 
     // Refresh token confirmed expired by server — log out
-    return redirectToLogin()
+    return redirectToLogin(request.url)
   }
 
   // Had an access token but no refresh token, and access was invalid
-  return redirectToLogin()
+  return redirectToLogin(request.url)
 }
 
 export const config = {
