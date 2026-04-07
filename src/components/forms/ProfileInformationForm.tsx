@@ -23,13 +23,17 @@ import { updateProfile } from "@/actions/settings/profile"
 // const IS_QA = process.env.NEXT_PUBLIC_QA_MODE === "true"
 
 const toFormValues = (profile: UserProfile): ProfileFormValues => ({
-    fullName:     profile.full_name,
-    email:        profile.email,
-    phoneNumber:  profile.phone_number,
-    gender:       profile.gender,
-    country:      countries.find(v => v.label.toLowerCase() === profile.country.toLowerCase() || v.value.toLowerCase() === profile.country.toLowerCase() || v.label.toLowerCase().trim().match(profile.country.toLocaleLowerCase().trim()))?.value || profile.country,
-    state:        profile.state,
-    city:         profile.city,
+    fullName:     profile.full_name     ?? "",
+    email:        profile.email         ?? "",
+    phoneNumber:  profile.phone_number  ?? "",
+    gender:       profile.gender        ?? "",
+    country:      countries.find(v =>
+                    v.label.toLowerCase() === profile.country?.toLowerCase() ||
+                    v.value.toLowerCase() === profile.country?.toLowerCase() ||
+                    v.label.toLowerCase().trim().match(profile.country?.toLocaleLowerCase().trim())
+                  )?.value || profile.country || "",
+    state:        profile.state         ?? "",
+    city:         profile.city          ?? "",
     dob:          profile.dob ? new Date(profile.dob) : undefined,
     profileImage: profile.profile_picture ?? undefined,
 })
