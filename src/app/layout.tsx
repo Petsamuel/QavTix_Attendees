@@ -12,11 +12,14 @@ import AppSettings from "@/persistors/AppSettings"
 import AuthPersistor from "@/persistors/AuthPersistor"
 import { ReactNode } from "react"
 import { attendeeSiteMetadata } from "@/metadata"
-import { getProfile } from "@/actions/settings/profile"
+import { getServerAxios } from "@/lib/axios"
+import { GET_PROFILE_ENDPOINT } from "@/endpoints"
 
 export const metadata: Metadata = attendeeSiteMetadata
 
 async function getLayoutData() {
+
+    const axiosInstance = await getServerAxios()
 
     const [locationResult, profileResult] = await Promise.allSettled([
         getOrDetectLocation(),
