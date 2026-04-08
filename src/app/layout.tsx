@@ -20,7 +20,7 @@ async function getLayoutData() {
 
     const [locationResult, profileResult] = await Promise.allSettled([
         getOrDetectLocation(),
-        getProfile()
+        axiosInstance.get(GET_PROFILE_ENDPOINT).then(r => r.data)
     ])
 
     return {
