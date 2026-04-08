@@ -12,16 +12,20 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
     // Props for profile update use
     verified?: boolean
+    showRequired?: boolean
     verifiedMessage?: string
 }
 
 const CustomInput2 = forwardRef<HTMLInputElement, FormInputProps>(
-    ({ label, error, required, helperText, verified, verifiedMessage, className = '', ...props }, ref) => {
+    ({ label, error, required, helperText, verified, verifiedMessage, showRequired = false, className = '', ...props }, ref) => {
         return (
             <div className="w-full space-y-2.75">
                 <div className="flex justify-between items-center mb-2">
                     <label className="block text-sm font-medium text-brand-secondary-9">
                         {label}
+                        {showRequired && (
+                            <span className="text-red-500 ml-0.5">*</span>
+                        )}
                     </label>
 
 

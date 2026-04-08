@@ -5,8 +5,6 @@ import DesktopHeaderSection from "@/components/layout/DesktopHeaderSection"
 import DesktopSideNav from "@/components/layout/DesktopSideNav"
 import MobileHeaderSection from "@/components/layout/MobileHeaderSection"
 import PopUpsRenderer from "@/components/modals"
-import { GET_PROFILE_ENDPOINT } from "@/endpoints"
-import { getServerAxios } from "@/lib/axios"
 import { inter } from "@/lib/fonts"
 import { getOrDetectLocation } from "@/lib/location-utils"
 import ReduxStoreProvider from "@/lib/redux/ReduxStoreProvider"
@@ -14,14 +12,15 @@ import AppSettings from "@/persistors/AppSettings"
 import AuthPersistor from "@/persistors/AuthPersistor"
 import { ReactNode } from "react"
 import { attendeeSiteMetadata } from "@/metadata"
+import { getProfile } from "@/actions/settings/profile"
 
 export const metadata: Metadata = attendeeSiteMetadata
 
 async function getLayoutData() {
-    const axiosInstance = await getServerAxios()
+
     const [locationResult, profileResult] = await Promise.allSettled([
         getOrDetectLocation(),
-        axiosInstance.get(GET_PROFILE_ENDPOINT).then(r => r.data),
+        getProfile()
     ])
 
     return {
@@ -57,7 +56,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
                     </div>
 
                     <AppSettings currency={locationData.currency} region={locationData.region} />
-                    <AuthPersistor userData={profileData} />
+                    <AuthPersistor userData={profileData || null} />
                     <PopUpsRenderer />
                 </ReduxStoreProvider>
             </body>

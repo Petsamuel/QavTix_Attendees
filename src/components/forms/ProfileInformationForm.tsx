@@ -18,6 +18,8 @@ import ActionButton1 from "@/components/custom-utils/buttons/ActionBtn1"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
 import { updateProfile } from "@/actions/settings/profile"
+import { uploadToCloudinary } from "@/lib/upload/cloudinary"
+import { setUser } from "@/lib/redux/slices/authUserSlice"
 
 
 // const IS_QA = process.env.NEXT_PUBLIC_QA_MODE === "true"
@@ -34,7 +36,7 @@ const toFormValues = (profile: UserProfile): ProfileFormValues => ({
                   )?.value || profile.country || "",
     state:        profile.state         ?? "",
     city:         profile.city          ?? "",
-    dob:          profile.dob ? new Date(profile.dob) : undefined,
+    dob:          profile.dob ? new Date(profile.dob) : null,
     profileImage: profile.profile_picture ?? undefined,
 })
 
@@ -86,20 +88,49 @@ export default function ProfileInformationForm({ profile }: Props) {
     const country = watch("country")
 
     const onSubmit: SubmitHandler<ProfileFormValues> = async (values) => {
-        const result = await updateProfile(toPayload(values))
+        let profileImageUrl = '';
+
+        if (values.profileImage && typeof values.profileImage !== "string") {
+            try {
+                const profileUpload = await uploadToCloudinary(
+                    values.profileImage, 
+                    'qavtix-hosts/profiles'
+                )
+                profileImageUrl = profileUpload.secure_url;
+            } catch (uploadError) {
+                console.error("Cloudinary upload failed:", uploadError)
+
+                dispatch(showAlert({
+                    variant: "destructive",
+                    title: "Upload failed",
+                    description: "Failed to upload your profile picture. Please try again or choose a smaller image.",
+                }))
+
+                return;
+            }
+        }
+        const payload = toPayload({
+            ...values,
+            ...(profileImageUrl ? { profileImage: profileImageUrl } : {})
+        })
+
+        const result = await updateProfile(payload)
 
         if (result.success && result.data) {
             reset(toFormValues(result.data))
             setIsEditing(false)
+
+            dispatch(setUser(result.data))
+
             dispatch(showAlert({
-                variant:     "default",
-                title:       "Profile updated",
-                description: "Your changes have been saved.",
+                variant: "default",
+                title: "Profile updated",
+                description: "Your has been successfully updated.",
             }))
         } else {
             dispatch(showAlert({
-                variant:     "destructive",
-                title:       "Update failed",
+                variant: "destructive",
+                title: "Update failed",
                 description: result.message ?? "Could not save your profile. Please try again.",
             }))
         }
@@ -142,6 +173,7 @@ export default function ProfileInformationForm({ profile }: Props) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
                     <CustomInput2
+                        showRequired
                         label="Full Name"
                         readOnly={!isEditing}
                         className={!isEditing ? "pointer-events-none" : ""}
@@ -150,16 +182,18 @@ export default function ProfileInformationForm({ profile }: Props) {
                     />
 
                     <CustomInput2
+                        showRequired
                         label="Email Address"
                         readOnly
                         className="pointer-events-none"
                         error={errors.email?.message}
                         {...register("email")}
-                        verified={activeData.email_verified}
+                        verified={activeData.is_completed}
                         verifiedMessage="Email address verified"
                     />
 
                     <CustomInput2
+                        showRequired
                         label="Phone Number"
                         readOnly={!isEditing}
                         className={!isEditing ? "pointer-events-none" : ""}
@@ -174,6 +208,7 @@ export default function ProfileInformationForm({ profile }: Props) {
                             <CustomDatePicker
                                 label="Date Of Birth"
                                 placeholder="Select"
+                                showRequired
                                 icon={ChevronDown}
                                 value={field.value}
                                 onChange={field.onChange}
@@ -189,6 +224,7 @@ export default function ProfileInformationForm({ profile }: Props) {
                         render={({ field }) => (
                             <CustomSelect2
                                 label="Gender"
+                                showRequired
                                 options={GENDER_OPTIONS}
                                 value={field.value}
                                 onValueChange={field.onChange}
@@ -206,6 +242,7 @@ export default function ProfileInformationForm({ profile }: Props) {
                                 label="Country"
                                 options={countries}
                                 value={field.value}
+                                showRequired
                                 onValueChange={field.onChange}
                                 error={errors.country?.message}
                                 className={cn(!isEditing && "pointer-events-none")}
@@ -221,6 +258,7 @@ export default function ProfileInformationForm({ profile }: Props) {
                                 label="State"
                                 options={getStates(country)}
                                 value={field.value}
+                                showRequired
                                 onValueChange={field.onChange}
                                 error={errors.state?.message}
                                 className={cn(!isEditing && "pointer-events-none")}
@@ -229,6 +267,7 @@ export default function ProfileInformationForm({ profile }: Props) {
                     />
 
                     <CustomInput2
+                        showRequired
                         label="City"
                         readOnly={!isEditing}
                         error={errors.city?.message}

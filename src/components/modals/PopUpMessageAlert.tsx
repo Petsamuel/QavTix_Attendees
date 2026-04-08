@@ -120,7 +120,7 @@ export default function PopUpMessageAlertModal() {
                        <div className="flex justify-center items-center mt-7 mb-4">
                             {
                                 currentAlert.type === "profile_incomplete" ?
-                                <Image width={80} height={100} src="/images/vectors/setup-profile.png" alt="profile-icon" className="w-20 object-contain h-20 aspect-square pointer-events-none" />
+                                <Image width={80} height={100} src="/images/demo-images/setup-profile.png" alt="profile-icon" className="w-20 object-contain h-20 aspect-square pointer-events-none" />
                                 :
                                 <Icon icon={iconSrc} className="size-24" strokeWidth={2} />
                             }

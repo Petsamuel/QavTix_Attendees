@@ -1,10 +1,11 @@
+import { CACHE_TAGS } from "@/cache-tags"
 import { GET_PROFILE_ENDPOINT } from "@/endpoints"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(req: NextRequest) {
     try {
         const accessToken = req.cookies.get("access_token")?.value
-
+        
         if (!accessToken) {
             return NextResponse.json(
                 { message: "Not authenticated" },
@@ -18,6 +19,9 @@ export async function GET(req: NextRequest) {
                 "Content-Type":  "application/json",
                 "Authorization": `Bearer ${accessToken}`,
             },
+            next: {
+                tags: [CACHE_TAGS.PROFILE]
+            }
         })
 
         const json : ProfileResponse = await res.json()

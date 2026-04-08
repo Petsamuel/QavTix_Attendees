@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import Logo from "./Logo";
 import AuthUserDetails from "./AuthUserDetails";
 import { useEffect } from "react";
+import NeedHelpButton from "../buttons/NeedHelpButton";
 
 interface MobileNavMenuProps {
     isOpen: boolean;
@@ -151,7 +152,8 @@ export default function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
                             </ul>
                         </div>
 
-                        <div className="pt-6 border-t border-brand-accent-3/30">
+                        <div className="pt-6 space-y-4 border-t border-brand-accent-3/30">
+                            <NeedHelpButton  />
                             <AuthUserDetails />
                         </div>
                     </motion.div>
