@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { clearUser, setUser } from "@/lib/redux/slices/authUserSlice"
 
-export default function AuthPersistor({ userData }:{ userData: AuthUser }) {
+export default function AuthPersistor({ userData }:{ userData: AuthUser | null }) {
 
     const dispatch = useAppDispatch()
     const didRun   = useRef(false)

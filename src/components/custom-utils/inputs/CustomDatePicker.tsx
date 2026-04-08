@@ -14,13 +14,14 @@ import { delay } from "@/helper-fns/delay"
 
 interface CustomDatePickerProps {
     label:        string
-    value?:       Date
+    value?:       Date | null
     onChange:     (date?: Date) => void
     error?:       string
     placeholder?: string
     icon?:        LucideIcon
     className?:   string
     disabled?:    boolean
+    showRequired?:    boolean
     fromYear?:    number
     toYear?:      number
 }
@@ -30,6 +31,7 @@ export default function CustomDatePicker({
     value,
     onChange,
     error,
+    showRequired = false,
     placeholder = "DD/MM/YYYY",
     icon: Icon   = CalendarIcon,
     className,
@@ -49,6 +51,9 @@ export default function CustomDatePicker({
         <div className={cn("w-full space-y-2.75", className)}>
             <label className="block text-sm font-medium text-brand-secondary-9 mb-2">
                 {label}
+                {showRequired && (
+                    <span className="text-red-500 ml-0.5">*</span>
+                )}
             </label>
 
             <Popover open={open} onOpenChange={disabled ? undefined : setOpen}>
@@ -75,7 +80,7 @@ export default function CustomDatePicker({
                 <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                         mode="single"
-                        selected={value}
+                        selected={value ?? undefined}
                         onSelect={handleSelect}
                         captionLayout="dropdown"
                         defaultMonth={value ?? new Date(toYear - 25, 0)}

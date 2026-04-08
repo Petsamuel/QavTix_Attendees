@@ -56,3 +56,4 @@ export const HOST_PROFILE_LINK = `${process.env.NEXT_PUBLIC_APP_DOMAIN}/host/pro
 export const EXPLORE_EVENT_LINK = `${process.env.NEXT_PUBLIC_APP_DOMAIN}/events` as const;
 export const EVENT_DETAILS_LINK = `${process.env.NEXT_PUBLIC_APP_DOMAIN}/events/details/[event_id]/` as const;
 export const MARKETPLACE_EVENT_DETAILS_LINK = `${process.env.NEXT_PUBLIC_APP_DOMAIN}/events/marketplace/[event_id]/` as const;
+export const FAQ_PAGE = `${process.env.NEXT_PUBLIC_APP_DOMAIN}/faq/` as const;

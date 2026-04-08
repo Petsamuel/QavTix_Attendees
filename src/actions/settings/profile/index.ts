@@ -9,7 +9,7 @@ import { cookies } from "next/headers"
 
 interface ProfileResult {
     success:  boolean
-    data?:    UserProfile
+    data?:    AuthUser
     message?: string
 }
 

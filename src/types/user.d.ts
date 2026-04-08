@@ -1,13 +1,18 @@
 type UserRole = "attendee" | "host" | "admin"
 
 type AuthUser = {
-    profile_img: string,
+    profile_picture: string,
     full_name: string,
     id: string,
     phone_number: string
     username: string
     role: UserRole
     email: string,
+    dob: string | null
+    gender: string
+    country: string
+    city: string
+    state: string
     phone: string
     currency: string
     subscription_status: "active" | "inactive" | "cancelled" | "trialing" | null

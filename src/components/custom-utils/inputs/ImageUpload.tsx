@@ -18,44 +18,36 @@ export default function ProfileImageUploader({
     onImageChange,
     className
 }: ProfileImageUploaderProps) {
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Update preview if initialImage changes from props
+    const [previewUrl, setPreviewUrl] = useState<string | null>(initialImage ?? null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
     useEffect(() => {
-        if (initialImage) setPreviewUrl(initialImage);
+        setPreviewUrl(initialImage ?? null)
     }, [initialImage])
 
-
     useEffect(() => {
-        if (!isEditing) setPreviewUrl(initialImage || null)
-    }, [isEditing])
+        if (!isEditing) setPreviewUrl(initialImage ?? null)
+    }, [isEditing, initialImage])
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
+        const file = e.target.files?.[0]
         if (file) {
-            // Create a local preview URL
             const url = URL.createObjectURL(file)
             setPreviewUrl(url)
-            
-            // Pass the file back to the parent form (React Hook Form or state)
             if (onImageChange) onImageChange(file)
         }
     }
 
     const triggerFileInput = () => {
-        if (isEditing) {
-            fileInputRef.current?.click();
-        }
+        if (isEditing) fileInputRef.current?.click()
     }
 
-    // Determine which icon to show on the floating button
-    const actionIcon = previewUrl ? "hugeicons:pencil-edit-01" : "hugeicons:add-01";
+    const actionIcon = previewUrl ? "hugeicons:pencil-edit-01" : "hugeicons:add-01"
 
     return (
         <div className={cn("relative w-32 h-32 md:w-40 md:h-40 group", className)}>
-            {/* Main Image Container */}
-            <div 
+            <div
                 onClick={triggerFileInput}
                 className={cn(
                     "relative w-full h-full rounded-full border-2 overflow-hidden bg-brand-neutral-4 transition-all",
@@ -64,11 +56,10 @@ export default function ProfileImageUploader({
                 )}
             >
                 {previewUrl ? (
-                    <Image 
-                        src={previewUrl} 
-                        alt="Profile" 
-                        fill 
-                        className="object-cover"
+                    <img
+                        src={previewUrl}
+                        alt="Profile picture"
+                        className="w-full h-full object-cover"
                     />
                 ) : (
                     <div className="flex flex-col items-center justify-center text-brand-secondary-3">
@@ -76,15 +67,13 @@ export default function ProfileImageUploader({
                     </div>
                 )}
 
-                {/* Overlay when editing */}
                 {isEditing && (
                     <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                         <span className="sr-only">Upload Image</span>
+                        <span className="sr-only">Upload Image</span>
                     </div>
                 )}
             </div>
 
-            {/* Floating Action Button */}
             {isEditing && (
                 <button
                     type="button"
@@ -95,8 +84,7 @@ export default function ProfileImageUploader({
                 </button>
             )}
 
-            {/* Hidden Input */}
-            <input 
+            <input
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileChange}

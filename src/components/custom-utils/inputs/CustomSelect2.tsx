@@ -8,6 +8,7 @@ interface FormSelectProps extends React.HTMLAttributes<HTMLDivElement> {
     label: string
     error?: string
     required?: boolean
+    showRequired?: boolean
     options: readonly { value: string; label: string }[]
     value?: string
     onValueChange?: (value: string) => void
@@ -20,14 +21,18 @@ const CustomSelect2 = ({
     disabled,
     options,
     value,
+    showRequired = false,
     onValueChange,
     className = '',
     ...props
 }: FormSelectProps) => {
     return (
         <div className={`w-full ${className}`} {...props}>
-            <Label className="block text-sm font-medium text-brand-neutral-9 mb-2">
+            <Label className="block text-sm font-medium text-brand-secondary-9 mb-2">
                 {label}
+                {showRequired && (
+                    <span className="text-red-500 ml-0.5">*</span>
+                )}
             </Label>
 
 

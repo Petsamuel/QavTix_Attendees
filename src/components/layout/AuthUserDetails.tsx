@@ -26,7 +26,7 @@ export default function AuthUserDetails() {
     return (
         isAuthenticated && user?.id ? (
             <div className="flex items-center gap-2">
-                <CustomAvatar id={user.id || "" } profileImg={user.profile_img} name={user.full_name || ""} size="size-9" />
+                <CustomAvatar id={user.id || "" } profileImg={user.profile_picture} name={user.full_name || ""} size="size-9" />
                 <div className={`shrink w-3/5`}>
                     <p className="truncate capitalize text-xs font-medium">{user.full_name}</p>
                     <p className="truncate text-[11px] font-normal">{user.email}</p>

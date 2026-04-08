@@ -56,20 +56,7 @@ type AttendeeDashboardResponse = ApiResponse<AttendeeDashboardResponseData>
 
 
 
-interface UserProfile {
-    id:               number
-    full_name:        string
-    email:            string
-    email_verified:   boolean
-    phone_number:     string
-    dob:              string | null
-    gender:           string
-    country:          string
-    state:            string
-    city:             string
-    profile_picture:  string | null
-    role:             string
-}
+interface UserProfile extends AuthUser{}
 
 interface UpdateProfilePayload {
     full_name?:       string
