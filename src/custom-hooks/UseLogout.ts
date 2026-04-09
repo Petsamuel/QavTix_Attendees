@@ -12,8 +12,8 @@ export function useLogOut() {
     const handleLogOut = async () => {
         if (isLoggingOut) return
         setIsLoggingOut(true)
-        await logOut()
         dispatch(clearUser())
+        await logOut()
         setIsLoggingOut(false)
     }
 
