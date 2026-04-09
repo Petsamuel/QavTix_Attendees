@@ -12,7 +12,7 @@ export default function AuthUserDetails() {
 
     // Use local state to prevent hydration mismatch
     const [isMounted, setIsMounted] = useState(false)
-    const { handleLogOut } = useLogOut()
+    const { handleLogOut, isLoggingOut } = useLogOut()
     const { isAuthenticated, user } = useAppSelector(store => store.authUser)
     
     useEffect(() => {
@@ -43,9 +43,13 @@ export default function AuthUserDetails() {
                             <span>{user.full_name}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="cursor-pointer text-brand-secondary-9 text-xs font-medium bg-red-50/50">
-                            <button onClick={handleLogOut} className="flex items-center gap-2">
-                                <Icon icon="solar:logout-2-outline" width="40" height="40" aria-hidden="true" className="text-brand-primary-darkRed block" />
-                                <span>Sign Out</span>
+                            <button onClick={handleLogOut} disabled={isLoggingOut} className="flex items-center gap-2">
+                                {isLoggingOut ? (
+                                    <Icon icon="eos-icons:three-dots-loading" width="20" height="20" className="text-brand-primary-darkRed" />
+                                ) : (
+                                    <Icon icon="solar:logout-2-outline" width="40" height="40" aria-hidden="true" className="text-brand-primary-darkRed block" />
+                                )}
+                                <span>{isLoggingOut ? "Signing out..." : "Sign Out"}</span>
                             </button>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
