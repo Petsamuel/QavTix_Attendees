@@ -1,17 +1,15 @@
 "use server"
 
-import { LOGOUT_PATH } from "@/apiPaths"
 import { LOGIN_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
+import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
 export const logOut = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_APP_DOMAIN}${LOGOUT_PATH}`, {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-    })
+    const cookiesStore = await cookies()
+    cookiesStore.delete("access_token")
+    cookiesStore.delete("refresh_token")
     redirect(process.env.NEXT_PUBLIC_APP_DOMAIN || "/")
 }
 
