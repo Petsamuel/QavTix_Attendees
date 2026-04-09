@@ -6,13 +6,13 @@ import { useAppSelector } from "@/lib/redux/hooks"
 import { useEffect, useState } from "react"
 import AuthUserDetailsSkeletonLoader from "../loaders/AuthUserDetailsSkeletonLoader"
 import CustomAvatar from "../custom-utils/avatars/CustomAvatar"
-import { logOut } from "@/actions/auth"
+import { useLogOut } from "@/custom-hooks/UseLogout"
 
 export default function AuthUserDetails() {
 
     // Use local state to prevent hydration mismatch
     const [isMounted, setIsMounted] = useState(false)
-    
+    const { handleLogOut } = useLogOut()
     const { isAuthenticated, user } = useAppSelector(store => store.authUser)
     
     useEffect(() => {
@@ -43,7 +43,7 @@ export default function AuthUserDetails() {
                             <span>{user.full_name}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="cursor-pointer text-brand-secondary-9 text-xs font-medium bg-red-50/50">
-                            <button onClick={logOut} className="flex items-center gap-2">
+                            <button onClick={handleLogOut} className="flex items-center gap-2">
                                 <Icon icon="solar:logout-2-outline" width="40" height="40" aria-hidden="true" className="text-brand-primary-darkRed block" />
                                 <span>Sign Out</span>
                             </button>

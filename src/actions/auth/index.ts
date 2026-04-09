@@ -7,10 +7,11 @@ import { getServerAxios } from "@/lib/axios"
 import { redirect } from "next/navigation"
 
 export const logOut = async () => {
-
-    const axiosInstance = await getServerAxios()
-
-    await axiosInstance.post(LOGOUT_PATH)
+    await fetch(`${process.env.NEXT_PUBLIC_APP_DOMAIN}${LOGOUT_PATH}`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+    })
     redirect(process.env.NEXT_PUBLIC_APP_DOMAIN || "/")
 }
 
