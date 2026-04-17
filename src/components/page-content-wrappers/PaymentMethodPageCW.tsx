@@ -6,6 +6,7 @@ import { space_grotesk } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
 import PaymentCard from "@/components/cards/PaymentCard"
 import ChangeDefaultCardModal from "../modals/ChangeDefaultPaymentMethod"
+import AddPaymentCardModal from "@/lib/features/export/add-payment-card"
 
 
 interface Props {
@@ -38,7 +39,7 @@ export default function PaymentMethodsPageCW({ initialMethods }: Props) {
                     <p className="text-xs text-brand-secondary-5">Add a card to manage your payments.</p>
                 </div>
             ) : (
-                <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+                <div className="flex flex-col flex-wrap md:flex-row gap-8 lg:gap-12 items-start">
                     {/* Default card — larger, vibrant */}
                     {defaultMethod && (
                         <div className="w-full lg:w-auto space-y-3">
@@ -72,7 +73,11 @@ export default function PaymentMethodsPageCW({ initialMethods }: Props) {
                             </div>
                         </div>
                     )}
+                    <div className="md:self-center md:ms-6">
+                        <AddPaymentCardModal />
+                    </div>
                 </div>
+
             )}
 
             <ChangeDefaultCardModal

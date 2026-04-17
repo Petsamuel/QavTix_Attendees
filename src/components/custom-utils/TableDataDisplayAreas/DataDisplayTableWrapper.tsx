@@ -28,6 +28,7 @@ interface DataDisplayTableWrapperProps {
     onFilterChange?:    (filters: FilterValues) => void
     children:           ReactNode
     isLoading?:         boolean
+    currentSearch?:     string
     className?:         string
 
     viewMode?:          "grid" | "list"
@@ -43,6 +44,7 @@ export default function DataDisplayTableWrapper({
     activeTab,
     setActiveTab,
     onSearch,
+    currentSearch,
     setFilters,
     categories = [],
     children,
@@ -116,6 +118,7 @@ export default function DataDisplayTableWrapper({
                     <SearchTableInput1
                         placeholder={searchPlaceholder}
                         onSearch={onSearch}
+                        currentSearch={currentSearch}
                     />
                 )}
 

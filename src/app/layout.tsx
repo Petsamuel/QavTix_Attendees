@@ -11,7 +11,7 @@ import ReduxStoreProvider from "@/lib/redux/ReduxStoreProvider"
 import AppSettings from "@/persistors/AppSettings"
 import AuthPersistor from "@/persistors/AuthPersistor"
 import { ReactNode } from "react"
-import { attendeeSiteMetadata } from "@/metadata"
+import { attendeeSiteMetadata } from "@/lib/metadata"
 import { getServerAxios } from "@/lib/axios"
 import { GET_PROFILE_ENDPOINT } from "@/endpoints"
 
@@ -28,7 +28,7 @@ async function getLayoutData() {
 
     return {
         locationData: locationResult.status === "fulfilled" ? locationResult.value         : DEFAULT_LOCATION,
-        profileData:  profileResult.status  === "fulfilled" ? profileResult.value?.data    : null,
+        profileData:  profileResult.status  === "fulfilled" ? profileResult.value?.data as UserProfile    : null,
     }
 }
 

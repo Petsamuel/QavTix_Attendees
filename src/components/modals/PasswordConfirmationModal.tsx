@@ -1,7 +1,6 @@
 "use client"
 
 import { FormEvent, useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks"
 import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { AnimatedDialog } from "../custom-utils/dialogs/AnimatedDialog"
@@ -11,7 +10,7 @@ import { openSuccessModal } from "@/lib/redux/slices/successModalSlice"
 import { usePathname } from "next/navigation"
 import { Icon } from "@iconify/react"
 import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
-import { cancelPlan, deleteAccount } from "@/actions/privacy"
+import { cancelPlan, deleteAccount } from "@/actions/settings/privacy"
 import { logOut, verifyPassword } from "@/actions/auth"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
 

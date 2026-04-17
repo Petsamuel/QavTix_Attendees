@@ -44,15 +44,10 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
 
     const { isFavourite, toggle: toggleFavourite, feedbackMsg } = useFavourite(card.id, card.isFavourite)
 
-    const eventUrl = `${process.env.NEXT_PUBLIC_APP_DOMAIN}/events/details/${card.id}`
+    const eventUrl = EVENT_DETAILS_LINK.replace("[event_id]", card.id)
 
     const handleShare = () => {
-        if (typeof navigator?.share === 'function') {
-            navigator.share({ title: card.title, text: `Check out ${card.title}! 🎉`, url: eventUrl })
-                .catch(() => setShowShare(true))
-        } else {
-            setShowShare(true)
-        }
+        setShowShare(true)
     }
 
     const handleDelist = async (e: React.MouseEvent) => {

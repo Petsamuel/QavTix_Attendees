@@ -54,6 +54,7 @@ export const CANCEL_PLAN_ENDPOINT = "payments/attendee-plans/cancel/"
 
 export const PAYOUT_ACCOUNTS_ENDPOINT = "attendee/payouts/list"
 export const ADD_PAYOUT_ACCOUNT_ENDPOINT = "attendee/payouts/add/"
-
+export const ADD_PAYMENT_CARD_CONFIRM = "payments/cards/confirm/"
 
 export const PAYMENT_METHODS_ENDPOINT = "payments/cards/"
+export const ADD_PAYMENT_CARD = "payment/cards/initiate/"

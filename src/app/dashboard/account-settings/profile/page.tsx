@@ -1,6 +1,6 @@
 import { getProfile } from "@/actions/settings/profile"
 import ProfileInformationForm from "@/components/forms/ProfileInformationForm"
-import { ATTENDEE_PAGE_METADATA } from "@/metadata"
+import { ATTENDEE_PAGE_METADATA } from "@/lib/metadata"
 import type { Metadata } from "next"
 
 

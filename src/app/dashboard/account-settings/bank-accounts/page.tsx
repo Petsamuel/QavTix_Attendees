@@ -1,7 +1,7 @@
 import { getPaymentAccounts } from "@/actions/payment"
 import { getPaystackBanks } from "@/actions/payout"
 import BankAccountsPageCW from "@/components/page-content-wrappers/settings/BankAccountPageCW"
-import { ATTENDEE_PAGE_METADATA } from "@/metadata"
+import { ATTENDEE_PAGE_METADATA } from "@/lib/metadata"
 import type { Metadata } from "next"
 
 

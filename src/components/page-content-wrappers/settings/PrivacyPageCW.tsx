@@ -12,7 +12,8 @@ import { showAlert } from "@/lib/redux/slices/alertSlice"
 import {
     updatePrivacySettings,
     downloadPrivacyData,
-} from "@/actions/privacy"
+} from "@/actions/settings/privacy"
+import { useRouter } from "next/navigation"
 
 interface Props {
     initialSettings: PrivacySettings
@@ -40,7 +41,8 @@ export default function PrivacySettingsPageCW({ initialSettings }: Props) {
 
     const activePlan = useAppSelector(state => state.authUser.user?.subscription_status ?? null)
     const planExpiresAt = useAppSelector(state => state.authUser.user?.plan_expires_at ?? null)
-
+    const router = useRouter()
+    
     const hasCancellablePlan =
         activePlan === "active" || activePlan === "trialing"
 
@@ -59,6 +61,7 @@ export default function PrivacySettingsPageCW({ initialSettings }: Props) {
             show_favorites: values.allowFavorites,
         })
         setAnyLoading(false)
+        router.refresh()
 
         if (!result.success) {
             dispatch(showAlert({

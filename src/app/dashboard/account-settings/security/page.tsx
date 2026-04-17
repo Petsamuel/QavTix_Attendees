@@ -1,7 +1,7 @@
 import SecurityPageForm from "@/components/forms/SecurityPageForm"
 import { INITIAL_PROVIDERS } from "@/components-data/auth-providers"
 import { get2FASettings } from "@/actions/settings/security"
-import { ATTENDEE_PAGE_METADATA } from "@/metadata"
+import { ATTENDEE_PAGE_METADATA } from "@/lib/metadata"
 import type { Metadata } from "next"
 
 

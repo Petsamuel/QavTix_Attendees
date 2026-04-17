@@ -3,7 +3,7 @@
 import { ADD_PAYOUT_ACCOUNT_ENDPOINT, PAYOUT_ACCOUNTS_ENDPOINT, WITHDRAWAL_REQUEST_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
-import { revalidateTag } from "next/cache"
+import { updateTag } from "next/cache"
 import { CACHE_TAGS } from "@/cache-tags"
 import { cookies } from "next/headers"
 import { randomUUID } from "crypto"
@@ -118,7 +118,7 @@ export async function addPayoutAccount(payload: {
     try {
         const axiosInstance = await getServerAxios()
         const { data } = await axiosInstance.post(ADD_PAYOUT_ACCOUNT_ENDPOINT, payload)
-        revalidateTag(CACHE_TAGS.PAYOUT_ACCOUNTS, "max")
+        updateTag(CACHE_TAGS.PAYOUT_ACCOUNTS)
         return { success: true, data: data.data ?? data }
     } catch (error: any) {
         console.log("[addPayoutAccount] status:", error?.response?.status)
@@ -131,7 +131,7 @@ export async function deletePayoutAccount(accountId: string): Promise<{ success:
     try {
         const axiosInstance = await getServerAxios()
         await axiosInstance.delete(`${PAYOUT_ACCOUNTS_ENDPOINT}/${accountId}`)
-        revalidateTag(CACHE_TAGS.PAYOUT_ACCOUNTS, "max")
+        updateTag(CACHE_TAGS.PAYOUT_ACCOUNTS)
         return { success: true }
     } catch (error: any) {
         console.log("[deletePayoutAccount] status:", error?.response?.status)
@@ -160,9 +160,9 @@ export async function requestWithdrawal(payload: WithdrawalPayload): Promise<Wit
                 "Idempotency-Key": randomUUID(),
             },
         })
-        revalidateTag(CACHE_TAGS.AFFILIATE_EARNINGS,  "max")
-        revalidateTag(CACHE_TAGS.AFFILIATE_DASHBOARD, "max")
-        revalidateTag(CACHE_TAGS.WITHDRAWAL_HISTORY,  "max")
+        updateTag(CACHE_TAGS.AFFILIATE_EARNINGS)
+        updateTag(CACHE_TAGS.AFFILIATE_DASHBOARD)
+        updateTag(CACHE_TAGS.WITHDRAWAL_HISTORY)
         return { success: true }
     } catch (error: any) {
         console.log("[requestWithdrawal] status:", error?.response?.status)

@@ -76,6 +76,14 @@ export default function MyTicketsPageCW({ metrics, categories, upcoming, past, c
         [metrics, currency]
     )
 
+    const handleTabChange = (tab: string) => {
+        // Reset the leaving tab's search
+        tabStates.upcoming.resetSearch()
+        tabStates.past.resetSearch()
+        tabStates.cancelled.resetSearch()
+        setActiveTab(tab as typeof activeTab)
+    }
+
     return (
         <main className="mt-6 pb-12">
             <div className="flex justify-between items-center gap-5 mb-5 mt-10 lg:mt-0">
@@ -104,9 +112,10 @@ export default function MyTicketsPageCW({ metrics, categories, upcoming, past, c
                     setFilters={setFilters}
                     tabs={tabList}
                     activeTab={activeTab}
-                    setActiveTab={setActiveTab as Dispatch<SetStateAction<string>>}
+                    setActiveTab={handleTabChange as Dispatch<SetStateAction<string>>}
                     filterOptions={filterOptions}
                     categories={availableCategories}
+                    currentSearch={activeTabState.search}
                     showSearch={true}
                     searchPlaceholder="Search Ticket By Event Name..."
                     onSearch={activeTabState.handleSearch}

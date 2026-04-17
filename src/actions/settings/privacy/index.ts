@@ -9,7 +9,7 @@ import {
 } from "@/endpoints";
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
-import { revalidateTag } from "next/cache"
+import { updateTag } from "next/cache"
 import { cookies } from "next/headers"
 import { CACHE_TAGS } from "@/cache-tags"
 
@@ -55,7 +55,7 @@ export async function updatePrivacySettings(
     try {
         const axiosInstance = await getServerAxios()
         await axiosInstance.patch(SET_PRIVACY_SETTINGS_ENDPOINT, payload)
-        revalidateTag(CACHE_TAGS.PRIVACY_SETTINGS, "max")
+        updateTag(CACHE_TAGS.PRIVACY_SETTINGS)
         return { success: true }
     } catch (error: any) {
         console.log("[updatePrivacySettings] status:", error?.response?.status)
@@ -97,7 +97,7 @@ export async function cancelPlan(): Promise<{ success: boolean; message?: string
     try {
         const axiosInstance = await getServerAxios()
         await axiosInstance.post(CANCEL_PLAN_ENDPOINT)
-        revalidateTag(CACHE_TAGS.PROFILE, "max")
+        updateTag(CACHE_TAGS.PROFILE)
         return { success: true }
     } catch (error: any) {
         console.log("[cancelPlan] status:", error?.response?.status)

@@ -36,7 +36,6 @@ interface LoginResponseData {
 
 type LoginResponse = ApiResponse<LoginResponseData>
 
-// POST /auth/register/
 interface RegisterRequest {
     email:     string
     password:  string
@@ -44,7 +43,6 @@ interface RegisterRequest {
     role:      UserRole
 }
 
-// GET /auth/me/ or /auth/profile/
 type ProfileResponse = ApiResponse<AuthUser>
 
 

@@ -15,6 +15,7 @@ import { space_grotesk } from "@/lib/fonts"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
 import { updateNotificationSettings } from "@/actions/settings/notification"
+import { useRouter } from "next/navigation"
 
 interface Props {
     initialSettings: NotificationSettings
@@ -23,6 +24,7 @@ interface Props {
 export default function NotificationSettingsPageForm({ initialSettings }: Props) {
 
     const dispatch = useAppDispatch()
+    const router = useRouter()
     const [anyLoading, setAnyLoading] = useState(false)
 
     const { control, getValues } = useForm<NotificationFormValues>({
@@ -35,6 +37,7 @@ export default function NotificationSettingsPageForm({ initialSettings }: Props)
         setAnyLoading(true)
         const result = await updateNotificationSettings(toPayload(getValues()))
         setAnyLoading(false)
+        router.refresh()
 
         if (!result.success) {
             dispatch(showAlert({

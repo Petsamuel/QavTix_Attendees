@@ -1,6 +1,6 @@
 import { getPaymentMethods } from "@/actions/payment"
 import PaymentMethodsPageCW from "@/components/page-content-wrappers/PaymentMethodPageCW"
-import { ATTENDEE_PAGE_METADATA } from "@/metadata"
+import { ATTENDEE_PAGE_METADATA } from "@/lib/metadata"
 import type { Metadata } from "next"
 
 

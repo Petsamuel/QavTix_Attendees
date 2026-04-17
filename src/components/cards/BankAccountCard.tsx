@@ -4,41 +4,17 @@ import { useState } from "react"
 import { Icon } from "@iconify/react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import Image from "next/image"
 import { space_grotesk } from "@/lib/fonts"
 import { PayoutAccount, deletePayoutAccount } from "@/actions/payout"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
-import { getBankLogoUrl } from "@/helper-fns/bankLogos"
+import BankLogo from "../financials/BankLogo"
 
 interface Props {
     account:  PayoutAccount
     onDelete: (id: string) => void
 }
 
-const BankLogo = ({ bankName }: { bankName: string }) => {
-    const logoUrl = getBankLogoUrl(bankName)
-    const [imgError, setImgError] = useState(false)
-
-    if (!logoUrl || imgError) {
-        return (
-            <div className="w-full h-full flex items-center justify-center bg-brand-neutral-2">
-                <Icon icon="ph:bank-fill" className="size-5 text-brand-neutral-7" />
-            </div>
-        )
-    }
-
-    return (
-        <Image
-            src={logoUrl}
-            width={40}
-            height={40}
-            alt={bankName}
-            className="object-contain w-full h-full"
-            onError={() => setImgError(true)}
-        />
-    )
-}
 
 export default function BankAccountCard({ account, onDelete }: Props) {
 
