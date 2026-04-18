@@ -1,6 +1,6 @@
 import { getGroups } from "@/actions/groups"
 import GroupSettingsCW from "@/components/forms/GroupSettings"
-import { ATTENDEE_PAGE_METADATA } from "@/metadata"
+import { ATTENDEE_PAGE_METADATA } from "@/lib/metadata"
 import type { Metadata } from "next"
 
 

@@ -12,6 +12,7 @@ import { EventIconActionButton } from "@/components/buttons/EventIconActionButto
 import { copyToClipboard } from "@/helper-fns/copyToClipboard"
 import ShareEventModal from "@/components/modals/ShareEventModal"
 import { EventCardProps, fromFavouriteEvent } from "@/components/cards/resources/event-card-adapter"
+import { EVENT_DETAILS_LINK } from "@/enums/navigation"
 
 
 // Per-row actions
@@ -20,15 +21,8 @@ const RowActions = ({ id, title }: { id: string; title: string }) => {
     const [showShare,   setShowShare]   = useState(false)
     const [isFavourite, setIsFavourite] = useState(true)
 
-    const eventUrl = `${process.env.NEXT_PUBLIC_APP_DOMAIN}/events/${id}`
-
     const handleShare = () => {
-        if (typeof navigator?.share === 'function') {
-            navigator.share({ title, text: `Check out ${title}! 🎉`, url: eventUrl })
-                .catch(() => setShowShare(true))
-        } else {
-            setShowShare(true)
-        }
+        setShowShare(true)
     }
 
     return (
@@ -42,7 +36,7 @@ const RowActions = ({ id, title }: { id: string; title: string }) => {
                 />
                 <EventIconActionButton
                     icon="ph:link-bold"
-                    onClick={() => copyToClipboard(eventUrl)}
+                    onClick={() => copyToClipboard(EVENT_DETAILS_LINK.replace("[event_id]", id))}
                     className="hover:text-white"
                     feedback="Link copied!"
                 />
@@ -57,7 +51,7 @@ const RowActions = ({ id, title }: { id: string; title: string }) => {
             <ShareEventModal
                 isOpen={showShare}
                 onClose={() => setShowShare(false)}
-                shareUrl={eventUrl}
+                shareUrl={EVENT_DETAILS_LINK.replace("[event_id]", id)}
                 title={title}
             />
         </>

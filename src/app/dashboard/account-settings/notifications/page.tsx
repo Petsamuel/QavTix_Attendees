@@ -1,6 +1,6 @@
 import { getNotificationSettings } from "@/actions/settings/notification"
 import NotificationSettingsPageForm from "@/components/forms/NotificationSettingsPageForm"
-import { ATTENDEE_PAGE_METADATA } from "@/metadata"
+import { ATTENDEE_PAGE_METADATA } from "@/lib/metadata"
 import type { Metadata } from "next"
 
 

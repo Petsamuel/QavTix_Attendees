@@ -24,6 +24,8 @@ export interface TabConfig<T> {
     key:          string
     initialData:  TabSlice<T>
     staticParams: Record<string, string>
+    onCards?:     (cards: any | null) => void
+    resultsKey?:  string
 }
 
 export interface UseDataDisplayConfig<T> {
@@ -39,6 +41,7 @@ export interface TabState<T> {
     cachedItems:   T[]
     count:         number
     totalPages:    number
+    currentPage:   number
     hasNext:       boolean
     status:        FetchStatus
     isLoading:     boolean
@@ -48,18 +51,20 @@ export interface TabState<T> {
     search:        string
     handleSearch:  (query: string) => void
     loadMore:      () => void
+    fetchPage:     (page: number) => void
+    resetSearch: () => void
 }
 
-const buildFilterParams = (filters: Partial<FilterValues>): Record<string, string | string[]> => {
-    const params: Record<string, string | string[]> = {}
-    if (filters.categories?.length)                                    params.category     = filters.categories
-    if (filters.dateRange?.from)                                       params.start_date   = format(new Date(filters.dateRange.from), 'yyyy-MM-dd')
-    if (filters.dateRange?.to)                                         params.end_date     = format(new Date(filters.dateRange.to),   'yyyy-MM-dd')
-    if (filters.priceRange?.min != null && filters.priceRange.min > 0) params.min_price    = String(filters.priceRange.min)
-    if (filters.priceRange?.max != null)                               params.max_price    = String(filters.priceRange.max)
-    if (filters.status)                                                params.status       = filters.status
-    if (filters.ticketType?.length)                                    params.ticket_type  = filters.ticketType
-    if (filters.isMineFilter != null)                                  params.is_mine      = String(filters.isMineFilter)
+const buildFilterParams = (filters: Partial<FilterValues>): Record<string, string> => {
+    const params: Record<string, string> = {}
+    if (filters.categories?.length)                                    params.category    = filters.categories.join(',')
+    if (filters.dateRange?.from)                                       params.start_date  = format(new Date(filters.dateRange.from), 'yyyy-MM-dd')
+    if (filters.dateRange?.to)                                         params.end_date    = format(new Date(filters.dateRange.to),   'yyyy-MM-dd')
+    if (filters.priceRange?.min != null && filters.priceRange.min > 0) params.min_price   = String(filters.priceRange.min)
+    if (filters.priceRange?.max != null)                               params.max_price   = String(filters.priceRange.max)
+    if (filters.status)                                                params.status      = filters.status
+    if (filters.ticketType?.length)                                    params.ticket_type = filters.ticketType.join(',')
+    if (filters.isMineFilter != null)                                  params.is_mine     = String(filters.isMineFilter)
     return params
 }
 
@@ -85,10 +90,13 @@ const useTabState = <T>(
     const [cachedItems, setCachedItems] = useState<T[]>(config.initialData.results)
     const [count,       setCount]       = useState(config.initialData.count)
     const [totalPages,  setTotalPages]  = useState(config.initialData.total_pages ?? 1)
+    const [currentPage, setCurrentPage] = useState(1)
     const [hasNext,     setHasNext]     = useState(!!config.initialData.next)
     const [search,      setSearch]      = useState("")
     const [status,      setStatus]      = useState<FetchStatus>("idle")
 
+    const configRef = useRef(config)
+    configRef.current = config
     const filtersRef       = useRef(filters)
     filtersRef.current     = filters
 
@@ -98,9 +106,9 @@ const useTabState = <T>(
     const searchRef        = useRef(search)
     searchRef.current      = search
 
-    const initialized  = useRef(false)
-    const isFetching   = useRef(false)
-    const pageRef      = useRef(1)
+    const initialized   = useRef(false)
+    const isFetching    = useRef(false)
+    const pageRef       = useRef(1)
     const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     const filterKey = [
@@ -121,13 +129,13 @@ const useTabState = <T>(
         isFetching.current = true
 
         setStatus(append ? "loadingMore" : "loading")
-
+        
         const result = await fetchPaginatedData<T>({
             endpoint,
             staticParams: config.staticParams,
             filterParams: buildFilterParams(filtersRef.current),
             page:   p,
-            search: s,
+            search: s
         })
 
         isFetching.current = false
@@ -135,6 +143,7 @@ const useTabState = <T>(
         if (!result.success) {
             setItems([])
             setStatus("error")
+            configRef.current.onCards?.(null)
             return
         }
 
@@ -145,6 +154,7 @@ const useTabState = <T>(
             setCount(0)
             setHasNext(false)
             setTotalPages(0)
+            setCurrentPage(p)
             setStatus("empty")
             return
         }
@@ -153,6 +163,7 @@ const useTabState = <T>(
         setCount(result.count)
         setHasNext(!!result.next)
         setTotalPages(result.total_pages ?? 1)
+        setCurrentPage(p)
         setStatus("idle")
 
         if (!s && !hasActiveFilters(filtersRef.current)) {
@@ -161,18 +172,14 @@ const useTabState = <T>(
     })
 
     useEffect(() => {
-        if (!initialized.current) {
-            return
-        }
-
-        if (prevFilterKey.current === filterKey) {
-            return
-        }
+        if (!initialized.current) return
+        if (prevFilterKey.current === filterKey) return
 
         prevFilterKey.current = filterKey
 
         if (!hasActiveFilters(filters) && !searchRef.current) {
             pageRef.current = 1
+            setCurrentPage(1)
             setItems(cachedItemsRef.current)
             setCount(cachedItemsRef.current.length)
             setHasNext(false)
@@ -182,11 +189,12 @@ const useTabState = <T>(
         }
 
         setSearch("")
-        searchRef.current = ""
-        pageRef.current = 1
+        searchRef.current  = ""
+        pageRef.current    = 1
         fetchData.current(1, "", false)
     }, [filterKey])
 
+    // INIT — must be LAST so filter effect sees initialized=false on mount
     useEffect(() => {
         initialized.current = true
         return () => { initialized.current = false }
@@ -199,7 +207,8 @@ const useTabState = <T>(
         if (!trimmed) {
             setSearch("")
             searchRef.current = ""
-            pageRef.current = 1
+            pageRef.current   = 1
+            setCurrentPage(1)
             setItems(cachedItemsRef.current)
             setCount(cachedItemsRef.current.length)
             setHasNext(false)
@@ -218,19 +227,42 @@ const useTabState = <T>(
 
     const loadMore = useCallback(() => {
         if (!hasNext || status === "loadingMore" || isFetching.current) return
-        const nextPage = pageRef.current + 1
-        pageRef.current = nextPage
+        const nextPage      = pageRef.current + 1
+        pageRef.current     = nextPage
         fetchData.current(nextPage, searchRef.current, true)
     }, [hasNext, status])
 
+    // Fetches a specific page, replacing current items (no append)
+    const fetchPage = useCallback((page: number) => {
+        if (isFetching.current) return
+        if (page < 1 || (totalPages > 0 && page > totalPages)) return
+        pageRef.current = page
+        fetchData.current(page, searchRef.current, false)
+    }, [totalPages])
+
+
+    const resetSearch = useCallback(() => {
+        if (debounceTimer.current) clearTimeout(debounceTimer.current)
+        setSearch("")
+        searchRef.current = ""
+        pageRef.current   = 1
+        setCurrentPage(1)
+        setItems(cachedItemsRef.current)
+        setCount(cachedItemsRef.current.length)
+        setHasNext(false)
+        setTotalPages(1)
+        setStatus(cachedItemsRef.current.length === 0 ? "empty" : "idle")
+    }, [])
+
     return {
-        items, cachedItems, count, totalPages, hasNext,
+        items, cachedItems, count, totalPages, currentPage, hasNext,
         status,
         isLoading:     status === "loading",
         isLoadingMore: status === "loadingMore",
         isError:       status === "error",
         isEmpty:       status === "empty",
-        search, handleSearch, loadMore,
+        search, handleSearch, loadMore, fetchPage,
+        resetSearch
     }
 }
 

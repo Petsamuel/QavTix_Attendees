@@ -2,39 +2,13 @@
 
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
-import Image from "next/image"
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group"
 import { Label } from "../ui/label"
 import { Icon } from "@iconify/react"
 import { getPaymentAccounts } from "@/actions/payment"
 import { BankAccountSkeleton } from "../loaders/BankListLoader"
-import { getBankLogoUrl } from "@/helper-fns/bankLogos"
+import BankLogo from "../financials/BankLogo"
 
-
-
-const BankLogo = ({ bankName }: { bankName: string }) => {
-    const logoUrl = getBankLogoUrl(bankName)
-    const [imgError, setImgError] = useState(false)
-
-    if (!logoUrl || imgError) {
-        return (
-            <div className="w-full h-full flex items-center justify-center bg-brand-neutral-2">
-                <Icon icon="ph:bank-fill" className="size-5 text-brand-neutral-6" />
-            </div>
-        )
-    }
-
-    return (
-        <Image
-            src={logoUrl}
-            width={40}
-            height={40}
-            alt={bankName}
-            className="object-contain w-full h-full"
-            onError={() => setImgError(true)}
-        />
-    )
-}
 
 
 

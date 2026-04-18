@@ -31,7 +31,7 @@ export default function SecurityPageForm({ initialProviders }: Props) {
         handleSubmit,
         watch,
         reset,
-        formState: { errors, isSubmitting, isDirty },
+        formState: { errors, isSubmitting },
     } = useForm<PasswordSchema>({
         resolver: zodResolver(passwordSchema),
     })

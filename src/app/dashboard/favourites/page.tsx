@@ -1,7 +1,7 @@
 import { getFavourites } from "@/actions/favourites"
 import { getCategories } from "@/actions/filters"
 import FavouritesPageCW from "@/components/page-content-wrappers/FavouritesPageMC"
-import { ATTENDEE_PAGE_METADATA } from "@/metadata"
+import { ATTENDEE_PAGE_METADATA } from "@/lib/metadata"
 import type { Metadata } from "next"
 
 

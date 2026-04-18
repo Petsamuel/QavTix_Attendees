@@ -1,6 +1,6 @@
-import { getPrivacySettings } from "@/actions/privacy"
+import { getPrivacySettings } from "@/actions/settings/privacy"
 import PrivacySettingsPageCW from "@/components/page-content-wrappers/settings/PrivacyPageCW"
-import { ATTENDEE_PAGE_METADATA } from "@/metadata"
+import { ATTENDEE_PAGE_METADATA } from "@/lib/metadata"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = ATTENDEE_PAGE_METADATA.PRIVACY;
