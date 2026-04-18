@@ -55,14 +55,14 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
         e.stopPropagation()
         if (isDelisting) return
         setIsDelisting(true)
-        await delistTicket(card.id)
+        await delistTicket(card.marketplace_id!)
         setIsDelisting(false)
     }
 
     return (
         <>
             <Link
-                href={(card.eventCardFor === "marketplace" ? MARKETPLACE_EVENT_DETAILS_LINK : EVENT_DETAILS_LINK).replace("[event_id]", card.id)}
+                href={(card.eventCardFor === "marketplace" ? MARKETPLACE_EVENT_DETAILS_LINK : EVENT_DETAILS_LINK).replace("[event_id]", card.marketplace_id || "")}
                 target="_blank"
                 className="block w-full max-w-72 p-3 relative min-h-[25em] rounded-[32px] border border-brand-neutral-6 bg-white hover:bg-brand-secondary-1 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-[1.5px] focus:ring-brand-accent-5 focus:ring-offset-[1.5px] group"
                 aria-label={`View event: ${card.title}`}

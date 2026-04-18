@@ -1,6 +1,7 @@
 interface MarketplaceEvent {
     id:                string
     event_name:        string
+    marketplace_id:    string
     host:              string
     price:             string
     category:          string

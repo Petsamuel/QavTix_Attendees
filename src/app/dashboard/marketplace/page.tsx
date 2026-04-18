@@ -17,6 +17,8 @@ export default async function MarketplacePage() {
         throw new Error(result.message || "Failed to load marketplace.")
     }
 
+    console.log(result.data)
+
     return (
         <MarketplaceCW
             initialData={result.data}
