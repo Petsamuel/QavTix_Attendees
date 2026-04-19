@@ -81,6 +81,7 @@ export async function removeFavourite(eventId: string | number): Promise<MutateF
         revalidateTag(CACHE_TAGS.EVENT_CARDS, 'max')
         return { success: true }
     } catch (error: any) {
+        console.log(handleApiError(error?.response?.data))
         return { success: false, message: handleApiError(error?.response?.data) }
     }
 }

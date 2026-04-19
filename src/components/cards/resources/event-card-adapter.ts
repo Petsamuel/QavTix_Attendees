@@ -12,6 +12,7 @@ export interface EventCardProps {
     originalPrice: string | null
     status:        string | null   // displayed as a badge
     attendees?:    number
+    marketplace_id?: string
     isFavourite?:  boolean
     is_mine?:      boolean
     currency?:     string          // ISO code e.g. "NGN", "USD", "GBP"
@@ -40,9 +41,11 @@ export function fromFavouriteEvent(e: FavouriteEvent): EventCardProps {
         image:         e.event_image,
         price:         e.price,
         originalPrice: null,
+        isFavourite:   true,
         status:        e.event_status,
         attendees:     e.attendees_count,
         currency:      e.currency ?? undefined,
+
     }
 }
 
@@ -65,7 +68,6 @@ export function fromIEvent(e: IEvent & {
         originalPrice: e.resolvedOriginalPrice ?? null,
         status:        e.status ?? null,
         attendees:     e.attendees,
-        isFavourite:   false,
         currency:      e.currency ?? undefined,
     }
 }
@@ -73,6 +75,7 @@ export function fromIEvent(e: IEvent & {
 export function fromMarketplaceEvent(e: MarketplaceEvent): EventCardProps {
     return {
         id:            e.id,
+        marketplace_id: e.marketplace_id,
         title:         e.event_name,
         category:      e.category,
         host:          e.host,

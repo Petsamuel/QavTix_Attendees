@@ -19,6 +19,8 @@ import { deriveCategories } from "@/helper-fns/deriveCategories"
 import { ApiCategory } from "@/actions/filters"
 import { PLATFORM_CURRENCY } from "@/components-data/currencies"
 import { useIsMounted } from "@/custom-hooks/UseIsMounted"
+import { useRouter } from "next/navigation"
+import { SETTINGS_SUB_LINKS } from "@/enums/navigation"
 
 
 interface MyTicketsPageCWProps {
@@ -40,6 +42,7 @@ export default function MyTicketsPageCW({ metrics, categories, upcoming, past, c
 
     const { user }    = useAppSelector(store => store.authUser)
     const isMounted   = useIsMounted()
+    const router = useRouter()
 
     const currency = isMounted
         ? (user?.currency || PLATFORM_CURRENCY)
@@ -99,7 +102,7 @@ export default function MyTicketsPageCW({ metrics, categories, upcoming, past, c
             </div>
             {
                 isMounted && !user?.is_completed && (
-                <button className="text-brand-primary-6 font-bold text-sm mb-4 md:hidden">
+                <button onClick={() => router.push(SETTINGS_SUB_LINKS[0].href)} className="text-brand-primary-6 font-bold text-sm mb-4 md:hidden">
                     Complete Profile
                 </button>
             )}

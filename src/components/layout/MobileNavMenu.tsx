@@ -131,6 +131,7 @@ export default function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
 
                                                                     <Link
                                                                         href={sub.href}
+                                                                        onClick={onClose}
                                                                         className={cn(
                                                                             "flex-1 py-3 ml-3 pl-3 text-[13px] transition-colors",
                                                                             isSubActive 

@@ -287,7 +287,7 @@ export default function ProfileInformationForm({ profile }: Props) {
                             </button>
                             <ActionButton1
                                 buttonText={isSubmitting ? "Saving..." : "Save Changes"}
-                                className="w-1/2 rounded-lg"
+                                className="w-1/2 rounded-lg text-sm! px-2!"
                                 iconPosition="right"
                                 buttonType="submit"
                                 icon={isSubmitting ? "eos-icons:three-dots-loading" : "gravity-ui:arrow-right"}
