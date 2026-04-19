@@ -57,10 +57,12 @@ export default function DataDisplayTableWrapper({
 
     const wrapperRef = useRef<HTMLDivElement>(null)
 
-    useEffect(() => {
-        if (!activeTab) return
-        wrapperRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-    }, [activeTab])
+    const handleTabChange = (value: string) => {
+        setActiveTab?.(value)
+        setTimeout(() => {
+            wrapperRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+        }, 0)
+    }
 
     return (
         <div ref={wrapperRef} className={cn(
@@ -82,7 +84,7 @@ export default function DataDisplayTableWrapper({
                         {tabs.map((tab) => (
                             <button
                                 key={tab.value}
-                                onClick={() => setActiveTab(tab.value)}
+                                onClick={() => handleTabChange(tab.value)}
                                 className={cn(
                                     'relative pb-3 px-1 text-sm transition-colors whitespace-nowrap',
                                     activeTab === tab.value
