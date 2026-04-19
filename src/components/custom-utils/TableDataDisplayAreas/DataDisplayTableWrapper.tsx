@@ -61,7 +61,7 @@ export default function DataDisplayTableWrapper({
         setActiveTab?.(value)
         setTimeout(() => {
             wrapperRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-        }, 0)
+        }, 100)
     }
 
     return (
