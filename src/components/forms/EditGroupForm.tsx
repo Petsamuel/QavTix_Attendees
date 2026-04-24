@@ -10,17 +10,21 @@ import CustomInput1 from "../custom-utils/inputs/CustomInput1"
 import { validateEmail } from "@/helper-fns/validateEmail"
 import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
 import { updateGroup } from "@/actions/groups"
-import { useAppDispatch } from "@/lib/redux/hooks"
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
+import { useRouter } from "next/navigation"
+import { NAVIGATION_LINKS, SETTINGS_SUB_LINKS } from "@/enums/navigation"
+import { useIsMounted } from "@/custom-hooks/UseIsMounted"
 
 interface Props {
-    groupID:     string
+    groupID: string
     initialData: EditGroupFormValues
 }
 
 export default function EditGroupForm({ groupID, initialData }: Props) {
 
-    const dispatch     = useAppDispatch()
+    const dispatch = useAppDispatch()
+    const router = useRouter()
     const [emailInput, setEmailInput] = useState("")
 
     const {
@@ -33,11 +37,16 @@ export default function EditGroupForm({ groupID, initialData }: Props) {
         reset,
         formState: { errors, isSubmitting, isDirty },
     } = useForm<EditGroupFormValues>({
-        resolver:      zodResolver(editGroupSchema),
+        resolver: zodResolver(editGroupSchema),
         defaultValues: initialData,
     })
 
+    const { user } = useAppSelector(store => store.authUser)
     const members = watch("members")
+    const submittableMembers = members.filter(v => v !== user?.email)
+    const canSubmit = isDirty && submittableMembers.length > 0 && !isSubmitting
+    const isMounted = useIsMounted()
+
 
     const addMember = (e: KeyboardEvent<HTMLInputElement>) => {
         clearErrors("members")
@@ -52,7 +61,8 @@ export default function EditGroupForm({ groupID, initialData }: Props) {
     }
 
     const removeMember = (email: string) => {
-        setValue("members", members.filter(m => m !== email), { shouldDirty: true })
+        const updated = members.filter(m => m !== email)
+        setValue("members", updated, { shouldDirty: true, shouldValidate: true })
     }
 
     const onSubmit = async (values: EditGroupFormValues) => {
@@ -61,14 +71,15 @@ export default function EditGroupForm({ groupID, initialData }: Props) {
         if (result.success) {
             reset(values)   // update baseline so isDirty resets
             dispatch(showAlert({
-                variant:     "default",
-                title:       "Group updated",
+                variant: "default",
+                title: "Group updated",
                 description: `"${values.name}" has been updated.`,
             }))
+            router.push(SETTINGS_SUB_LINKS.find(v => v.href.includes("groups"))?.href || NAVIGATION_LINKS.ACCOUNT_SETTINGS.href)
         } else {
             dispatch(showAlert({
-                variant:     "destructive",
-                title:       "Could not update group",
+                variant: "destructive",
+                title: "Could not update group",
                 description: result.message ?? "Please try again.",
             }))
         }
@@ -93,8 +104,8 @@ export default function EditGroupForm({ groupID, initialData }: Props) {
                         "flex flex-wrap gap-2 p-2 min-h-25 rounded-xl border-[1.4px] transition-all duration-200 bg-gray-50/30",
                         errors.members ? "border-red-400" : "border-brand-primary-2 focus-within:border-brand-primary-4 focus-within:ring-1 focus-within:ring-brand-primary-4"
                     )}>
-                        {members.map(email => (
-                            <div key={email} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-200/70 text-brand-secondary-7 rounded-md text-sm animate-in zoom-in-95 duration-200">
+                        {isMounted && members.filter(v => v !== user?.email).map(email => (
+                            <div key={email} className="flex h-fit items-center gap-1.5 px-3 py-1.5 bg-gray-200/70 text-brand-secondary-7 rounded-md text-sm animate-in zoom-in-95 duration-200">
                                 <span>{email}</span>
                                 <button type="button" onClick={() => removeMember(email)} className="hover:text-red-500 transition-colors">
                                     <Icon icon="hugeicons:cancel-01" width="14" />
@@ -120,7 +131,7 @@ export default function EditGroupForm({ groupID, initialData }: Props) {
                 <ActionButton1
                     buttonText="Save Changes"
                     buttonType="submit"
-                    isDisabled={!isDirty}
+                    isDisabled={!canSubmit}
                     isLoading={isSubmitting}
                     className="rounded-md h-11!"
                 />

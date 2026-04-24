@@ -2,9 +2,10 @@
 
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
-import { revalidatePath } from "next/cache"
-import { SETTINGS_SUB_LINKS } from "@/enums/navigation"
+import { revalidateTag } from "next/cache"
 import { CREATE_GROUP_ENDPOINT, DELETE_GROUP_ENDPOINT, EDIT_GROUP_ENDPOINT, GET_GROUPS_ENDPOINT } from "@/endpoints"
+import { CACHE_TAGS } from "@/cache-tags"
+import { cookies } from "next/headers"
 
 export interface GroupMemberItem {
     email: string
@@ -31,17 +32,33 @@ interface MutateGroupResult {
 
 export async function getGroups(): Promise<GroupsResult> {
     try {
-        const axiosInstance = await getServerAxios()
-        const { data } = await axiosInstance.get(GET_GROUPS_ENDPOINT)
+        const cookieStore = await cookies()
+        const accessToken = cookieStore.get("access_token")?.value
 
-        const raw = data.data ?? data
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/${GET_GROUPS_ENDPOINT}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                },
+                next: { tags: [CACHE_TAGS.GROUPS], revalidate: 3600 },
+            }
+        )
+
+        if (!res.ok) {
+            const json = await res.json()
+            return { success: false, message: handleApiError(json) }
+        }
+
+        const json = await res.json()
+        const raw = json.data ?? json
         const groups = Array.isArray(raw) ? raw : []
 
         return { success: true, data: groups }
     } catch (error: any) {
-        console.log("[getGroups] status:", error?.response?.status)
-        console.log("[getGroups] body:", JSON.stringify(error?.response?.data))
-        return { success: false, message: handleApiError(error?.response?.data) }
+        console.log("[getGroups] error:", error)
+        return { success: false, message: "Failed to load groups." }
     }
 }
 
@@ -55,7 +72,7 @@ export async function createGroup(payload: {
             name:    payload.name,
             members: payload.members.map(email => ({ email })),
         })
-        revalidatePath(SETTINGS_SUB_LINKS[3].href)
+        revalidateTag(CACHE_TAGS.GROUPS, "max")
         return { success: true, data: data.data ?? data }
     } catch (error: any) {
         console.log("[createGroup] status:", error?.response?.status)
@@ -74,7 +91,7 @@ export async function updateGroup(
             name:    payload.name,
             members: payload.members.map(email => ({ email })),
         })
-        revalidatePath(SETTINGS_SUB_LINKS[3].href)
+        revalidateTag(CACHE_TAGS.GROUPS, "max")
         return { success: true, data: data.data ?? data }
     } catch (error: any) {
         console.log("[updateGroup] status:", error?.response?.status)
@@ -87,11 +104,11 @@ export async function deleteGroup(groupID: string): Promise<{ success: boolean; 
     try {
         const axiosInstance = await getServerAxios()
         await axiosInstance.delete(DELETE_GROUP_ENDPOINT.replace("[group_id]", groupID))
-        revalidatePath(SETTINGS_SUB_LINKS[3].href)
+        revalidateTag(CACHE_TAGS.GROUPS, "max")
         return { success: true }
     } catch (error: any) {
         console.log("[deleteGroup] status:", error?.response?.status)
         console.log("[deleteGroup] body:", JSON.stringify(error?.response?.data))
         return { success: false, message: handleApiError(error?.response?.data) }
     }
-}
+}

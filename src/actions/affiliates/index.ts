@@ -14,8 +14,8 @@ import { revalidateTag } from "next/cache"
 
 async function fetchWithTag<T>(
     endpoint: string,
-    tag:      string,
-    params?:  Record<string, string | number>,
+    tag: string,
+    params?: Record<string, string | number>,
 ): Promise<{ success: true; data: T } | { success: false; message: string }> {
     try {
         const cookieStore = await cookies()
@@ -33,7 +33,8 @@ async function fetchWithTag<T>(
                 "Content-Type": "application/json",
                 ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
             },
-            next: { tags: [tag] },
+            next: { tags: [tag], revalidate: 3000 },
+            cache: "force-cache",
         })
 
         if (!res.ok) {
@@ -59,11 +60,11 @@ export async function getAffiliateDashboard() {
 }
 
 interface GetAffiliateLinksParams {
-    page?:       number
-    search?:     string
-    category?:   string
+    page?: number
+    search?: string
+    category?: string
     start_date?: string
-    end_date?:   string
+    end_date?: string
 }
 
 export async function getAffiliateLinks(params: GetAffiliateLinksParams = {}) {
@@ -75,12 +76,12 @@ export async function getAffiliateLinks(params: GetAffiliateLinksParams = {}) {
 }
 
 interface GetEarningsParams {
-    page?:       number
-    search?:     string
-    category?:   string
+    page?: number
+    search?: string
+    category?: string
     start_date?: string
-    end_date?:   string
-    status?:     string
+    end_date?: string
+    status?: string
 }
 
 export async function getEarningsHistory(params: GetEarningsParams = {}) {
@@ -99,12 +100,12 @@ export async function getEarningsHistory(params: GetEarningsParams = {}) {
 
 export async function getAffiliatePerformanceSingle(
     filter: PerformanceFilter,
-    year?:   number,
+    year?: number,
 ) {
     const tagMap: Record<PerformanceFilter, string> = {
-        week:  CACHE_TAGS.AFFILIATE_PERFORMANCE_WEEK,
+        week: CACHE_TAGS.AFFILIATE_PERFORMANCE_WEEK,
         month: CACHE_TAGS.AFFILIATE_PERFORMANCE_MONTH,
-        year:  CACHE_TAGS.AFFILIATE_PERFORMANCE_YEAR,
+        year: CACHE_TAGS.AFFILIATE_PERFORMANCE_YEAR,
     }
 
     return fetchWithTag<AffiliatePerformanceData>(
@@ -118,13 +119,13 @@ export async function getAffiliatePerformanceAll(year: number): Promise<AllPerfo
     const [weekRes, monthRes, yearRes] = await Promise.all([
         getAffiliatePerformanceSingle("week"),
         getAffiliatePerformanceSingle("month"),
-        getAffiliatePerformanceSingle("year",  year),
+        getAffiliatePerformanceSingle("year", year),
     ])
 
     return {
-        week:  weekRes.success  ? weekRes.data  as WeekPerformanceData  : null,
+        week: weekRes.success ? weekRes.data as WeekPerformanceData : null,
         month: monthRes.success ? monthRes.data as MonthPerformanceData : null,
-        year:  yearRes.success  ? yearRes.data  as YearPerformanceData  : null,
+        year: yearRes.success ? yearRes.data as YearPerformanceData : null,
     }
 }
 

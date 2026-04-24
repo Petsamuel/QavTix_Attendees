@@ -3,7 +3,7 @@
 import { CHANGE_PASSWORD_ENDPOINT, GET_TWO_FACTOR_ENDPOINT, UPDATE_TWO_FACTOR_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
-import { updateTag } from "next/cache"
+import { revalidateTag } from "next/cache"
 import { CACHE_TAGS } from "@/cache-tags"
 import { cookies } from "next/headers"
 
@@ -38,7 +38,7 @@ export async function get2FASettings(): Promise<Get2FAResult> {
                     "Content-Type": "application/json",
                     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
                 },
-                next: { tags: [CACHE_TAGS.TWO_FACTOR] },
+                next: { tags: [CACHE_TAGS.TWO_FACTOR], revalidate: 3600 },
             }
         )
 
@@ -63,7 +63,7 @@ export async function toggle2FAProvider(
     try {
         const axiosInstance = await getServerAxios()
         await axiosInstance.patch(UPDATE_TWO_FACTOR_ENDPOINT, { [providerID]: enable })
-        updateTag(CACHE_TAGS.TWO_FACTOR)
+        revalidateTag(CACHE_TAGS.TWO_FACTOR, "max")
         return { success: true }
     } catch (error: any) {
         console.log("[toggle2FAProvider] status:", error?.response?.status)

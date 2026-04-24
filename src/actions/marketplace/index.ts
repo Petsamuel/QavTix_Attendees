@@ -8,7 +8,7 @@ import { revalidateTag } from "next/cache"
 import { cookies } from "next/headers"
 
 interface TransferTicketPayload {
-    ticket_id:       string
+    ticket_id: string
     recipient_email: string
 }
 
@@ -19,7 +19,7 @@ interface TransferTicketResult {
 
 interface ResellTicketPayload {
     ticket_id: string
-    price:     string
+    price: string
 }
 
 interface ResellTicketResult {
@@ -29,10 +29,11 @@ interface ResellTicketResult {
 
 
 export async function transferTicket(payload: TransferTicketPayload): Promise<TransferTicketResult> {
-    
+
     try {
         const axiosInstance = await getServerAxios()
         const { data } = await axiosInstance.post(TRANSFER_TICKET_ENDPOINT, payload)
+        revalidateTag(CACHE_TAGS.MARKETPLACE, "max")
 
         return {
             success: true,
@@ -51,8 +52,9 @@ export async function transferTicket(payload: TransferTicketPayload): Promise<Tr
 
 export async function resellTicket(payload: ResellTicketPayload): Promise<ResellTicketResult> {
     try {
-        const api      = await getServerAxios()
+        const api = await getServerAxios()
         const { data } = await api.post(RESELL_TICKET_ENDPOINT, payload)
+        revalidateTag(CACHE_TAGS.MARKETPLACE, "max")
 
         return {
             success: true,
@@ -73,24 +75,24 @@ export async function resellTicket(payload: ResellTicketPayload): Promise<Resell
 
 
 interface GetMarketplaceParams {
-    page?:       number
-    search?:     string
-    category?:   string
+    page?: number
+    search?: string
+    category?: string
     start_date?: string
-    end_date?:   string
-    min_price?:  string
-    max_price?:  string
+    end_date?: string
+    min_price?: string
+    max_price?: string
 }
 
 interface GetMarketplaceResult {
-    success:  boolean
-    data?:    PaginatedResponse<MarketplaceEvent>
+    success: boolean
+    data?: PaginatedResponse<MarketplaceEvent>
     message?: string
 }
 
 
 interface MutateMarketplaceResult {
-    success:  boolean
+    success: boolean
     message?: string
 }
 
@@ -109,7 +111,7 @@ export async function getMarketplace(params: GetMarketplaceParams = {}): Promise
                 "Content-Type": "application/json",
                 ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
             },
-            next: { tags: [CACHE_TAGS.EVENT_CARDS, CACHE_TAGS.MARKETPLACE] },
+            next: { tags: [CACHE_TAGS.EVENT_CARDS, CACHE_TAGS.MARKETPLACE], revalidate: 3000 },
         })
 
         if (!res.ok) {
@@ -133,7 +135,7 @@ export async function delistTicket(eventID: string | number): Promise<MutateMark
         const axiosInstance = await getServerAxios()
         const endpoint = MARKETPLACE_DELIST_ENDPOINT.replace("[event_id]", String(eventID))
         await axiosInstance.delete(endpoint)
-        revalidateTag(CACHE_TAGS.MARKETPLACE, 'max')
+        revalidateTag(CACHE_TAGS.MARKETPLACE, "max")
         return { success: true }
     } catch (error: any) {
         return { success: false, message: handleApiError(error?.response?.data) }

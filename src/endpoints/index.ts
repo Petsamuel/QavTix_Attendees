@@ -19,9 +19,9 @@ export const CATEGORIES_ENDPOINT = "public/categories"
 export const TICKET_RECEIPT_ENDPOINT = `attendee/tickets/[id]/receipt/`
 
 
-export const AFFILIATE_DASHBOARD_ENDPOINT   = "attendee/affliate/dashboard"
-export const AFFILIATE_LINKS_ENDPOINT       = "attendee/affliate/event"
-export const AFFILIATE_EARNINGS_ENDPOINT    = "attendee/affliate/earning/history"
+export const AFFILIATE_DASHBOARD_ENDPOINT = "attendee/affliate/dashboard"
+export const AFFILIATE_LINKS_ENDPOINT = "attendee/affliate/event"
+export const AFFILIATE_EARNINGS_ENDPOINT = "attendee/affliate/earning/history"
 export const AFFILIATE_PERFORMANCE_ENDPOINT = "attendee/affliate/graph"
 export const WITHDRAWAL_HISTORY_ENDPOINT = "attendee/withdrawal/history"
 export const WITHDRAWAL_REQUEST_ENDPOINT = "attendee/withdrawal/request/"
@@ -55,6 +55,8 @@ export const CANCEL_PLAN_ENDPOINT = "payments/attendee-plans/cancel/"
 export const PAYOUT_ACCOUNTS_ENDPOINT = "attendee/payouts/list"
 export const ADD_PAYOUT_ACCOUNT_ENDPOINT = "attendee/payouts/add/"
 export const ADD_PAYMENT_CARD_CONFIRM = "payments/cards/confirm/"
+export const DELETE_PAYMENT_METHOD = "attendee/payouts/remove/[id]/"
+
 
 export const PAYMENT_METHODS_ENDPOINT = "payments/cards/"
-export const ADD_PAYMENT_CARD = "payment/cards/initiate/"
+export const ADD_PAYMENT_CARD = "payments/cards/initiate/"

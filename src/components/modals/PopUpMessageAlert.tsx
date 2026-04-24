@@ -17,12 +17,12 @@ import { useLogOut } from "@/custom-hooks/UseLogout"
 
 export default function PopUpMessageAlertModal() {
     const dispatch = useDispatch()
-    const router   = useRouter()
+    const router = useRouter()
 
     const { alerts, isOpen } = useAppSelector((state) => state.popupAlert)
 
     const [currentIndex, setCurrentIndex] = useState(0)
-    const [direction,    setDirection]    = useState<"left" | "right">("right")
+    const [direction, setDirection] = useState<"left" | "right">("right")
     const { handleLogOut, isLoggingOut } = useLogOut()
 
     useEffect(() => {
@@ -30,8 +30,8 @@ export default function PopUpMessageAlertModal() {
     }, [isOpen])
 
     const currentAlert = alerts[currentIndex] ?? null
-    const config       = currentAlert ? POPUP_MESSAGE_ALERT_CONFIG[currentAlert.type] : null
-    const iconSrc      = config?.icon ?? null
+    const config = currentAlert ? POPUP_MESSAGE_ALERT_CONFIG[currentAlert.type] : null
+    const iconSrc = config?.icon ?? null
 
     const goTo = (index: number) => {
         if (index < 0 || index >= alerts.length) return
@@ -59,8 +59,8 @@ export default function PopUpMessageAlertModal() {
 
     if (!isOpen || alerts.length === 0 || !currentAlert || !config || !iconSrc) return null
 
-    const isFirst             = currentIndex === 0
-    const isLast              = currentIndex === alerts.length - 1
+    const isFirst = currentIndex === 0
+    const isLast = currentIndex === alerts.length - 1
     const isProfileIncomplete = currentAlert.type === "profile_incomplete"
 
     return (
@@ -117,13 +117,20 @@ export default function PopUpMessageAlertModal() {
                             direction === "right" ? "slide-in-from-right-10" : "slide-in-from-left-10"
                         )}
                     >
-                       <div className="flex justify-center items-center mt-7 mb-4">
-                            {
-                                currentAlert.type === "profile_incomplete" ?
-                                <Image width={80} height={100} src="/images/demo-images/setup-profile.png" alt="profile-icon" className="w-20 object-contain h-20 aspect-square pointer-events-none" />
-                                :
+                        <div className="flex justify-center items-center mt-7 mb-4">
+                            {currentAlert.type === "profile_incomplete" ? (
+                                <div className="relative w-20 h-20">
+                                    <Image
+                                        src="/images/vectors/profile-icon.svg"
+                                        alt="profile-icon"
+                                        fill
+                                        className="object-contain pointer-events-none"
+                                        priority
+                                    />
+                                </div>
+                            ) : (
                                 <Icon icon={iconSrc} className="size-24" strokeWidth={2} />
-                            }
+                            )}
                         </div>
 
                         <div className="pb-8 px-4 text-center">

@@ -9,7 +9,7 @@ import {
 } from "@/endpoints";
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
-import { updateTag } from "next/cache"
+import { revalidateTag } from "next/cache"
 import { cookies } from "next/headers"
 import { CACHE_TAGS } from "@/cache-tags"
 
@@ -31,7 +31,7 @@ export async function getPrivacySettings(): Promise<PrivacyResult> {
                     "Content-Type": "application/json",
                     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
                 },
-                next: { tags: [CACHE_TAGS.PRIVACY_SETTINGS] },
+                next: { tags: [CACHE_TAGS.PRIVACY_SETTINGS], revalidate: 3600 },
             }
         )
 
@@ -55,7 +55,7 @@ export async function updatePrivacySettings(
     try {
         const axiosInstance = await getServerAxios()
         await axiosInstance.patch(SET_PRIVACY_SETTINGS_ENDPOINT, payload)
-        updateTag(CACHE_TAGS.PRIVACY_SETTINGS)
+        revalidateTag(CACHE_TAGS.PRIVACY_SETTINGS, "max")
         return { success: true }
     } catch (error: any) {
         console.log("[updatePrivacySettings] status:", error?.response?.status)
@@ -97,7 +97,7 @@ export async function cancelPlan(): Promise<{ success: boolean; message?: string
     try {
         const axiosInstance = await getServerAxios()
         await axiosInstance.post(CANCEL_PLAN_ENDPOINT)
-        updateTag(CACHE_TAGS.PROFILE)
+        revalidateTag(CACHE_TAGS.PROFILE, "max")
         return { success: true }
     } catch (error: any) {
         console.log("[cancelPlan] status:", error?.response?.status)

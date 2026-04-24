@@ -3,7 +3,7 @@
 import { GET_PROFILE_ENDPOINT, UPDATE_PROFILE_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
-import { updateTag } from "next/cache"
+import { revalidateTag } from "next/cache"
 import { CACHE_TAGS } from "@/cache-tags"
 import { cookies } from "next/headers"
 
@@ -25,7 +25,7 @@ export async function getProfile(): Promise<ProfileResult> {
                     "Content-Type": "application/json",
                     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
                 },
-                next: { tags: [CACHE_TAGS.PROFILE] },
+                next: { tags: [CACHE_TAGS.PROFILE], revalidate: 3600 },
             }
         )
 
@@ -48,7 +48,7 @@ export async function updateProfile(payload: UpdateProfilePayload): Promise<Prof
     try {
         const axiosInstance = await getServerAxios()
         const { data } = await axiosInstance.patch(UPDATE_PROFILE_ENDPOINT, payload)
-        updateTag(CACHE_TAGS.PROFILE)
+        revalidateTag(CACHE_TAGS.PROFILE, "max")
         return { success: true, data: data.data ?? data }
     } catch (error: any) {
         console.log("[updateProfile] status:", error?.response?.status)

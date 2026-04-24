@@ -2,7 +2,8 @@
 
 import { TICKET_RECEIPT_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
-import { getServerAxios } from "@/lib/axios"
+import { CACHE_TAGS } from "@/cache-tags"
+import { cookies } from "next/headers"
 
 interface GetReceiptResult {
     success:  boolean
@@ -12,15 +13,31 @@ interface GetReceiptResult {
 
 export async function getTicketReceipt(ticketID: string): Promise<GetReceiptResult> {
     try {
-        const axiosInstance = await getServerAxios()
-        const { data } = await axiosInstance.get<TicketReceiptResponse>(
-            `${TICKET_RECEIPT_ENDPOINT}`.replace("[id]", ticketID)
+        const cookieStore = await cookies()
+        const accessToken = cookieStore.get("access_token")?.value
+
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/${TICKET_RECEIPT_ENDPOINT.replace("[id]", ticketID)}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                },
+                next: { tags: [CACHE_TAGS.TICKET_RECEIPTS], revalidate: 3600 },
+            }
         )
-        return { success: true, data: data.data }
+
+        if (!res.ok) {
+            const json = await res.json()
+            return { success: false, message: handleApiError(json) }
+        }
+
+        const json = await res.json()
+        return { success: true, data: json.data }
     } catch (error: any) {
         return {
             success: false,
-            message: handleApiError(error?.response?.data),
+            message: "Failed to load ticket receipt.",
         }
     }
 }

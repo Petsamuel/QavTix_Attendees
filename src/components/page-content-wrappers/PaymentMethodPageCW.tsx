@@ -16,11 +16,11 @@ interface Props {
 
 export default function PaymentMethodsPageCW({ initialMethods }: Props) {
 
-    const [methods,     setMethods]     = useState<PaymentMethod[]>(initialMethods)
-    const [showModal,   setShowModal]   = useState(false)
+    const [methods, setMethods] = useState<PaymentMethod[]>(initialMethods)
+    const [showModal, setShowModal] = useState(false)
 
     const defaultMethod = methods.find(m => m.is_default)
-    const otherMethods  = methods.filter(m => !m.is_default)
+    const otherMethods = methods.filter(m => !m.is_default)
 
     return (
         <main className="w-full pt-8 pb-16 space-y-10">
@@ -28,6 +28,9 @@ export default function PaymentMethodsPageCW({ initialMethods }: Props) {
                 <h2 className={cn(space_grotesk.className, "text-lg font-bold text-brand-secondary-9")}>
                     Payment Method
                 </h2>
+                <div className="md:self-center md:ms-6">
+                    <AddPaymentCardModal />
+                </div>
             </div>
 
             {methods.length === 0 ? (
@@ -54,7 +57,7 @@ export default function PaymentMethodsPageCW({ initialMethods }: Props) {
                                 className="flex mt-8 items-center gap-1.5 text-sm font-bold text-brand-primary-6 hover:text-brand-primary-7 transition-colors group"
                             >
                                 Change Default Card
-                                <Icon icon="zondicons:arrow-right"  className="size-3 group-hover:translate-x-0.5 transition-transform" />
+                                <Icon icon="zondicons:arrow-right" className="size-3 group-hover:translate-x-0.5 transition-transform" />
                             </button>
                         </div>
                     )}
@@ -73,9 +76,6 @@ export default function PaymentMethodsPageCW({ initialMethods }: Props) {
                             </div>
                         </div>
                     )}
-                    <div className="md:self-center md:ms-6">
-                        <AddPaymentCardModal />
-                    </div>
                 </div>
 
             )}
