@@ -8,23 +8,23 @@ import { revalidateTag } from "next/cache"
 import { cookies } from "next/headers"
 
 interface GetFavouritesParams {
-    page?:       number
-    search?:     string
-    category?:   string
+    page?: number
+    search?: string
+    category?: string
     start_date?: string
-    end_date?:   string
-    min_price?:  string
-    max_price?:  string
+    end_date?: string
+    min_price?: string
+    max_price?: string
 }
 
 interface GetFavouritesResult {
-    success:  boolean
-    data?:    PaginatedResponse<FavouriteEvent>
+    success: boolean
+    data?: PaginatedResponse<FavouriteEvent>
     message?: string
 }
 
 interface MutateFavouriteResult {
-    success:  boolean
+    success: boolean
     message?: string
 }
 
@@ -45,7 +45,8 @@ export async function getFavourites(params: GetFavouritesParams = {}): Promise<G
                 "Content-Type": "application/json",
                 ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
             },
-            next: { tags: [CACHE_TAGS.EVENT_CARDS] },
+            next: { tags: [CACHE_TAGS.EVENT_CARDS], revalidate: 3000 },
+            cache: "force-cache"
         })
 
         if (!res.ok) {

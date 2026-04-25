@@ -1,7 +1,7 @@
 "use server"
 
 import { CATEGORIES_ENDPOINT } from "@/endpoints"
-import { getServerAxios } from "@/lib/axios"
+import { CACHE_TAGS } from "@/cache-tags"
 
 export interface ApiCategory {
     id:   number
@@ -16,9 +16,15 @@ export interface GetCategoriesResult {
 
 export async function getCategories(): Promise<GetCategoriesResult> {
     try {
-        const axiosInstance = await getServerAxios()
-        const { data } = await axiosInstance.get(CATEGORIES_ENDPOINT)
-        return { success: true, data: data.data ?? [] }
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/${CATEGORIES_ENDPOINT}`, {
+            headers: { "Content-Type": "application/json" },
+            next: { tags: [CACHE_TAGS.CATEGORIES], revalidate: 3600 },
+        })
+
+        if (!res.ok) return { success: false, data: [] }
+
+        const json = await res.json()
+        return { success: true, data: json.data ?? [] }
     } catch {
         return { success: false, data: [] }
     }

@@ -25,35 +25,35 @@ import { setUser } from "@/lib/redux/slices/authUserSlice"
 // const IS_QA = process.env.NEXT_PUBLIC_QA_MODE === "true"
 
 const toFormValues = (profile: UserProfile): ProfileFormValues => ({
-    fullName:     profile.full_name     ?? "",
-    email:        profile.email         ?? "",
-    phoneNumber:  profile.phone_number  ?? "",
-    gender:       profile.gender        ?? "",
-    country:      countries.find(v =>
-                    v.label.toLowerCase() === profile.country?.toLowerCase() ||
-                    v.value.toLowerCase() === profile.country?.toLowerCase() ||
-                    v.label.toLowerCase().trim().match(profile.country?.toLocaleLowerCase().trim())
-                  )?.value || profile.country || "",
-    state:        profile.state         ?? "",
-    city:         profile.city          ?? "",
-    dob:          profile.dob ? new Date(profile.dob) : null,
+    fullName: profile.full_name ?? "",
+    email: profile.email ?? "",
+    phoneNumber: profile.phone_number ?? "",
+    gender: profile.gender ?? "",
+    country: countries.find(v =>
+        v.label.toLowerCase() === profile.country?.toLowerCase() ||
+        v.value.toLowerCase() === profile.country?.toLowerCase() ||
+        v.label.toLowerCase().trim().match(profile.country?.toLocaleLowerCase().trim())
+    )?.value || profile.country || "",
+    state: profile.state ?? "",
+    city: profile.city ?? "",
+    dob: profile.dob ? new Date(profile.dob) : undefined as unknown as Date,
     profileImage: profile.profile_picture ?? undefined,
 })
 
 const toPayload = (values: ProfileFormValues): UpdateProfilePayload => {
     const profilePicture: string | null =
         values.profileImage instanceof File
-            ? null       
+            ? null
             : (values.profileImage as string | undefined) ?? null
 
     return {
-        full_name:       values.fullName,
-        phone_number:    values.phoneNumber,
-        gender:          values.gender,
-        country:         countries.find(v => v.value.toLowerCase() === values.country.toLowerCase())?.label,
-        state:           values.state,
-        city:            values.city,
-        dob:             values.dob
+        full_name: values.fullName,
+        phone_number: values.phoneNumber,
+        gender: values.gender,
+        country: countries.find(v => v.value.toLowerCase() === values.country.toLowerCase())?.label,
+        state: values.state,
+        city: values.city,
+        dob: values.dob
             ? (values.dob as Date).toISOString().split("T")[0]
             : null,
         profile_picture: profilePicture,
@@ -68,9 +68,9 @@ interface Props {
 
 export default function ProfileInformationForm({ profile }: Props) {
 
-    const dispatch    = useAppDispatch()
-    const activeData  = profile
-    const [isEditing,   setIsEditing]   = useState(false)
+    const dispatch = useAppDispatch()
+    const activeData = profile
+    const [isEditing, setIsEditing] = useState(false)
 
     const {
         register,
@@ -81,7 +81,7 @@ export default function ProfileInformationForm({ profile }: Props) {
         reset,
         formState: { errors, isDirty, isSubmitting },
     } = useForm<ProfileFormValues>({
-        resolver:      zodResolver(profileSchema),
+        resolver: zodResolver(profileSchema),
         defaultValues: toFormValues(activeData),
     })
 
@@ -93,7 +93,7 @@ export default function ProfileInformationForm({ profile }: Props) {
         if (values.profileImage && typeof values.profileImage !== "string") {
             try {
                 const profileUpload = await uploadToCloudinary(
-                    values.profileImage, 
+                    values.profileImage,
                     'qavtix-hosts/profiles'
                 )
                 profileImageUrl = profileUpload.secure_url;
@@ -145,7 +145,7 @@ export default function ProfileInformationForm({ profile }: Props) {
         <div className="w-full max-w-4xl pt-8 pb-16">
             <div className="flex items-center justify-between mb-8">
                 <h2 className={cn(space_grotesk.className, "text-brand-secondary-8 font-bold text-lg")}>
-                    Profile Information 
+                    Profile Information
                 </h2>
 
                 {!isEditing && (
@@ -239,13 +239,13 @@ export default function ProfileInformationForm({ profile }: Props) {
                         control={control}
                         render={({ field }) => (
                             <CustomSelect2
-                                label="Country"
+                                label={`Country ${!!activeData.country ? '(Not editable)' : ''}`}
                                 options={countries}
                                 value={field.value}
                                 showRequired
                                 onValueChange={field.onChange}
                                 error={errors.country?.message}
-                                className={cn(!isEditing && "pointer-events-none")}
+                                className={cn((!isEditing || !!activeData.country) && "pointer-events-none opacity-80")}
                             />
                         )}
                     />
@@ -275,7 +275,7 @@ export default function ProfileInformationForm({ profile }: Props) {
                         {...register("city")}
                     />
 
-                    {isEditing && isDirty && (
+                    {isEditing && (
                         <div className="md:col-span-2 flex gap-6 mt-2 animate-in slide-in-from-bottom-2 duration-300">
                             <button
                                 type="button"

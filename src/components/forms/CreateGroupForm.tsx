@@ -14,7 +14,7 @@ import { useAppDispatch } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
 
 const createGroupSchema = z.object({
-    name:    z.string().min(1, "Group name is required"),
+    name: z.string().min(1, "Group name is required"),
     members: z.array(z.string().email()).min(1, "Add at least one member"),
 })
 
@@ -22,7 +22,7 @@ type CreateGroupFormValues = z.infer<typeof createGroupSchema>
 
 interface Props {
     onCreated: (group: Group) => void
-    onCancel:  () => void
+    onCancel: () => void
 }
 
 export default function CreateGroupForm({ onCreated, onCancel }: Props) {
@@ -39,7 +39,7 @@ export default function CreateGroupForm({ onCreated, onCancel }: Props) {
         watch,
         formState: { errors, isSubmitting, isDirty },
     } = useForm<CreateGroupFormValues>({
-        resolver:      zodResolver(createGroupSchema),
+        resolver: zodResolver(createGroupSchema),
         defaultValues: { name: "", members: [] },
     })
 
@@ -66,14 +66,14 @@ export default function CreateGroupForm({ onCreated, onCancel }: Props) {
         if (result.success && result.data) {
             onCreated(result.data)
             dispatch(showAlert({
-                variant:     "default",
-                title:       "Group created",
+                variant: "default",
+                title: "Group created",
                 description: `"${values.name}" has been created.`,
             }))
         } else {
             dispatch(showAlert({
-                variant:     "destructive",
-                title:       "Could not create group",
+                variant: "destructive",
+                title: "Could not create group",
                 description: result.message ?? "Please try again.",
             }))
         }
@@ -96,7 +96,7 @@ export default function CreateGroupForm({ onCreated, onCancel }: Props) {
                     errors.members ? "border-red-400" : "border-brand-primary-2 focus-within:border-brand-primary-4 focus-within:ring-1 focus-within:ring-brand-primary-4"
                 )}>
                     {members.map(email => (
-                        <div key={email} className="flex h-10 items-center gap-1.5 px-3 py-1.5 bg-gray-200/70 text-brand-secondary-7 rounded-md text-sm animate-in zoom-in-95 duration-200">
+                        <div key={email} className="flex h-fit items-center gap-1.5 px-3 py-1.5 bg-gray-200/70 text-brand-secondary-7 rounded-md text-sm animate-in zoom-in-95 duration-200">
                             <span>{email}</span>
                             <button type="button" onClick={() => removeMember(email)} className="hover:text-red-500 transition-colors">
                                 <Icon icon="hugeicons:cancel-01" width="14" />
@@ -112,6 +112,7 @@ export default function CreateGroupForm({ onCreated, onCancel }: Props) {
                         className="flex-1 h-10 ps-1 min-w-30 bg-transparent outline-none text-sm text-brand-secondary-9 placeholder:text-brand-secondary-4"
                     />
                 </div>
+                <p className="text-[11px] text-brand-secondary-8">Enter member's email and click enter to save</p>
                 {errors.members && <p className="text-xs text-red-500 mt-1">{errors.members.message}</p>}
             </div>
 

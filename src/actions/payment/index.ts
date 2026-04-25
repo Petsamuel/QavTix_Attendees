@@ -3,7 +3,7 @@
 import { ADD_PAYMENT_CARD, ADD_PAYMENT_CARD_CONFIRM, PAYMENT_ACCOUNTS_ENDPOINT, PAYMENT_METHODS_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
-import { updateTag } from "next/cache"
+import { revalidateTag } from "next/cache"
 import { CACHE_TAGS } from "@/cache-tags"
 import { cookies } from "next/headers"
 
@@ -25,7 +25,7 @@ export async function getPaymentAccounts(): Promise<GetPaymentAccountsResult> {
                     "Content-Type": "application/json",
                     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
                 },
-                next: { tags: [CACHE_TAGS.PAYMENT_ACCOUNTS] },
+                next: { tags: [CACHE_TAGS.PAYMENT_ACCOUNTS], revalidate: 3600 },
             }
         )
 
@@ -66,7 +66,7 @@ export async function getPaymentMethods(): Promise<PaymentMethodsResult> {
                     "Content-Type": "application/json",
                     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
                 },
-                next: { tags: [CACHE_TAGS.PAYMENT_METHODS] },
+                next: { tags: [CACHE_TAGS.PAYMENT_METHODS], revalidate: 3600 },
             }
         )
 
@@ -89,7 +89,7 @@ export async function setDefaultPaymentMethod(methodID: number): Promise<MutateR
     try {
         const axiosInstance = await getServerAxios()
         await axiosInstance.patch(`${PAYMENT_METHODS_ENDPOINT}/${methodID}/default/`)
-        updateTag(CACHE_TAGS.PAYMENT_METHODS)
+        revalidateTag(CACHE_TAGS.PAYMENT_METHODS, "max")
         return { success: true }
     } catch (error: any) {
         console.log("[setDefaultPaymentMethod] status:", error?.response?.status)
@@ -102,7 +102,7 @@ export async function deletePaymentMethod(methodId: number): Promise<MutateResul
     try {
         const axiosInstance = await getServerAxios()
         await axiosInstance.delete(`${PAYMENT_METHODS_ENDPOINT}/${methodId}/`)
-        updateTag(CACHE_TAGS.PAYMENT_METHODS)
+        revalidateTag(CACHE_TAGS.PAYMENT_METHODS, "max")
         return { success: true }
     } catch (error: any) {
         console.log("[deletePaymentMethod] status:", error?.response?.status)

@@ -3,7 +3,7 @@
 import { NOTIFICATION_SETTINGS_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
-import { updateTag } from "next/cache"
+import { revalidateTag } from "next/cache"
 import { CACHE_TAGS } from "@/cache-tags"
 import { cookies } from "next/headers"
 
@@ -27,7 +27,7 @@ export async function getNotificationSettings(): Promise<NotificationResult> {
                     "Content-Type": "application/json",
                     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
                 },
-                next: { tags: [CACHE_TAGS.NOTIFICATION_SETTINGS] },
+                next: { tags: [CACHE_TAGS.NOTIFICATION_SETTINGS], revalidate: 3600 },
             }
         )
 
@@ -51,7 +51,7 @@ export async function updateNotificationSettings(
     try {
         const axiosInstance = await getServerAxios()
         const { data } = await axiosInstance.patch(NOTIFICATION_SETTINGS_ENDPOINT, payload)
-        updateTag(CACHE_TAGS.NOTIFICATION_SETTINGS)
+        revalidateTag(CACHE_TAGS.NOTIFICATION_SETTINGS, "max")
         return { success: true, data: data.data ?? data }
     } catch (error: any) {
         console.log("[updateNotificationSettings] status:", error?.response?.status)

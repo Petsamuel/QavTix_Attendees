@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Icon } from "@iconify/react";
 import Logo from "./Logo";
 import MobileNavMenu from "./MobileNavMenu";
+import { NotificationBell } from "./NotificationBell";
 
 export default function MobileHeaderSection() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -20,21 +21,24 @@ export default function MobileHeaderSection() {
             <div className="flex items-center justify-between flex-wrap w-full lg:hidden pb-8">
                 <Logo width={100} height={100} />
 
-                <MobileNavMenu 
-                    isOpen={isMenuOpen} 
-                    onClose={() => setIsMenuOpen(false)} 
+                <MobileNavMenu
+                    isOpen={isMenuOpen}
+                    onClose={() => setIsMenuOpen(false)}
                 />
 
-                <button
-                    aria-label="Toggle menu"
-                    onClick={handleOpenMenu}
-                    className="text-brand-secondary-9 active:scale-95 transition-transform p-1"
-                >
-                    <Icon
-                        icon="lineicons:menu-hamburger-1"
-                        className="size-8"
-                    />
-                </button>
+                <div className="flex items-center gap-4 w-fit">
+                    <NotificationBell />
+                    <button
+                        aria-label="Toggle menu"
+                        onClick={handleOpenMenu}
+                        className="text-brand-secondary-9 active:scale-95 transition-transform p-1"
+                    >
+                        <Icon
+                            icon="lineicons:menu-hamburger-1"
+                            className="size-8"
+                        />
+                    </button>
+                </div>
             </div>
         </header>
     )
