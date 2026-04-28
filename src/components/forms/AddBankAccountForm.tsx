@@ -95,6 +95,7 @@ export default function AddBankAccountForm({ open, onOpenChange, banks, onAdded 
             bank_name:      values.bank_name,
             account_name:   accountName,
             account_number: values.account_number,
+            bank_code:      values.bank_code,
         })
 
         if (result.success && result.data) {

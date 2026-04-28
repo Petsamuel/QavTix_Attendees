@@ -11,7 +11,10 @@ export default function ReduxStoreProvider({
 }) {
   const storeRef = useRef<AppStore | null>(null)
   if (!storeRef.current) {
+    const originalRandom = Math.random
+    Math.random = () => 0.5
     storeRef.current = makeStore()
+    Math.random = originalRandom
   }
 
   return <Provider store={storeRef.current}>{children}</Provider>

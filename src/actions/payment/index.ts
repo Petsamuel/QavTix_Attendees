@@ -14,10 +14,10 @@ interface GetPaymentAccountsResult {
 }
 
 export async function getPaymentAccounts(): Promise<GetPaymentAccountsResult> {
-    try {
-        const cookieStore = await cookies()
+    const cookieStore = await cookies()
         const accessToken = cookieStore.get("access_token")?.value
 
+try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${PAYMENT_ACCOUNTS_ENDPOINT}`,
             {
@@ -55,10 +55,10 @@ interface MutateResult {
 }
 
 export async function getPaymentMethods(): Promise<PaymentMethodsResult> {
-    try {
-        const cookieStore = await cookies()
+    const cookieStore = await cookies()
         const accessToken = cookieStore.get("access_token")?.value
 
+try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${PAYMENT_METHODS_ENDPOINT}`,
             {
@@ -86,8 +86,8 @@ export async function getPaymentMethods(): Promise<PaymentMethodsResult> {
 }
 
 export async function setDefaultPaymentMethod(methodID: number): Promise<MutateResult> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         await axiosInstance.patch(`${PAYMENT_METHODS_ENDPOINT}/${methodID}/default/`)
         revalidateTag(CACHE_TAGS.PAYMENT_METHODS, "max")
         return { success: true }
@@ -99,8 +99,8 @@ export async function setDefaultPaymentMethod(methodID: number): Promise<MutateR
 }
 
 export async function deletePaymentMethod(methodId: number): Promise<MutateResult> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         await axiosInstance.delete(`${PAYMENT_METHODS_ENDPOINT}/${methodId}/`)
         revalidateTag(CACHE_TAGS.PAYMENT_METHODS, "max")
         return { success: true }
@@ -127,8 +127,8 @@ interface VerifyPaymentPayload {
 }
 
 export async function addPaymentMethod(country: string): Promise<InitializePaymentResult> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         const { data: json } = await axiosInstance.post(ADD_PAYMENT_CARD, { country, currency: "naira" })
         const checkout_url = json.data?.checkout_url ?? json.checkout_url
         if (!checkout_url) {
@@ -147,8 +147,8 @@ export async function addPaymentMethod(country: string): Promise<InitializePayme
 export async function verifyPaymentMethod(
     payload: VerifyPaymentPayload
 ): Promise<{ message: string, success: boolean }> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         await axiosInstance.post(ADD_PAYMENT_CARD_CONFIRM, payload)
         return { success: true, message: "Confirmation Successful" }
 

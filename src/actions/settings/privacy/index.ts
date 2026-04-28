@@ -20,10 +20,10 @@ interface PrivacyResult {
 }
 
 export async function getPrivacySettings(): Promise<PrivacyResult> {
-    try {
-        const cookieStore = await cookies()
+    const cookieStore = await cookies()
         const accessToken = cookieStore.get("access_token")?.value
 
+try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${GET_PRIVACY_SETTINGS_ENDPOINT}`,
             {
@@ -52,8 +52,8 @@ export async function getPrivacySettings(): Promise<PrivacyResult> {
 export async function updatePrivacySettings(
     payload: PrivacySettings,
 ): Promise<{ success: boolean; message?: string }> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         await axiosInstance.patch(SET_PRIVACY_SETTINGS_ENDPOINT, payload)
         revalidateTag(CACHE_TAGS.PRIVACY_SETTINGS, "max")
         return { success: true }
@@ -65,8 +65,8 @@ export async function updatePrivacySettings(
 }
 
 export async function downloadPrivacyData(): Promise<{ success: boolean; message?: string }> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         await axiosInstance.post(DOWNLOAD_DATA_ENDPOINT)
         return { success: true }
     } catch (error: any) {
@@ -77,8 +77,8 @@ export async function downloadPrivacyData(): Promise<{ success: boolean; message
 }
 
 export async function deleteAccount(): Promise<{ success: boolean; message?: string }> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         await axiosInstance.delete(DELETE_ACCOUNT_ENDPOINT)
 
         const cookieStore = await cookies()
@@ -94,8 +94,8 @@ export async function deleteAccount(): Promise<{ success: boolean; message?: str
 }
 
 export async function cancelPlan(): Promise<{ success: boolean; message?: string }> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         await axiosInstance.post(CANCEL_PLAN_ENDPOINT)
         revalidateTag(CACHE_TAGS.PROFILE, "max")
         return { success: true }

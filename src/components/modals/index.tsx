@@ -11,21 +11,25 @@ import { useEffect } from "react";
 import { PROFILE_INCOMPLETE_ALERT } from "./resources/popup-message-alert-config";
 import { usePathname } from "next/navigation";
 
-export default function PopUpsRenderer(){
+export default function PopUpsRenderer() {
 
     const { isAuthenticated, user } = useAppSelector((state) => state.authUser)
     const dispatch = useAppDispatch()
     const pathName = usePathname()
-    
+
     useEffect(() => {
-        if (!user?.is_completed && isAuthenticated && !pathName.includes("account-settings")) {
+        const isNotFound = pathName === "/_not-found" || pathName === "/not-found"
+        const isAccountSettings = pathName.includes("account-settings")
+        const shouldSuppress = isNotFound || isAccountSettings
+
+        if (!user?.is_completed && isAuthenticated && !shouldSuppress) {
             dispatch(triggerPopupAlert(PROFILE_INCOMPLETE_ALERT))
         }
 
-        if (pathName.includes("account-settings")){
+        if (shouldSuppress) {
             dispatch(closePopupAlertModal())
         }
-    },[user?.id, user?.is_completed, isAuthenticated, pathName])
+    }, [user?.id, user?.is_completed, isAuthenticated, pathName])
 
     return (
         <>

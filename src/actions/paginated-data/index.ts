@@ -20,9 +20,9 @@ export interface FetchResult<T> {
 }
 
 export async function fetchPaginatedData<T>(params: FetchParams): Promise<FetchResult<T>> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
 
+try {
         const requestParams: Record<string, any> = {
             ...params.staticParams,
             ...params.filterParams,

@@ -16,10 +16,10 @@ interface NotificationResult {
 }
 
 export async function getNotificationSettings(): Promise<NotificationResult> {
-    try {
-        const cookieStore = await cookies()
+    const cookieStore = await cookies()
         const accessToken = cookieStore.get("access_token")?.value
 
+try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${NOTIFICATION_SETTINGS_ENDPOINT}`,
             {
@@ -48,8 +48,8 @@ export async function getNotificationSettings(): Promise<NotificationResult> {
 export async function updateNotificationSettings(
     payload: UpdateNotificationPayload,
 ): Promise<NotificationResult> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         const { data } = await axiosInstance.patch(NOTIFICATION_SETTINGS_ENDPOINT, payload)
         revalidateTag(CACHE_TAGS.NOTIFICATION_SETTINGS, "max")
         return { success: true, data: data.data ?? data }

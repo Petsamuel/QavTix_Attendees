@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useForm, Controller, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { cn } from "@/lib/utils"
@@ -36,7 +36,7 @@ const toFormValues = (profile: UserProfile): ProfileFormValues => ({
     )?.value || profile.country || "",
     state: profile.state ?? "",
     city: profile.city ?? "",
-    dob: profile.dob ? new Date(profile.dob) : undefined as unknown as Date,
+    dob: profile.dob ? new Date(`${profile.dob}T00:00:00`) : undefined as unknown as Date,
     profileImage: profile.profile_picture ?? undefined,
 })
 
@@ -54,7 +54,7 @@ const toPayload = (values: ProfileFormValues): UpdateProfilePayload => {
         state: values.state,
         city: values.city,
         dob: values.dob
-            ? (values.dob as Date).toISOString().split("T")[0]
+            ? `${(values.dob as Date).getFullYear()}-${String((values.dob as Date).getMonth() + 1).padStart(2, '0')}-${String((values.dob as Date).getDate()).padStart(2, '0')}`
             : null,
         profile_picture: profilePicture,
     }
@@ -141,6 +141,24 @@ export default function ProfileInformationForm({ profile }: Props) {
         setIsEditing(false)
     }
 
+    const editBtnRef = useRef<HTMLButtonElement>(null)
+    const [hasAnimated, setHasAnimated] = useState(false)
+    const [showRing, setShowRing] = useState(false)
+    const [showTooltip, setShowTooltip] = useState(false)
+
+    useEffect(() => {
+        if (hasAnimated) return
+        const timer = setTimeout(() => {
+            editBtnRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+            setShowRing(true)
+            setShowTooltip(true)
+            setHasAnimated(true)
+            setTimeout(() => setShowRing(false), 2200)
+            setTimeout(() => setShowTooltip(false), 3000)
+        }, 900)
+        return () => clearTimeout(timer)
+    }, [])
+
     return (
         <div className="w-full max-w-4xl pt-8 pb-16">
             <div className="flex items-center justify-between mb-8">
@@ -149,19 +167,76 @@ export default function ProfileInformationForm({ profile }: Props) {
                 </h2>
 
                 {!isEditing && (
-                    <button
-                        type="button"
-                        onClick={() => setIsEditing(true)}
-                        className="flex items-center md:bg-brand-primary-1 p-2 rounded-lg justify-between text-xs font-bold gap-2 transition-opacity text-brand-primary-5 hover:text-brand-primary-7"
-                    >
-                        <span className="size-11 md:size-7 aspect-square rounded-md flex justify-center items-center text-white bg-brand-primary-3">
-                            <Icon icon="hugeicons:pencil-edit-01" width="30" className="md:w-4.5" />
-                        </span>
-                        <span className="sr-only md:not-sr-only">Edit Info</span>
-                    </button>
+                    <div className="relative flex items-center justify-center">
+
+                        {/* Tooltip */}
+                        <div
+                            style={{
+                                position: "absolute",
+                                top: "-36px",
+                                left: "50%",
+                                background: "#1e3a8a",
+                                color: "#e0e7ff",
+                                fontSize: "11px",
+                                fontWeight: 500,
+                                padding: "4px 10px",
+                                borderRadius: "20px",
+                                whiteSpace: "nowrap",
+                                pointerEvents: "none",
+                                zIndex: 50,
+                                transition: "opacity 0.4s ease, transform 0.4s ease",
+                                opacity: showTooltip ? 1 : 0,
+                                transform: showTooltip
+                                    ? "translateX(-50%) translateY(0)"
+                                    : "translateX(-50%) translateY(4px)",
+                            }}
+                        >
+                            Click to edit
+                        </div>
+
+                        {/* Pulse rings */}
+                        {showRing && (
+                            <>
+                                <span style={{
+                                    position: "absolute",
+                                    inset: "-4px",
+                                    borderRadius: "10px",
+                                    border: "2px solid #3b82f6",
+                                    animation: "editRing 0.65s ease-out 0s 3 forwards",
+                                    pointerEvents: "none",
+                                }} />
+                                <span style={{
+                                    position: "absolute",
+                                    inset: "-4px",
+                                    borderRadius: "10px",
+                                    border: "2px solid #3b82f6",
+                                    animation: "editRing 0.65s ease-out 0.22s 3 forwards",
+                                    pointerEvents: "none",
+                                    opacity: 0.5,
+                                }} />
+                            </>
+                        )}
+
+                        <button
+                            ref={editBtnRef}
+                            type="button"
+                            onClick={() => setIsEditing(true)}
+                            style={{
+                                outline: showRing ? "2px solid #93c5fd" : "2px solid transparent",
+                                outlineOffset: "2px",
+                                transition: "outline 0.3s ease",
+                                borderRadius: "8px",
+                            }}
+                            className="flex items-center md:bg-brand-primary-1 p-2 rounded-lg justify-between text-xs font-bold gap-2 text-brand-primary-5 hover:text-brand-primary-7"
+                        >
+                            <span className="size-11 md:size-7 aspect-square rounded-md flex justify-center items-center text-white bg-brand-primary-3">
+                                <Icon icon="hugeicons:pencil-edit-01" width="30" className="md:w-4.5" />
+                            </span>
+                            <span className="sr-only md:not-sr-only">Edit Info</span>
+                        </button>
+                    </div>
                 )}
             </div>
-
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                 <div className="flex justify-center items-center md:justify-start">
                     <ProfileImageUploader
