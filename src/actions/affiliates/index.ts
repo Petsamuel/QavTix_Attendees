@@ -33,7 +33,7 @@ async function fetchWithTag<T>(
                 "Content-Type": "application/json",
                 ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
             },
-            next: { tags: [tag], revalidate: 3000 },
+            next: { tags: [tag], revalidate: 2000 },
             cache: "force-cache",
         })
 
