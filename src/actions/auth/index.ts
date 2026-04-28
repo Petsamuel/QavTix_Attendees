@@ -18,8 +18,8 @@ export async function verifyPassword(
     email:    string,
     password: string,
 ): Promise<{ success: boolean; message?: string }> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         await axiosInstance.post(LOGIN_ENDPOINT, { email, password })
         return { success: true }
     } catch (error: any) {

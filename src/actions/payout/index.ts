@@ -79,10 +79,10 @@ export async function getPaystackBanks(): Promise<{ success: boolean; data?: Ban
 }
 
 export async function getPayoutAccounts(): Promise<{ success: boolean; data?: PayoutAccount[]; message?: string }> {
-    try {
-        const cookieStore = await cookies()
+    const cookieStore = await cookies()
         const accessToken = cookieStore.get("access_token")?.value
 
+try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${PAYOUT_ACCOUNTS_ENDPOINT}`,
             {
@@ -116,8 +116,8 @@ export async function addPayoutAccount(payload: {
     bank_code?: string
     is_default?: boolean
 }): Promise<MutateResult> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         const { data } = await axiosInstance.post(ADD_PAYOUT_ACCOUNT_ENDPOINT, payload)
         revalidateTag(CACHE_TAGS.PAYOUT_ACCOUNTS, "max")
         return { success: true, data: data.data ?? data }
@@ -129,8 +129,8 @@ export async function addPayoutAccount(payload: {
 }
 
 export async function deletePayoutAccount(accountId: string): Promise<{ success: boolean; message?: string }> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         await axiosInstance.delete(DELETE_PAYMENT_METHOD.replace("[id]", accountId))
         revalidateTag(CACHE_TAGS.PAYOUT_ACCOUNTS, "max")
         return { success: true }
@@ -154,8 +154,8 @@ interface WithdrawalResult {
 
 
 export async function requestWithdrawal(payload: WithdrawalPayload): Promise<WithdrawalResult> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         await axiosInstance.post(WITHDRAWAL_REQUEST_ENDPOINT, payload, {
             headers: {
                 "Idempotency-Key": randomUUID(),

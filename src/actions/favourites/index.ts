@@ -29,10 +29,10 @@ interface MutateFavouriteResult {
 }
 
 export async function getFavourites(params: GetFavouritesParams = {}): Promise<GetFavouritesResult> {
-    try {
-        const cookieStore = await cookies()
+    const cookieStore = await cookies()
         const accessToken = cookieStore.get("access_token")?.value
 
+try {
         const url = new URL(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${FAVOURITES_ENDPOINT}`
         )
@@ -64,8 +64,8 @@ export async function getFavourites(params: GetFavouritesParams = {}): Promise<G
 
 
 export async function addFavourite(eventId: string | number): Promise<MutateFavouriteResult> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         await axiosInstance.post(ADD_FAVOURITE_ENDPOINT, { event_id: eventId })
         revalidateTag(CACHE_TAGS.EVENT_CARDS, 'max')
         return { success: true }
@@ -75,8 +75,8 @@ export async function addFavourite(eventId: string | number): Promise<MutateFavo
 }
 
 export async function removeFavourite(eventId: string | number): Promise<MutateFavouriteResult> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         const endpoint = REMOVE_FAVOURITE_ENDPOINT.replace("[event_id]", String(eventId))
         await axiosInstance.delete(endpoint)
         revalidateTag(CACHE_TAGS.EVENT_CARDS, 'max')

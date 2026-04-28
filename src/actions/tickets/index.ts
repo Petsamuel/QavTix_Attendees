@@ -12,10 +12,10 @@ interface GetReceiptResult {
 }
 
 export async function getTicketReceipt(ticketID: string): Promise<GetReceiptResult> {
-    try {
-        const cookieStore = await cookies()
+    const cookieStore = await cookies()
         const accessToken = cookieStore.get("access_token")?.value
 
+try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${TICKET_RECEIPT_ENDPOINT.replace("[id]", ticketID)}`,
             {

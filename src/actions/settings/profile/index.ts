@@ -14,10 +14,10 @@ interface ProfileResult {
 }
 
 export async function getProfile(): Promise<ProfileResult> {
-    try {
-        const cookieStore = await cookies()
+    const cookieStore = await cookies()
         const accessToken = cookieStore.get("access_token")?.value
 
+try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${GET_PROFILE_ENDPOINT}`,
             {
@@ -45,8 +45,8 @@ export async function getProfile(): Promise<ProfileResult> {
 }
 
 export async function updateProfile(payload: UpdateProfilePayload): Promise<ProfileResult> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         const { data } = await axiosInstance.patch(UPDATE_PROFILE_ENDPOINT, payload)
         revalidateTag(CACHE_TAGS.PROFILE, "max")
         return { success: true, data: data.data ?? data }

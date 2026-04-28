@@ -31,10 +31,10 @@ interface MutateGroupResult {
 }
 
 export async function getGroups(): Promise<GroupsResult> {
-    try {
-        const cookieStore = await cookies()
+    const cookieStore = await cookies()
         const accessToken = cookieStore.get("access_token")?.value
 
+try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${GET_GROUPS_ENDPOINT}`,
             {
@@ -66,8 +66,8 @@ export async function createGroup(payload: {
     name:    string
     members: string[]
 }): Promise<MutateGroupResult> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         const { data } = await axiosInstance.post(CREATE_GROUP_ENDPOINT, {
             name:    payload.name,
             members: payload.members.map(email => ({ email })),
@@ -85,8 +85,8 @@ export async function updateGroup(
     groupID: string,
     payload: { name: string; members: string[] },
 ): Promise<MutateGroupResult> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         const { data } = await axiosInstance.patch(EDIT_GROUP_ENDPOINT.replace("[group_id]", groupID), {
             name:    payload.name,
             members: payload.members.map(email => ({ email })),
@@ -101,8 +101,8 @@ export async function updateGroup(
 }
 
 export async function deleteGroup(groupID: string): Promise<{ success: boolean; message?: string }> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         await axiosInstance.delete(DELETE_GROUP_ENDPOINT.replace("[group_id]", groupID))
         revalidateTag(CACHE_TAGS.GROUPS, "max")
         return { success: true }

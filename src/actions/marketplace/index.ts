@@ -30,8 +30,8 @@ interface ResellTicketResult {
 
 export async function transferTicket(payload: TransferTicketPayload): Promise<TransferTicketResult> {
 
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         const { data } = await axiosInstance.post(TRANSFER_TICKET_ENDPOINT, payload)
         revalidateTag(CACHE_TAGS.MARKETPLACE, "max")
 
@@ -51,8 +51,8 @@ export async function transferTicket(payload: TransferTicketPayload): Promise<Tr
 
 
 export async function resellTicket(payload: ResellTicketPayload): Promise<ResellTicketResult> {
-    try {
-        const api = await getServerAxios()
+    const api = await getServerAxios()
+try {
         const { data } = await api.post(RESELL_TICKET_ENDPOINT, payload)
         revalidateTag(CACHE_TAGS.MARKETPLACE, "max")
 
@@ -97,10 +97,10 @@ interface MutateMarketplaceResult {
 }
 
 export async function getMarketplace(params: GetMarketplaceParams = {}): Promise<GetMarketplaceResult> {
-    try {
-        const cookieStore = await cookies()
+    const cookieStore = await cookies()
         const accessToken = cookieStore.get("access_token")?.value
 
+try {
         const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/${MARKETPLACE_LIST_ENDPOINT}`)
         Object.entries(params).forEach(([k, v]) => {
             if (v != null) url.searchParams.set(k, String(v))
@@ -131,8 +131,8 @@ export async function getMarketplace(params: GetMarketplaceParams = {}): Promise
 
 
 export async function delistTicket(eventID: string | number): Promise<MutateMarketplaceResult> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         const endpoint = MARKETPLACE_DELIST_ENDPOINT.replace("[event_id]", String(eventID))
         await axiosInstance.delete(endpoint)
         revalidateTag(CACHE_TAGS.MARKETPLACE, "max")

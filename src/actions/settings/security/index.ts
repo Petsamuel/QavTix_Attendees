@@ -27,10 +27,10 @@ interface ChangePasswordResult {
 }
 
 export async function get2FASettings(): Promise<Get2FAResult> {
-    try {
-        const cookieStore = await cookies()
+    const cookieStore = await cookies()
         const accessToken = cookieStore.get("access_token")?.value
 
+try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${GET_TWO_FACTOR_ENDPOINT}`,
             {
@@ -60,8 +60,8 @@ export async function toggle2FAProvider(
     providerID: string,
     enable:     boolean,
 ): Promise<Toggle2FAResult> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         await axiosInstance.patch(UPDATE_TWO_FACTOR_ENDPOINT, { [providerID]: enable })
         revalidateTag(CACHE_TAGS.TWO_FACTOR, "max")
         return { success: true }
@@ -76,8 +76,8 @@ export async function changePassword(
     oldPassword: string,
     newPassword: string,
 ): Promise<ChangePasswordResult> {
-    try {
-        const axiosInstance = await getServerAxios()
+    const axiosInstance = await getServerAxios()
+try {
         await axiosInstance.post(CHANGE_PASSWORD_ENDPOINT, {
             old_password: oldPassword,
             new_password: newPassword,

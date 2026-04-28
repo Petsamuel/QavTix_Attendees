@@ -1,4 +1,5 @@
 import AffliatesPageCW from "@/components/page-content-wrappers/AffliatesPageCW"
+import { connection } from "next/server"
 import {
     getAffiliateDashboard,
     getAffiliateLinks,
@@ -18,6 +19,7 @@ export const metadata: Metadata = ATTENDEE_PAGE_METADATA.AFFILIATES;
 const emptySlice = { results: [], count: 0, next: null, previous: null, total_pages: 1 }
 
 async function getAffiliateData() {
+    await connection()
     const currentYear = new Date().getFullYear()
 
     const [dashboardRes, linksRes, earningsRes, performanceData, categoriesRes, withdrawalHistoryRes] = await Promise.all([

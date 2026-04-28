@@ -17,10 +17,10 @@ async function fetchWithTag<T>(
     tag: string,
     params?: Record<string, string | number>,
 ): Promise<{ success: true; data: T } | { success: false; message: string }> {
-    try {
-        const cookieStore = await cookies()
+    const cookieStore = await cookies()
         const accessToken = cookieStore.get("access_token")?.value
 
+try {
         const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/${endpoint}`)
         if (params) {
             Object.entries(params).forEach(([k, v]) => {
