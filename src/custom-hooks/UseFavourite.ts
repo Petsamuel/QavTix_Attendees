@@ -3,21 +3,29 @@
 import { useRef, useState } from "react"
 import { addFavourite, removeFavourite } from "@/actions/favourites"
 import { useAppDispatch } from "@/lib/redux/hooks"
-import { showAlert } from "@/lib/redux/slices/alertSlice"
+import { showSnackbar } from "@/lib/redux/slices/snackbarSlice"
+import { useRevalidate } from "./UseRevalidate"
 
-export function useFavourite(eventId: string | number, initialState = false) {
+interface UseFavouriteOptions {
+    /** When true, router.refresh() is called after a successful removeFavourite.
+     *  Use this on the Favourites page so the server-side list re-fetches. */
+    refreshOnRemove?: boolean
+    /** Optional callback fired after a successful toggle (either direction). */
+    onSuccess?: (wasFavourite: boolean) => void
+}
 
-    const [isFavourite,   setIsFavourite]   = useState(initialState)
-    const [feedbackMsg,   setFeedbackMsg]   = useState<string | null>(null)
-    const isPending     = useRef(false)
-    const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-    const dispatch      = useAppDispatch()
+export function useFavourite(
+    eventId: string | number,
+    initialState = false,
+    options: UseFavouriteOptions = {},
+) {
+    const { refreshOnRemove = false, onSuccess } = options
 
-    const showFeedback = (msg: string) => {
-        if (feedbackTimer.current) clearTimeout(feedbackTimer.current)
-        setFeedbackMsg(msg)
-        feedbackTimer.current = setTimeout(() => setFeedbackMsg(null), 1200)
-    }
+    const [isFavourite, setIsFavourite] = useState(initialState)
+    const isPending = useRef(false)
+    const dispatch = useAppDispatch()
+    const { trigger: triggerFav } = useRevalidate("favourites")
+    const { trigger: triggerMarketplace } = useRevalidate("marketplace")
 
     const toggle = async () => {
         if (isPending.current) return
@@ -29,25 +37,36 @@ export function useFavourite(eventId: string | number, initialState = false) {
             return !prev  // optimistic flip
         })
 
+        // Show a loading snackbar
+        dispatch(showSnackbar({
+            message: snapshot ? "Removing from favourites..." : "Adding to favourites...",
+            variant: "loading",
+        }))
+
         const result = snapshot
             ? await removeFavourite(eventId)
             : await addFavourite(eventId)
 
         if (result.success) {
-            // Only show feedback after confirmed success
-            showFeedback(snapshot ? "Removed" : "Saved!")
+            dispatch(showSnackbar({
+                message: snapshot ? "Removed from favourites" : "Added to favourites",
+                variant: "success",
+            }))
+
+            onSuccess?.(snapshot)
+            triggerFav()
+            triggerMarketplace()
         } else {
-            // Revert + error toast, no feedback
+            // Revert + error toast
             setIsFavourite(snapshot)
-            dispatch(showAlert({
-                variant:     "destructive",
-                title:       "Could not update favourites",
-                description: result.message ?? "Please try again.",
+            dispatch(showSnackbar({
+                message: result.message ?? "Could not update favourites. Please try again.",
+                variant: "error",
             }))
         }
 
         isPending.current = false
     }
 
-    return { isFavourite, toggle, feedbackMsg }
+    return { isFavourite, toggle }
 }

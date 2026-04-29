@@ -17,12 +17,20 @@ import {
 } from "@/actions/payout"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
-import SearchableSelect from "../custom-utils/inputs/CustomSearchableSelect"
 import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import BankLogo from "../financials/BankLogo"
+import { cn } from "@/lib/utils"
 
 const addAccountSchema = z.object({
-    bank_code:      z.string().min(1, "Select a bank"),
-    bank_name:      z.string().min(1),
+    bank_code: z.string().min(1, "Select a bank"),
+    bank_name: z.string().min(1),
     account_number: z.string().length(10, "Account number must be 10 digits"),
 })
 
@@ -31,18 +39,18 @@ type AddAccountFormValues = z.infer<typeof addAccountSchema>
 type VerifyState = "idle" | "verifying" | "verified" | "failed"
 
 interface Props {
-    open:          boolean
-    onOpenChange:  Dispatch<SetStateAction<boolean>>
-    banks:         BankOption[]
-    onAdded:       (account: PayoutAccount) => void
+    open: boolean
+    onOpenChange: Dispatch<SetStateAction<boolean>>
+    banks: BankOption[]
+    onAdded: (account: PayoutAccount) => void
 }
 
 export default function AddBankAccountForm({ open, onOpenChange, banks, onAdded }: Props) {
 
     const dispatch = useAppDispatch()
 
-    const [verifyState,  setVerifyState]  = useState<VerifyState>("idle")
-    const [accountName,  setAccountName]  = useState<string | null>(null)
+    const [verifyState, setVerifyState] = useState<VerifyState>("idle")
+    const [accountName, setAccountName] = useState<string | null>(null)
 
     const {
         register,
@@ -55,8 +63,11 @@ export default function AddBankAccountForm({ open, onOpenChange, banks, onAdded 
         resolver: zodResolver(addAccountSchema),
     })
 
-    const bankCode      = watch("bank_code")
+    const bankCode = watch("bank_code")
     const accountNumber = watch("account_number")
+
+    // Derive selected bank object from current code
+    const selectedBank = banks.find(b => b.value === bankCode)
 
     // Auto-verify when both bank and 10-digit account number are filled
     useEffect(() => {
@@ -76,7 +87,7 @@ export default function AddBankAccountForm({ open, onOpenChange, banks, onAdded 
                 setVerifyState("failed")
                 setAccountName(null)
             }
-        }, 500) 
+        }, 500)
 
         return () => clearTimeout(timer)
     }, [bankCode, accountNumber])
@@ -92,24 +103,24 @@ export default function AddBankAccountForm({ open, onOpenChange, banks, onAdded 
         if (verifyState !== "verified" || !accountName) return
 
         const result = await addPayoutAccount({
-            bank_name:      values.bank_name,
-            account_name:   accountName,
+            bank_name: values.bank_name,
+            account_name: accountName,
             account_number: values.account_number,
-            bank_code:      values.bank_code,
+            bank_code: values.bank_code,
         })
 
         if (result.success && result.data) {
             onAdded(result.data)
             handleClose()
             dispatch(showAlert({
-                variant:     "default",
-                title:       "Account added",
+                variant: "default",
+                title: "Account added",
                 description: `${accountName} · ${values.bank_name} has been saved.`,
             }))
         } else {
             dispatch(showAlert({
-                variant:     "destructive",
-                title:       "Could not add account",
+                variant: "destructive",
+                title: "Could not add account",
                 description: result.message ?? "Please try again.",
             }))
         }
@@ -124,23 +135,66 @@ export default function AddBankAccountForm({ open, onOpenChange, banks, onAdded 
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5">
-                    <SearchableSelect
-                        label="Bank Name"
-                        required
-                        options={banks}
-                        value={bankCode}
-                        placeholder="Select a bank"
-                        searchPlaceholder="Search banks..."
-                        onValueChange={(val) => {
-                            const bank = banks.find(b => b.value === val)
-                            setValue("bank_code", val, { shouldValidate: true })
-                            setValue("bank_name", bank?.name ?? "")
-                            setAccountName(null)
-                            setVerifyState("idle")
-                        }}
-                        error={errors.bank_code?.message}
-                    />
 
+                    {/* ── Bank selector with logo ──────────────────────────── */}
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-brand-secondary-9">
+                            Bank Name <span className="text-red-500">*</span>
+                        </label>
+
+                        <Select
+                            value={bankCode}
+                            onValueChange={(val) => {
+                                const bank = banks.find(b => b.value === val)
+                                setValue("bank_code", val, { shouldValidate: true })
+                                setValue("bank_name", bank?.name ?? "")
+                                setAccountName(null)
+                                setVerifyState("idle")
+                            }}
+                        >
+                            <SelectTrigger
+                                id="bank-select"
+                                className={cn(
+                                    "h-14! w-full rounded-xl border-brand-secondary-3 bg-white text-brand-secondary-9 text-sm",
+                                    "focus:ring-1 focus:ring-brand-accent-4 focus:border-brand-accent-4",
+                                    errors.bank_code && "border-red-400 focus:ring-red-300",
+                                )}
+                            >
+                                <SelectValue placeholder="Select a bank">
+                                    {selectedBank && (
+                                        <span className="flex items-center gap-2.5">
+                                            <span className="w-6 h-6 rounded-full overflow-hidden shrink-0 border border-brand-neutral-3">
+                                                <BankLogo bankName={selectedBank.name} />
+                                            </span>
+                                            <span className="truncate">{selectedBank.name}</span>
+                                        </span>
+                                    )}
+                                </SelectValue>
+                            </SelectTrigger>
+
+                            <SelectContent className="max-h-64 overflow-y-auto">
+                                {banks.map((bank) => (
+                                    <SelectItem key={bank.value} value={bank.value}>
+                                        <span className="flex items-center gap-2.5 py-0.5">
+                                            <span className="w-6 h-6 rounded-full overflow-hidden shrink-0 border border-brand-neutral-3">
+                                                <BankLogo bankName={bank.name} />
+                                            </span>
+                                            <span className="truncate text-sm">{bank.name}</span>
+                                        </span>
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        {errors.bank_code && (
+                            <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
+                                <Icon icon="mage:exclamation-circle" className="size-3.5 shrink-0" />
+                                {errors.bank_code.message}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* ── Account number + live verification ───────────────── */}
                     <div className="space-y-1">
                         <CustomInput1
                             label="Account Number"
@@ -150,7 +204,7 @@ export default function AddBankAccountForm({ open, onOpenChange, banks, onAdded 
                             {...register("account_number")}
                         />
 
-                        {/* Verification feedback — shown below account number input */}
+                        {/* Verification feedback */}
                         <div className="h-6 flex items-center px-1">
                             {verifyState === "verifying" && (
                                 <span className="flex items-center gap-1.5 text-xs text-brand-secondary-5">
@@ -184,8 +238,7 @@ export default function AddBankAccountForm({ open, onOpenChange, banks, onAdded 
                             Cancel
                         </button>
 
-
-                        <ActionButton1 
+                        <ActionButton1
                             isLoading={isSubmitting}
                             isDisabled={verifyState !== "verified" || isSubmitting}
                             className="flex-1"

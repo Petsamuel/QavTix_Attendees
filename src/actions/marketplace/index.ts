@@ -4,7 +4,7 @@ import { CACHE_TAGS } from "@/cache-tags"
 import { MARKETPLACE_DELIST_ENDPOINT, MARKETPLACE_LIST_ENDPOINT, RESELL_TICKET_ENDPOINT, TRANSFER_TICKET_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
-import { revalidateTag } from "next/cache"
+import { revalidateTag, cacheTag } from "next/cache"
 import { cookies } from "next/headers"
 
 interface TransferTicketPayload {
@@ -97,10 +97,14 @@ interface MutateMarketplaceResult {
 }
 
 export async function getMarketplace(params: GetMarketplaceParams = {}): Promise<GetMarketplaceResult> {
-    const cookieStore = await cookies()
-        const accessToken = cookieStore.get("access_token")?.value
+    const accessToken = (await cookies()).get("access_token")?.value;
+    return _getMarketplace(accessToken, params);
+}
 
-try {
+async function _getMarketplace(accessToken: string | undefined, params: GetMarketplaceParams = {}): Promise<GetMarketplaceResult> {
+    "use cache"
+    cacheTag(CACHE_TAGS.EVENT_CARDS, CACHE_TAGS.MARKETPLACE)
+    try {
         const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/${MARKETPLACE_LIST_ENDPOINT}`)
         Object.entries(params).forEach(([k, v]) => {
             if (v != null) url.searchParams.set(k, String(v))
@@ -111,7 +115,6 @@ try {
                 "Content-Type": "application/json",
                 ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
             },
-            next: { tags: [CACHE_TAGS.EVENT_CARDS, CACHE_TAGS.MARKETPLACE], revalidate: 3000 },
         })
 
         if (!res.ok) {

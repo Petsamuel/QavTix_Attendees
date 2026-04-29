@@ -12,8 +12,8 @@ export function useLogOut() {
     const handleLogOut = async () => {
         if (isLoggingOut) return
         setIsLoggingOut(true)
-        dispatch(clearUser())
         await logOut()
+        dispatch(clearUser())
         setIsLoggingOut(false)
         window.location.href = process.env.NEXT_PUBLIC_APP_DOMAIN || 'qavtix.com'
     }

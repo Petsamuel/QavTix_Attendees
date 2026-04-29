@@ -3,7 +3,7 @@
 import { ADD_PAYOUT_ACCOUNT_ENDPOINT, DELETE_PAYMENT_METHOD, PAYOUT_ACCOUNTS_ENDPOINT, WITHDRAWAL_REQUEST_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
-import { revalidateTag } from "next/cache"
+import { revalidateTag, cacheTag } from "next/cache"
 import { CACHE_TAGS } from "@/cache-tags"
 import { cookies } from "next/headers"
 import { randomUUID } from "crypto"
@@ -57,10 +57,15 @@ export interface BankOption {
 }
 
 export async function getPaystackBanks(): Promise<{ success: boolean; data?: BankOption[]; message?: string }> {
+    return _getPaystackBanks()
+}
+
+async function _getPaystackBanks(): Promise<{ success: boolean; data?: BankOption[]; message?: string }> {
+    "use cache"
+    cacheTag("paystack_banks")
     try {
         const res = await fetch("https://api.paystack.co/bank?country=nigeria&perPage=100", {
             headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}` },
-            next: { revalidate: 60 * 60 * 24 },
         })
         const json = await res.json()
         if (!res.ok || !json.status) return { success: false, message: "Could not load banks" }
@@ -79,10 +84,14 @@ export async function getPaystackBanks(): Promise<{ success: boolean; data?: Ban
 }
 
 export async function getPayoutAccounts(): Promise<{ success: boolean; data?: PayoutAccount[]; message?: string }> {
-    const cookieStore = await cookies()
-        const accessToken = cookieStore.get("access_token")?.value
+    const accessToken = (await cookies()).get("access_token")?.value;
+    return _getPayoutAccounts(accessToken);
+}
 
-try {
+async function _getPayoutAccounts(accessToken: string | undefined): Promise<{ success: boolean; data?: PayoutAccount[]; message?: string }> {
+    "use cache"
+    cacheTag(CACHE_TAGS.PAYOUT_ACCOUNTS)
+    try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${PAYOUT_ACCOUNTS_ENDPOINT}`,
             {
@@ -90,7 +99,6 @@ try {
                     "Content-Type": "application/json",
                     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
                 },
-                next: { tags: [CACHE_TAGS.PAYOUT_ACCOUNTS], revalidate: 3600 },
             }
         )
 

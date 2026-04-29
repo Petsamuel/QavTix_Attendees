@@ -25,9 +25,9 @@ import { EVENT_DETAILS_LINK, MARKETPLACE_EVENT_DETAILS_LINK } from '@/enums/navi
 import Link from 'next/link'
 import { useIsMounted } from '@/custom-hooks/UseIsMounted'
 
-export default function EventsCard(card: EventCardProps & { eventCardFor?: "marketplace" | "global"}) {
+export default function EventsCard(card: EventCardProps & { eventCardFor?: "marketplace" | "global" }) {
 
-    const { user }  = useAppSelector(store => store.authUser)
+    const { user } = useAppSelector(store => store.authUser)
     const isMounted = useIsMounted()
 
     // Use undefined (platform default) until client has hydrated.
@@ -35,16 +35,20 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
     // then updates to the user's real currency after mount.
     const currency = isMounted ? user?.currency : undefined
 
-    const [imageError,  setImageError]  = useState(false)
-    const [showShare,   setShowShare]   = useState(false)
+    const [imageError, setImageError] = useState(false)
+    const [showShare, setShowShare] = useState(false)
     const [isDelisting, setIsDelisting] = useState(false)
     const pathName = usePathname()
 
     const displayCount = Math.min(card.attendees || 0, 3)
 
-    const { isFavourite, toggle: toggleFavourite, feedbackMsg } = useFavourite(card.id, card.isFavourite)
+    const { isFavourite, toggle: toggleFavourite } = useFavourite(
+        card.id,
+        card.isFavourite,
+        { refreshOnRemove: card.refreshOnRemove ?? false },
+    )
 
-    const eventUrl = EVENT_DETAILS_LINK.replace("[event_id]", card.id)
+    const eventUrl = EVENT_DETAILS_LINK.replace("[event_id]", card?.id)
 
     const handleShare = () => {
         setShowShare(true)
@@ -62,7 +66,8 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
     return (
         <>
             <Link
-                href={(card.eventCardFor === "marketplace" ? MARKETPLACE_EVENT_DETAILS_LINK : EVENT_DETAILS_LINK).replace("[event_id]", card.marketplace_id || "")}
+                href={(card.eventCardFor === "marketplace" ? MARKETPLACE_EVENT_DETAILS_LINK : EVENT_DETAILS_LINK)
+                    .replace("[event_id]", card.eventCardFor === "marketplace" ? (card.marketplace_id || "") : card.id)}
                 target="_blank"
                 className="block w-full max-w-72 p-3 relative min-h-[25em] rounded-[32px] border border-brand-neutral-6 bg-white hover:bg-brand-secondary-1 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-[1.5px] focus:ring-brand-accent-5 focus:ring-offset-[1.5px] group"
                 aria-label={`View event: ${card.title}`}
@@ -71,7 +76,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                     <div className="relative shrink-0">
                         {!pathName.includes("marketplace") ?
                             (
-                                card.status && 
+                                card.status &&
                                 <span className={cn(
                                     "absolute top-2 shadow-sm left-2 z-10 py-1 px-2 rounded-2xl text-center text-xs font-medium capitalize",
                                     statusStyles[card.status as keyof StatusStylesRecord]?.bg,
@@ -135,7 +140,6 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                                 icon={isFavourite ? "teenyicons:heart-solid" : "hugeicons:favourite"}
                                 onClick={toggleFavourite}
                                 feedback=""
-                                externalFeedback={feedbackMsg}
                                 iconStyles={isFavourite ? "text-brand-primary-5" : ""}
                             />
                         </div>

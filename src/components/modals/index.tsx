@@ -4,6 +4,7 @@ import SuccessModal from "./SuccessModal";
 import ConfirmationModal from "./ConfirmationModal";
 import PasswordModal from "./PasswordConfirmationModal";
 import CustomGlobalAlert from "../custom-utils/alerts/CustomGlobalAlert";
+import Snackbar from "../custom-utils/alerts/Snackbar";
 import PopUpMessageAlertModal from "./PopUpMessageAlert";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { closePopupAlertModal, triggerPopupAlert } from "@/lib/redux/slices/popupAlertSlice";
@@ -34,6 +35,7 @@ export default function PopUpsRenderer() {
     return (
         <>
             <CustomGlobalAlert />
+            <Snackbar />
             <SuccessModal />
             <ConfirmationModal />
             <PasswordModal />

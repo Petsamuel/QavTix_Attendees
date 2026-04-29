@@ -2,7 +2,7 @@
 
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
-import { revalidateTag } from "next/cache"
+import { revalidateTag, cacheTag } from "next/cache"
 import { CREATE_GROUP_ENDPOINT, DELETE_GROUP_ENDPOINT, EDIT_GROUP_ENDPOINT, GET_GROUPS_ENDPOINT } from "@/endpoints"
 import { CACHE_TAGS } from "@/cache-tags"
 import { cookies } from "next/headers"
@@ -31,10 +31,14 @@ interface MutateGroupResult {
 }
 
 export async function getGroups(): Promise<GroupsResult> {
-    const cookieStore = await cookies()
-        const accessToken = cookieStore.get("access_token")?.value
+    const accessToken = (await cookies()).get("access_token")?.value;
+    return _getGroups(accessToken);
+}
 
-try {
+async function _getGroups(accessToken: string | undefined): Promise<GroupsResult> {
+    "use cache"
+    cacheTag(CACHE_TAGS.GROUPS)
+    try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${GET_GROUPS_ENDPOINT}`,
             {
@@ -42,7 +46,6 @@ try {
                     "Content-Type": "application/json",
                     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
                 },
-                next: { tags: [CACHE_TAGS.GROUPS], revalidate: 3600 },
             }
         )
 

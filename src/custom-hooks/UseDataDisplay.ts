@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { format } from "date-fns"
 import { fetchPaginatedData } from "@/actions/paginated-data"
+import { useOnRevalidate } from "./UseRevalidate"
 
 export interface PageData<T> {
     results:      T[]
@@ -25,13 +26,14 @@ export interface TabConfig<T> {
     initialData:  TabSlice<T>
     staticParams: Record<string, string>
     onCards?:     (cards: any | null) => void
-    resultsKey?:  string
 }
 
 export interface UseDataDisplayConfig<T> {
-    endpoint:   string
-    tabs:       TabConfig<T>[]
-    activeTab?: string
+    endpoint:          string
+    tabs:              TabConfig<T>[]
+    activeTab?:        string
+    /** When set, calling useRevalidate(target).trigger() will refresh all tabs. */
+    revalidateTarget?: RevalidateTarget
 }
 
 type FetchStatus = "idle" | "loading" | "loadingMore" | "error" | "empty"
@@ -52,7 +54,9 @@ export interface TabState<T> {
     handleSearch:  (query: string) => void
     loadMore:      () => void
     fetchPage:     (page: number) => void
-    resetSearch: () => void
+    resetSearch:   () => void
+    /** Re-fetches page 1 without clearing the cache key — use after mutations. */
+    refresh:       () => void
 }
 
 const buildFilterParams = (filters: Partial<FilterValues>): Record<string, string> => {
@@ -132,10 +136,10 @@ const useTabState = <T>(
         
         const result = await fetchPaginatedData<T>({
             endpoint,
-            staticParams: config.staticParams,
+            staticParams: configRef.current.staticParams,
             filterParams: buildFilterParams(filtersRef.current),
-            page:   p,
-            search: s
+            page:         p,
+            search:       s,
         })
 
         isFetching.current = false
@@ -143,7 +147,6 @@ const useTabState = <T>(
         if (!result.success) {
             setItems([])
             setStatus("error")
-            configRef.current.onCards?.(null)
             return
         }
 
@@ -240,7 +243,6 @@ const useTabState = <T>(
         fetchData.current(page, searchRef.current, false)
     }, [totalPages])
 
-
     const resetSearch = useCallback(() => {
         if (debounceTimer.current) clearTimeout(debounceTimer.current)
         setSearch("")
@@ -254,6 +256,13 @@ const useTabState = <T>(
         setStatus(cachedItemsRef.current.length === 0 ? "empty" : "idle")
     }, [])
 
+    /** Re-fetches from page 1 without clearing any cached items. */
+    const refresh = useCallback(() => {
+        if (isFetching.current) return
+        pageRef.current = 1
+        fetchData.current(1, searchRef.current, false)
+    }, [])
+
     return {
         items, cachedItems, count, totalPages, currentPage, hasNext,
         status,
@@ -262,7 +271,7 @@ const useTabState = <T>(
         isError:       status === "error",
         isEmpty:       status === "empty",
         search, handleSearch, loadMore, fetchPage,
-        resetSearch
+        resetSearch, refresh,
     }
 }
 
@@ -281,6 +290,14 @@ export function useDataDisplay<T>(
     )
 
     const tabStates = Object.fromEntries(stateEntries) as Record<string, TabState<T>>
+
+    // ── Revalidation bus ─────────────────────────────────────────────────────
+    // When external code calls useRevalidate(target).trigger(), every mounted
+    // useDataDisplay with the same target will refresh all its tabs.
+    useOnRevalidate(config.revalidateTarget ?? "favourites", () => {
+        if (!config.revalidateTarget) return
+        Object.values(tabStates).forEach(state => state.refresh())
+    })
 
     return {
         tabStates,

@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Icon } from "@iconify/react"
 import { space_grotesk } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
 import PaymentCard from "@/components/cards/PaymentCard"
 import ChangeDefaultCardModal from "../modals/ChangeDefaultPaymentMethod"
 import AddPaymentCardModal from "@/lib/features/export/add-payment-card"
+import { getPaymentMethods } from "@/actions/payment"
 
 
 interface Props {
@@ -19,6 +20,17 @@ export default function PaymentMethodsPageCW({ initialMethods }: Props) {
     const [methods, setMethods] = useState<PaymentMethod[]>(initialMethods)
     const [showModal, setShowModal] = useState(false)
 
+    useEffect(() => {
+        setMethods(initialMethods)
+    }, [initialMethods])
+
+    const handleRefetch = async () => {
+        const res = await getPaymentMethods()
+        if (res.success && res.data) {
+            setMethods(res.data)
+        }
+    }
+
     const defaultMethod = methods.find(m => m.is_default)
     const otherMethods = methods.filter(m => !m.is_default)
 
@@ -29,7 +41,7 @@ export default function PaymentMethodsPageCW({ initialMethods }: Props) {
                     Payment Method
                 </h2>
                 <div className="md:self-center md:ms-6">
-                    <AddPaymentCardModal />
+                    <AddPaymentCardModal onSuccess={handleRefetch} />
                 </div>
             </div>
 
