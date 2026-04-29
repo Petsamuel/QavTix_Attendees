@@ -19,15 +19,15 @@ import { ApiCategory } from "@/actions/filters"
 
 interface Props {
     initialData: TabSlice<FavouriteEvent>
-    categories:  ApiCategory[]
+    categories: ApiCategory[]
 }
 
 export default function FavouritesPageCW({ initialData, categories }: Props) {
 
     const { filterOptions, tabList } = FavouritesPageFiltersNTabsData
 
-    const [filters,     setFilters]     = useState<Partial<FilterValues>>({})
-    const [activeTab,   setActiveTab]   = useState<typeof tabList[number]["value"]>("saved")
+    const [filters, setFilters] = useState<Partial<FilterValues>>({})
+    const [activeTab, setActiveTab] = useState<typeof tabList[number]["value"]>("saved")
     const [displayType, setDisplayType] = useState<"grid" | "list">("grid")
 
     const { activeTabState } = useDataDisplay<FavouriteEvent>(
@@ -35,6 +35,7 @@ export default function FavouritesPageCW({ initialData, categories }: Props) {
             endpoint: FAVOURITES_ENDPOINT,
             tabs: [{ key: "saved", initialData, staticParams: {} }],
             activeTab,
+            revalidateTarget: "favourites"
         },
         filters,
     )
@@ -65,7 +66,7 @@ export default function FavouritesPageCW({ initialData, categories }: Props) {
                 <p className="text-xs text-brand-secondary-5">Could not load saved events. Please try again.</p>
             </div>
         )
-        
+
         if (items.length === 0) return (
             <div className="mt-10">
                 <EmptyTicketsState
@@ -106,7 +107,7 @@ export default function FavouritesPageCW({ initialData, categories }: Props) {
         if (displayType === "grid") return (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(14em,1fr))] p-1 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,minmax(16em,1fr))] gap-y-6 gap-x-4 justify-items-center md:justify-items-start">
                 {items.map((event) => (
-                    <EventsCard key={event.id} {...fromFavouriteEvent(event)} />
+                    <EventsCard key={event.id} {...fromFavouriteEvent(event)} refreshOnRemove />
                 ))}
             </div>
         )

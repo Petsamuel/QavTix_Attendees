@@ -17,7 +17,7 @@ import { MARKETPLACE_LIST_ENDPOINT } from "@/endpoints"
 
 interface Props {
     initialData: TabSlice<MarketplaceEvent>
-    categories:  ApiCategory[]
+    categories: ApiCategory[]
 }
 
 const hasActiveFilters = (filters: Partial<FilterValues>) =>
@@ -36,7 +36,7 @@ export default function MarketplacePageCW({ initialData, categories }: Props) {
 
     const { filterOptions } = MarketplaceFiltersNTabsData
 
-    const [filters,     setFilters]     = useState<Partial<FilterValues>>({})
+    const [filters, setFilters] = useState<Partial<FilterValues>>({})
     const [displayType, setDisplayType] = useState<"grid" | "list">("grid")
 
     const activeTab = "all"
@@ -46,6 +46,7 @@ export default function MarketplacePageCW({ initialData, categories }: Props) {
             endpoint: MARKETPLACE_LIST_ENDPOINT,
             tabs: [{ key: "all", initialData, staticParams: {} }],
             activeTab,
+            revalidateTarget: "marketplace"
         },
         filters,
     )

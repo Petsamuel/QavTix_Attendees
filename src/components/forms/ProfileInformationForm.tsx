@@ -20,6 +20,7 @@ import { showAlert } from "@/lib/redux/slices/alertSlice"
 import { updateProfile } from "@/actions/settings/profile"
 import { uploadToCloudinary } from "@/lib/upload/cloudinary"
 import { setUser } from "@/lib/redux/slices/authUserSlice"
+import { resolveCountryLabel, resolveStateLabel } from "@/helper-fns/resolveCountryCode"
 
 
 // const IS_QA = process.env.NEXT_PUBLIC_QA_MODE === "true"
@@ -50,8 +51,8 @@ const toPayload = (values: ProfileFormValues): UpdateProfilePayload => {
         full_name: values.fullName,
         phone_number: values.phoneNumber,
         gender: values.gender,
-        country: countries.find(v => v.value.toLowerCase() === values.country.toLowerCase())?.label,
-        state: values.state,
+        country: resolveCountryLabel(values.country),
+        state: resolveStateLabel(values.country, values.state),
         city: values.city,
         dob: values.dob
             ? `${(values.dob as Date).getFullYear()}-${String((values.dob as Date).getMonth() + 1).padStart(2, '0')}-${String((values.dob as Date).getDate()).padStart(2, '0')}`
@@ -123,9 +124,9 @@ export default function ProfileInformationForm({ profile }: Props) {
             dispatch(setUser(result.data))
 
             dispatch(showAlert({
-                variant: "default",
+                variant: "success",
                 title: "Profile updated",
-                description: "Your has been successfully updated.",
+                description: "Your profile has been successfully updated.",
             }))
         } else {
             dispatch(showAlert({
@@ -263,8 +264,6 @@ export default function ProfileInformationForm({ profile }: Props) {
                         className="pointer-events-none"
                         error={errors.email?.message}
                         {...register("email")}
-                        verified={activeData.is_completed}
-                        verifiedMessage="Email address verified"
                     />
 
                     <CustomInput2
@@ -320,6 +319,7 @@ export default function ProfileInformationForm({ profile }: Props) {
                                 showRequired
                                 onValueChange={field.onChange}
                                 error={errors.country?.message}
+                                disabled={!isEditing || !!activeData.country}
                                 className={cn((!isEditing || !!activeData.country) && "pointer-events-none opacity-80")}
                             />
                         )}

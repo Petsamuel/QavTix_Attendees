@@ -6,6 +6,7 @@ import successModalReducer from './slices/successModalSlice'
 import popupAlertReducer from './slices/popupAlertSlice'
 import passwordConfirmationModalSlice from './slices/passwordModalConfirmationSlice'
 import settingsReducer from './slices/settingsSlice'
+import snackbarReducer from './slices/snackbarSlice'
 
 export const makeStore = () => {
   return configureStore({
@@ -16,7 +17,8 @@ export const makeStore = () => {
       confirmation: confirmationReducer,
       successModal: successModalReducer,
       settings: settingsReducer,
-      passwordModal: passwordConfirmationModalSlice
+      passwordModal: passwordConfirmationModalSlice,
+      snackbar: snackbarReducer
     }
   })
 }

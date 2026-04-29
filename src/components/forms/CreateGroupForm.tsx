@@ -66,7 +66,7 @@ export default function CreateGroupForm({ onCreated, onCancel }: Props) {
         if (result.success && result.data) {
             onCreated(result.data)
             dispatch(showAlert({
-                variant: "default",
+                variant: "success",
                 title: "Group created",
                 description: `"${values.name}" has been created.`,
             }))

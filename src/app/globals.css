@@ -119,6 +119,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -138,7 +139,8 @@
   --color-brand-primary-8: #003a91;
   --color-brand-primary-9: #002f74;
   --color-brand-primary-10: #00255c;
-  --color-brand-primary: #0052cc; /* Default primary */
+  --color-brand-primary: #0052cc;
+  /* Default primary */
 
   /* Secondary colors */
   --color-brand-secondary-1: #f0f1f2;
@@ -151,7 +153,8 @@
   --color-brand-secondary-8: #4c515b;
   --color-brand-secondary-9: #3d4149;
   --color-brand-secondary-10: #30333a;
-  --color-brand-secondary: #6b7280; /* Default secondary */
+  --color-brand-secondary: #6b7280;
+  /* Default secondary */
 
   /* Accent colors */
   --color-brand-accent-1: #fff2e9;
@@ -164,7 +167,8 @@
   --color-brand-accent-8: #b55717;
   --color-brand-accent-9: #914613;
   --color-brand-accent-10: #79370f;
-  --color-brand-accent: #ff7a21; /* Default accent */
+  --color-brand-accent: #ff7a21;
+  /* Default accent */
 
   /* Neutral colors */
   --color-brand-neutral-1: #ffffff;
@@ -177,7 +181,8 @@
   --color-brand-neutral-8: #595959;
   --color-brand-neutral-9: #454545;
   --color-brand-neutral-10: #262626;
-  --color-brand-neutral: #8c8c8c; /* Default neutral */
+  --color-brand-neutral: #8c8c8c;
+  /* Default neutral */
 
 
   --color-danger-tertiary: #FEE9E7;
@@ -197,6 +202,7 @@
       opacity: 0;
       transform: translate(-50%, -48%) scale(0.95);
     }
+
     to {
       opacity: 1;
       transform: translate(-50%, -50%) scale(1);
@@ -208,6 +214,7 @@
       opacity: 1;
       transform: translate(-50%, -50%) scale(1);
     }
+
     to {
       opacity: 0;
       transform: translate(-50%, -48%) scale(0.95);
@@ -218,6 +225,7 @@
     from {
       opacity: 0;
     }
+
     to {
       opacity: 1;
     }
@@ -227,6 +235,7 @@
     from {
       opacity: 1;
     }
+
     to {
       opacity: 0;
     }
@@ -237,4 +246,15 @@
   .global-px {
     @apply px-4 sm:px-10 lg:px-14 xl:px-20;
   }
+}
+
+iframe[id^="inline-background-"],
+iframe[id^="inline-checkout-"] {
+  z-index: 2147483647 !important;
+  position: fixed !important;
+}
+
+/* Force Radix/Shadcn Overlays to stay behind Paystack */
+[data-radix-portal] {
+  z-index: 9999 !important;
 }

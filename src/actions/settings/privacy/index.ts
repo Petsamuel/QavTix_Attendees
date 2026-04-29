@@ -9,7 +9,7 @@ import {
 } from "@/endpoints";
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
-import { revalidateTag } from "next/cache"
+import { revalidateTag, cacheTag } from "next/cache"
 import { cookies } from "next/headers"
 import { CACHE_TAGS } from "@/cache-tags"
 
@@ -20,10 +20,14 @@ interface PrivacyResult {
 }
 
 export async function getPrivacySettings(): Promise<PrivacyResult> {
-    const cookieStore = await cookies()
-        const accessToken = cookieStore.get("access_token")?.value
+    const accessToken = (await cookies()).get("access_token")?.value;
+    return _getPrivacySettings(accessToken);
+}
 
-try {
+async function _getPrivacySettings(accessToken: string | undefined): Promise<PrivacyResult> {
+    "use cache"
+    cacheTag(CACHE_TAGS.PRIVACY_SETTINGS)
+    try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${GET_PRIVACY_SETTINGS_ENDPOINT}`,
             {
@@ -31,7 +35,6 @@ try {
                     "Content-Type": "application/json",
                     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
                 },
-                next: { tags: [CACHE_TAGS.PRIVACY_SETTINGS], revalidate: 3600 },
             }
         )
 

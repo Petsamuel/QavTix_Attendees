@@ -3,13 +3,13 @@
 import { CHANGE_PASSWORD_ENDPOINT, GET_TWO_FACTOR_ENDPOINT, UPDATE_TWO_FACTOR_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
-import { revalidateTag } from "next/cache"
+import { cacheTag, revalidateTag } from "next/cache"
 import { CACHE_TAGS } from "@/cache-tags"
 import { cookies } from "next/headers"
 
 interface Get2FAResult {
-    success:  boolean
-    data?:    {
+    success: boolean
+    data?: {
         "google": false,
         "facebook": true
     }
@@ -17,20 +17,24 @@ interface Get2FAResult {
 }
 
 interface Toggle2FAResult {
-    success:  boolean
+    success: boolean
     message?: string
 }
 
 interface ChangePasswordResult {
-    success:  boolean
+    success: boolean
     message?: string
 }
 
 export async function get2FASettings(): Promise<Get2FAResult> {
-    const cookieStore = await cookies()
-        const accessToken = cookieStore.get("access_token")?.value
+    const accessToken = (await cookies()).get("access_token")?.value
+    return _get2FASettings(accessToken)
+}
 
-try {
+async function _get2FASettings(accessToken: string | undefined): Promise<Get2FAResult> {
+    "use cache"
+    cacheTag(CACHE_TAGS.TWO_FACTOR)
+    try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${GET_TWO_FACTOR_ENDPOINT}`,
             {
@@ -38,7 +42,7 @@ try {
                     "Content-Type": "application/json",
                     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
                 },
-                next: { tags: [CACHE_TAGS.TWO_FACTOR], revalidate: 3600 },
+
             }
         )
 
@@ -58,10 +62,10 @@ try {
 
 export async function toggle2FAProvider(
     providerID: string,
-    enable:     boolean,
+    enable: boolean,
 ): Promise<Toggle2FAResult> {
     const axiosInstance = await getServerAxios()
-try {
+    try {
         await axiosInstance.patch(UPDATE_TWO_FACTOR_ENDPOINT, { [providerID]: enable })
         revalidateTag(CACHE_TAGS.TWO_FACTOR, "max")
         return { success: true }
@@ -77,7 +81,7 @@ export async function changePassword(
     newPassword: string,
 ): Promise<ChangePasswordResult> {
     const axiosInstance = await getServerAxios()
-try {
+    try {
         await axiosInstance.post(CHANGE_PASSWORD_ENDPOINT, {
             old_password: oldPassword,
             new_password: newPassword,

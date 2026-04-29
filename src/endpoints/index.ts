@@ -46,9 +46,9 @@ export const DELETE_GROUP_MEMBER_ENDPOINT = "attendee/groups/[group_id]/remove-m
 
 
 export const GET_PRIVACY_SETTINGS_ENDPOINT = "attendee/privacy/settings"
-export const SET_PRIVACY_SETTINGS_ENDPOINT = "attendee/privacy/activity/sharing"
+export const SET_PRIVACY_SETTINGS_ENDPOINT = "attendee/privacy/activity/sharing/"
 export const DOWNLOAD_DATA_ENDPOINT = "attendee/privacy/data/download/"
-export const DELETE_ACCOUNT_ENDPOINT = "attendee/privacy/account/delete"
+export const DELETE_ACCOUNT_ENDPOINT = "attendee/privacy/account/delete/"
 export const CANCEL_PLAN_ENDPOINT = "payments/attendee-plans/cancel/"
 
 
@@ -60,3 +60,4 @@ export const DELETE_PAYMENT_METHOD = "attendee/payouts/remove/[id]/"
 
 export const PAYMENT_METHODS_ENDPOINT = "payments/cards/"
 export const ADD_PAYMENT_CARD = "payments/cards/initiate/"
+export const SET_DEFAULT_PAYMENT_CARD_ENDPOINT = "payments/cards/[card_id]/default/"

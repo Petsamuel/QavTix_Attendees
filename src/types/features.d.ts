@@ -35,3 +35,16 @@ interface StatusOption {
     icon: string
     description: string
 }
+
+/**
+ * Targets that can be imperatively invalidated via useRevalidate / useOnRevalidate.
+ * Extend this union when you add new data domains.
+ */
+type RevalidateTarget =
+    | "favourites"
+    | "tickets"
+    | "marketplace"
+    | "affiliates"
+    | "wallet"
+    | "profile"
+    | "groups"

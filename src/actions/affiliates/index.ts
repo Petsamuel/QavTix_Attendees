@@ -10,17 +10,26 @@ import {
 } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { cookies } from "next/headers"
-import { revalidateTag } from "next/cache"
+import { revalidateTag, cacheTag } from "next/cache"
 
 async function fetchWithTag<T>(
     endpoint: string,
     tag: string,
     params?: Record<string, string | number>,
 ): Promise<{ success: true; data: T } | { success: false; message: string }> {
-    const cookieStore = await cookies()
-        const accessToken = cookieStore.get("access_token")?.value
+    const accessToken = (await cookies()).get("access_token")?.value
+    return _fetchWithTag(endpoint, tag, params, accessToken)
+}
 
-try {
+async function _fetchWithTag<T>(
+    endpoint: string,
+    tag: string,
+    params: Record<string, string | number> | undefined,
+    accessToken: string | undefined
+): Promise<{ success: true; data: T } | { success: false; message: string }> {
+    "use cache"
+    cacheTag(tag)
+    try {
         const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/${endpoint}`)
         if (params) {
             Object.entries(params).forEach(([k, v]) => {
@@ -33,8 +42,6 @@ try {
                 "Content-Type": "application/json",
                 ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
             },
-            next: { tags: [tag], revalidate: 2000 },
-            cache: "force-cache",
         })
 
         if (!res.ok) {

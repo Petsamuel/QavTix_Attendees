@@ -3,7 +3,7 @@
 import { NOTIFICATION_SETTINGS_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
-import { revalidateTag } from "next/cache"
+import { revalidateTag, cacheTag } from "next/cache"
 import { CACHE_TAGS } from "@/cache-tags"
 import { cookies } from "next/headers"
 
@@ -16,10 +16,14 @@ interface NotificationResult {
 }
 
 export async function getNotificationSettings(): Promise<NotificationResult> {
-    const cookieStore = await cookies()
-        const accessToken = cookieStore.get("access_token")?.value
+    const accessToken = (await cookies()).get("access_token")?.value;
+    return _getNotificationSettings(accessToken);
+}
 
-try {
+async function _getNotificationSettings(accessToken: string | undefined): Promise<NotificationResult> {
+    "use cache"
+    cacheTag(CACHE_TAGS.NOTIFICATION_SETTINGS)
+    try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${NOTIFICATION_SETTINGS_ENDPOINT}`,
             {
@@ -27,7 +31,6 @@ try {
                     "Content-Type": "application/json",
                     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
                 },
-                next: { tags: [CACHE_TAGS.NOTIFICATION_SETTINGS], revalidate: 3600 },
             }
         )
 

@@ -20,35 +20,35 @@ interface Props {
 }
 
 const PLAN_STATUS_STYLES: Record<string, string> = {
-    active:    "bg-green-50  text-green-700  border-green-200",
-    trialing:  "bg-blue-50   text-blue-700   border-blue-200",
+    active: "bg-green-50  text-green-700  border-green-200",
+    trialing: "bg-blue-50   text-blue-700   border-blue-200",
     cancelled: "bg-neutral-100 text-neutral-500 border-neutral-200",
-    expired:   "bg-red-50    text-red-600    border-red-200",
+    expired: "bg-red-50    text-red-600    border-red-200",
 }
 
 const PLAN_STATUS_LABEL: Record<string, string> = {
-    active:    "Active",
-    trialing:  "Trial",
+    active: "Active",
+    trialing: "Trial",
     cancelled: "Cancelled",
-    expired:   "Expired",
+    expired: "Expired",
 }
 
 export default function PrivacySettingsPageCW({ initialSettings }: Props) {
 
     const dispatch = useAppDispatch()
-    const [anyLoading,    setAnyLoading] = useState(false)
+    const [anyLoading, setAnyLoading] = useState(false)
     const [isDownloading, setIsDownloading] = useState(false)
 
     const activePlan = useAppSelector(state => state.authUser.user?.subscription_status ?? null)
     const planExpiresAt = useAppSelector(state => state.authUser.user?.plan_expires_at ?? null)
     const router = useRouter()
-    
+
     const hasCancellablePlan =
         activePlan === "active" || activePlan === "trialing"
 
     const { control, getValues } = useForm({
         defaultValues: {
-            showEvents:     initialSettings.show_events,
+            showEvents: initialSettings.show_events,
             allowFavorites: initialSettings.show_favorites,
         }
     })
@@ -57,20 +57,26 @@ export default function PrivacySettingsPageCW({ initialSettings }: Props) {
         setAnyLoading(true)
         const values = getValues()
         const result = await updatePrivacySettings({
-            show_events:    values.showEvents,
+            show_events: values.showEvents,
             show_favorites: values.allowFavorites,
         })
         setAnyLoading(false)
         router.refresh()
 
-        if (!result.success) {
-            dispatch(showAlert({
-                variant:     "destructive",
-                title:       "Could not save privacy settings",
-                description: result.message ?? "Please try again.",
-            }))
-        }
-    }, [getValues, dispatch])
+        dispatch(showAlert(
+            result.success
+                ? {
+                    variant: "success",
+                    title: "Privacy settings updated",
+                    description: "Your privacy preferences have been saved.",
+                }
+                : {
+                    variant: "destructive",
+                    title: "Could not save privacy settings",
+                    description: result.message ?? "Please try again.",
+                },
+        ))
+    }, [getValues, dispatch, router])
 
     const handleDownload = async () => {
         if (isDownloading) return
@@ -79,8 +85,8 @@ export default function PrivacySettingsPageCW({ initialSettings }: Props) {
         setIsDownloading(false)
 
         dispatch(showAlert({
-            variant:     result.success ? "default" : "destructive",
-            title:       result.success ? "Data request sent" : "Download failed",
+            variant: result.success ? "default" : "destructive",
+            title: result.success ? "Data request sent" : "Download failed",
             description: result.success
                 ? "A copy of your data will be delivered to your email shortly."
                 : result.message ?? "Please try again.",

@@ -3,7 +3,7 @@
 import { GET_PROFILE_ENDPOINT, UPDATE_PROFILE_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
-import { revalidateTag } from "next/cache"
+import { revalidateTag, cacheTag } from "next/cache"
 import { CACHE_TAGS } from "@/cache-tags"
 import { cookies } from "next/headers"
 
@@ -14,10 +14,14 @@ interface ProfileResult {
 }
 
 export async function getProfile(): Promise<ProfileResult> {
-    const cookieStore = await cookies()
-        const accessToken = cookieStore.get("access_token")?.value
+    const accessToken = (await cookies()).get("access_token")?.value;
+    return _getProfile(accessToken);
+}
 
-try {
+async function _getProfile(accessToken: string | undefined): Promise<ProfileResult> {
+    "use cache"
+    cacheTag(CACHE_TAGS.PROFILE)
+    try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${GET_PROFILE_ENDPOINT}`,
             {
@@ -25,7 +29,6 @@ try {
                     "Content-Type": "application/json",
                     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
                 },
-                next: { tags: [CACHE_TAGS.PROFILE], revalidate: 3600 },
             }
         )
 
