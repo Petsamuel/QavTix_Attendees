@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { Icon } from "@iconify/react"
 import PaginationControls from "../tools/PaginationControl"
-import { getWithdrawalHistory } from "@/actions/affiliates"
+import { getWithdrawalHistory } from "@/actions/affiliates/client"
 import { formatPrice } from "@/helper-fns/formatPrice"
 import { useAppSelector } from "@/lib/redux/hooks"
 import TableLoader from "@/components/loaders/TableLoader"
@@ -21,12 +21,12 @@ export default function WithdrawalHistoryTable({ initialData }: Props) {
 
     const { user } = useAppSelector(store => store.authUser)
 
-    const [items,       setItems]       = useState<WithdrawalHistoryItem[]>(initialData.results)
-    const [isLoading,   setIsLoading]   = useState(false)
-    const [isError,     setIsError]     = useState(false)
+    const [items, setItems] = useState<WithdrawalHistoryItem[]>(initialData.results)
+    const [isLoading, setIsLoading] = useState(false)
+    const [isError, setIsError] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
-    const [totalPages,  setTotalPages]  = useState(initialData.total_pages ?? Math.ceil(initialData.count / PAGE_SIZE))
-    const [totalItems,  setTotalItems]  = useState(initialData.count)
+    const [totalPages, setTotalPages] = useState(initialData.total_pages ?? Math.ceil(initialData.count / PAGE_SIZE))
+    const [totalItems, setTotalItems] = useState(initialData.count)
 
     const fetchPage = async (page: number) => {
         setIsLoading(true)
@@ -44,14 +44,14 @@ export default function WithdrawalHistoryTable({ initialData }: Props) {
     }
 
     const startIndex = (currentPage - 1) * PAGE_SIZE + 1
-    const endIndex   = Math.min(currentPage * PAGE_SIZE, totalItems)
+    const endIndex = Math.min(currentPage * PAGE_SIZE, totalItems)
 
     if (isLoading) return <TableLoader />
 
     if (isError) return (
         <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
             <div className="p-3 rounded-full bg-red-50">
-                <Icon icon="mage:warning-circle" className="size-6 text-red-400" />
+                <Icon icon="mingcute:warning-line" className="size-6 text-red-400" />
             </div>
             <p className="text-sm font-medium text-brand-secondary-8">Something went wrong</p>
             <p className="text-xs text-brand-secondary-5">Could not load withdrawal history.</p>

@@ -1,4 +1,5 @@
-"use server"
+'use cache'
+
 
 import { CACHE_TAGS } from "@/cache-tags"
 import {
@@ -9,25 +10,14 @@ import {
     WITHDRAWAL_HISTORY_ENDPOINT,
 } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
-import { cookies } from "next/headers"
-import { revalidateTag, cacheTag } from "next/cache"
-
-async function fetchWithTag<T>(
-    endpoint: string,
-    tag: string,
-    params?: Record<string, string | number>,
-): Promise<{ success: true; data: T } | { success: false; message: string }> {
-    const accessToken = (await cookies()).get("access_token")?.value
-    return _fetchWithTag(endpoint, tag, params, accessToken)
-}
+import { cacheTag } from "next/cache"
 
 async function _fetchWithTag<T>(
     endpoint: string,
     tag: string,
-    params: Record<string, string | number> | undefined,
-    accessToken: string | undefined
+    accessToken: string | undefined,
+    params?: Record<string, string | number>,
 ): Promise<{ success: true; data: T } | { success: false; message: string }> {
-    "use cache"
     cacheTag(tag)
     try {
         const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/${endpoint}`)
@@ -46,7 +36,6 @@ async function _fetchWithTag<T>(
 
         if (!res.ok) {
             const json = await res.json()
-            console.log(`[${tag}] status:`, res.status, JSON.stringify(json))
             return { success: false, message: handleApiError(json) }
         }
 
@@ -54,15 +43,15 @@ async function _fetchWithTag<T>(
         return { success: true, data: json.data ?? json }
 
     } catch (err: any) {
-        console.log(`[${tag}] error:`, err?.message)
         return { success: false, message: "Request failed." }
     }
 }
 
-export async function getAffiliateDashboard() {
-    return fetchWithTag<AffiliateDashboardMetrics>(
+export async function getAffiliateDashboard(token: string | undefined) {
+    return _fetchWithTag<AffiliateDashboardMetrics>(
         AFFILIATE_DASHBOARD_ENDPOINT,
         CACHE_TAGS.AFFILIATE_DASHBOARD,
+        token
     )
 }
 
@@ -74,10 +63,11 @@ interface GetAffiliateLinksParams {
     end_date?: string
 }
 
-export async function getAffiliateLinks(params: GetAffiliateLinksParams = {}) {
-    return fetchWithTag<PaginatedResponse<AffiliateEvent>>(
+export async function getAffiliateLinks(token: string | undefined, params: GetAffiliateLinksParams = {}) {
+    return _fetchWithTag<PaginatedResponse<AffiliateEvent>>(
         AFFILIATE_LINKS_ENDPOINT,
         CACHE_TAGS.AFFILIATE_LINKS,
+        token,
         params as Record<string, string | number>,
     )
 }
@@ -91,21 +81,17 @@ interface GetEarningsParams {
     status?: string
 }
 
-export async function getEarningsHistory(params: GetEarningsParams = {}) {
-    return fetchWithTag<PaginatedResponse<EarningHistoryItem>>(
+export async function getEarningsHistory(token: string | undefined, params: GetEarningsParams = {}) {
+    return _fetchWithTag<PaginatedResponse<EarningHistoryItem>>(
         AFFILIATE_EARNINGS_ENDPOINT,
         CACHE_TAGS.AFFILIATE_EARNINGS,
+        token,
         params as Record<string, string | number>,
     )
 }
 
-
-
-
-// Each filter gets its own tag — prevents Next.js fetch deduplication
-// from returning the same cached response for all three
-
 export async function getAffiliatePerformanceSingle(
+    token: string | undefined,
     filter: PerformanceFilter,
     year?: number,
 ) {
@@ -115,18 +101,19 @@ export async function getAffiliatePerformanceSingle(
         year: CACHE_TAGS.AFFILIATE_PERFORMANCE_YEAR,
     }
 
-    return fetchWithTag<AffiliatePerformanceData>(
+    return _fetchWithTag<AffiliatePerformanceData>(
         AFFILIATE_PERFORMANCE_ENDPOINT,
         tagMap[filter],
+        token,
         { filter, ...(year != null && { year }) },
     )
 }
 
-export async function getAffiliatePerformanceAll(year: number): Promise<AllPerformanceData> {
+export async function getAffiliatePerformanceAll(token: string | undefined, year: number): Promise<AllPerformanceData> {
     const [weekRes, monthRes, yearRes] = await Promise.all([
-        getAffiliatePerformanceSingle("week"),
-        getAffiliatePerformanceSingle("month"),
-        getAffiliatePerformanceSingle("year", year),
+        getAffiliatePerformanceSingle(token, "week"),
+        getAffiliatePerformanceSingle(token, "month"),
+        getAffiliatePerformanceSingle(token, "year", year),
     ])
 
     return {
@@ -136,21 +123,11 @@ export async function getAffiliatePerformanceAll(year: number): Promise<AllPerfo
     }
 }
 
-
-
-export async function getWithdrawalHistory(page = 1) {
-    return fetchWithTag<PaginatedResponse<WithdrawalHistoryItem>>(
+export async function getWithdrawalHistory(token: string | undefined, page = 1) {
+    return _fetchWithTag<PaginatedResponse<WithdrawalHistoryItem>>(
         WITHDRAWAL_HISTORY_ENDPOINT,
         CACHE_TAGS.WITHDRAWAL_HISTORY,
+        token,
         { page },
     )
-}
-
-
-
-
-export async function revalidatePerformanceData() {
-    revalidateTag(CACHE_TAGS.AFFILIATE_PERFORMANCE_WEEK, "max")
-    revalidateTag(CACHE_TAGS.AFFILIATE_PERFORMANCE_MONTH, "max")
-    revalidateTag(CACHE_TAGS.AFFILIATE_PERFORMANCE_YEAR, "max")
 }

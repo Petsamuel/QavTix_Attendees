@@ -11,7 +11,7 @@ import { TabSlice, useDataDisplay } from "@/custom-hooks/UseDataDisplay"
 import { fromMarketplaceEvent } from "@/components/cards/resources/event-card-adapter"
 import { deriveCategories } from "@/helper-fns/deriveCategories"
 import EventCardLoaderContainer from "../loaders/EventCardLoader"
-import { ApiCategory } from "@/actions/filters"
+import { ApiCategory } from "@/actions/filters/index"
 import { MARKETPLACE_LIST_ENDPOINT } from "@/endpoints"
 
 

@@ -9,7 +9,7 @@ import { z } from "zod"
 import CustomInput1 from "../custom-utils/inputs/CustomInput1"
 import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
 import { validateEmail } from "@/helper-fns/validateEmail"
-import { createGroup, Group } from "@/actions/groups"
+import { createGroup, Group } from "@/actions/groups/client"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
 

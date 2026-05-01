@@ -1,13 +1,14 @@
 import AffliatesPageCW from "@/components/page-content-wrappers/AffliatesPageCW"
 import { connection } from "next/server"
+import { cookies } from "next/headers"
 import {
     getAffiliateDashboard,
     getAffiliateLinks,
     getEarningsHistory,
     getAffiliatePerformanceAll,
     getWithdrawalHistory,
-} from "@/actions/affiliates"
-import { ApiCategory, getCategories } from "@/actions/filters"
+} from "@/actions/affiliates/index"
+import { ApiCategory, getCategories } from "@/actions/filters/index"
 import { ATTENDEE_PAGE_METADATA } from "@/lib/metadata"
 import type { Metadata } from "next"
 
@@ -20,23 +21,26 @@ const emptySlice = { results: [], count: 0, next: null, previous: null, total_pa
 
 async function getAffiliateData() {
     await connection()
+    const cookiesStore = await cookies()
+    const token = cookiesStore.get("access_token")?.value
+
     const currentYear = new Date().getFullYear()
 
     const [dashboardRes, linksRes, earningsRes, performanceData, categoriesRes, withdrawalHistoryRes] = await Promise.all([
-        getAffiliateDashboard(),
-        getAffiliateLinks({ page: 1 }),
-        getEarningsHistory({ page: 1 }),
-        getAffiliatePerformanceAll(currentYear),
+        getAffiliateDashboard(token),
+        getAffiliateLinks(token, { page: 1 }),
+        getEarningsHistory(token, { page: 1 }),
+        getAffiliatePerformanceAll(token, currentYear),
         getCategories(),
-        getWithdrawalHistory(),
+        getWithdrawalHistory(token),
     ])
 
     return {
-        metrics:         dashboardRes.success ? dashboardRes.data as AffiliateDashboardMetrics : null,
-        affiliateLinks:  linksRes.success     ? linksRes.data    as PaginatedResponse<AffiliateEvent>     : emptySlice,
-        earningsHistory: earningsRes.success  ? earningsRes.data as PaginatedResponse<EarningHistoryItem> : emptySlice,
-        performance:     performanceData,
-        categories:     categoriesRes.success ? categoriesRes.data as ApiCategory[] : [],
+        metrics: dashboardRes.success ? dashboardRes.data as AffiliateDashboardMetrics : null,
+        affiliateLinks: linksRes.success ? linksRes.data as PaginatedResponse<AffiliateEvent> : emptySlice,
+        earningsHistory: earningsRes.success ? earningsRes.data as PaginatedResponse<EarningHistoryItem> : emptySlice,
+        performance: performanceData,
+        categories: categoriesRes.success ? categoriesRes.data as ApiCategory[] : [],
         withdrawalHistory: withdrawalHistoryRes.success ? withdrawalHistoryRes.data as PaginatedResponse<WithdrawalHistoryItem> : emptySlice
     }
 }

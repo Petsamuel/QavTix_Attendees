@@ -1,28 +1,28 @@
-"use server"
+'use server'
 
 import { getServerAxios } from "@/lib/axios"
 
 export interface FetchParams {
-    endpoint:     string
+    endpoint: string
     staticParams: Record<string, string>
     filterParams: Record<string, string | string[]>
-    page:         number
-    search:       string
+    page: number
+    search: string
 }
 
 export interface FetchResult<T> {
-    success:      boolean
-    results:      T[]
-    count:        number
-    next:         number | null
+    success: boolean
+    results: T[]
+    count: number
+    next: number | null
     total_pages?: number
-    message?:     string
+    message?: string
 }
 
 export async function fetchPaginatedData<T>(params: FetchParams): Promise<FetchResult<T>> {
-    const axiosInstance = await getServerAxios()
+    try {
+        const axiosInstance = await getServerAxios()
 
-try {
         const requestParams: Record<string, any> = {
             ...params.staticParams,
             ...params.filterParams,
@@ -37,10 +37,10 @@ try {
         const d = data.data ?? data
 
         return {
-            success:     true,
-            results:     d?.results    ?? [],
-            count:       d?.count      ?? 0,
-            next:        d?.next       ?? null,
+            success: true,
+            results: d?.results ?? [],
+            count: d?.count ?? 0,
+            next: d?.next ?? null,
             total_pages: d?.total_pages ?? undefined,
         }
     } catch (err: any) {

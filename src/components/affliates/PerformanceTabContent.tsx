@@ -6,7 +6,7 @@ import PerformanceChart from "../charts/PerformanceChart"
 import {
     AFFILIATE_METRICS_CONFIG,
 } from "../cards/resources/metrics-config"
-import { getAffiliatePerformanceAll } from "@/actions/affiliates"
+import { getAffiliatePerformanceAll } from "@/actions/affiliates/client"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { buildAffiliateMetricStats } from "@/helper-fns/buildMetricsConfig"
 import ChartLoader from "../loaders/ChartLoader"

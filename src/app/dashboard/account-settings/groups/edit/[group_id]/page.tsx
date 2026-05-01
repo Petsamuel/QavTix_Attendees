@@ -2,7 +2,8 @@ import { notFound } from "next/navigation"
 import EditGroupForm from "@/components/forms/EditGroupForm"
 import { space_grotesk } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
-import { getGroups } from "@/actions/groups"
+import { getGroups } from "@/actions/groups/index"
+import { cookies } from "next/headers"
 
 
 interface Props {
@@ -12,7 +13,10 @@ interface Props {
 export default async function EditGroupPage({ params }: Props) {
 
     const { group_id } = await params;
-    const result = await getGroups()
+    const cookieStore = await cookies()
+    const token = cookieStore.get("access_token")?.value
+
+    const result = await getGroups(token)
 
     if (!result.success || !result.data) {
         notFound()

@@ -13,7 +13,6 @@ import { useAppSelector } from "@/lib/redux/hooks"
 import { closePopupAlertModal } from "@/lib/redux/slices/popupAlertSlice"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { useLogOut } from "@/custom-hooks/UseLogout"
 
 export default function PopUpMessageAlertModal() {
     const dispatch = useDispatch()
@@ -23,7 +22,6 @@ export default function PopUpMessageAlertModal() {
 
     const [currentIndex, setCurrentIndex] = useState(0)
     const [direction, setDirection] = useState<"left" | "right">("right")
-    const { handleLogOut, isLoggingOut } = useLogOut()
 
     useEffect(() => {
         if (isOpen) setCurrentIndex(0)
@@ -156,22 +154,6 @@ export default function PopUpMessageAlertModal() {
                                     >
                                         {currentAlert.buttonText}
                                         <Icon icon="si:arrow-right-fill" width="24" height="24" />
-                                    </Button>
-                                )}
-
-                                {isProfileIncomplete && (
-                                    <Button
-                                        onClick={() => {
-                                            handleLogOut()
-                                            dispatch(closePopupAlertModal())
-                                            router.refresh()
-                                        }}
-                                        disabled={isLoggingOut}
-                                        variant="outline"
-                                        className="border-brand-neutral-6 text-brand-secondary-7 hover:text-red-500 hover:bg-transparent hover:border-red-300 px-8 py-3 rounded-lg transition-colors inline-flex items-center gap-1.5 disabled:opacity-50"
-                                    >
-                                        <Icon icon="hugeicons:logout-01" width="18" height="18" />
-                                        {isLoggingOut ? "Signing out..." : "Sign out"}
                                     </Button>
                                 )}
                             </div>

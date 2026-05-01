@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import PaymentCard from "@/components/cards/PaymentCard"
 import ChangeDefaultCardModal from "../modals/ChangeDefaultPaymentMethod"
 import AddPaymentCardModal from "@/lib/features/export/add-payment-card"
-import { getPaymentMethods } from "@/actions/payment"
+import { getPaymentMethods } from "@/actions/payment/client"
 
 
 interface Props {

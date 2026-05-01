@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { addFavourite, removeFavourite } from "@/actions/favourites"
+import { addFavourite, removeFavourite } from "@/actions/favourites/client"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { showSnackbar } from "@/lib/redux/slices/snackbarSlice"
 import { useRevalidate } from "./UseRevalidate"

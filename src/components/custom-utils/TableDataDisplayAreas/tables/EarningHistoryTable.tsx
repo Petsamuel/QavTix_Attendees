@@ -9,15 +9,15 @@ import { Icon } from "@iconify/react"
 import TableLoader from "@/components/loaders/TableLoader"
 
 interface EarningHistoryTableProps {
-    items:         EarningHistoryItem[]
-    isLoading:     boolean
+    items: EarningHistoryItem[]
+    isLoading: boolean
     isLoadingMore: boolean
-    hasNext:       boolean
-    count:         number
-    onLoadMore:    () => void
-    isEmpty:       boolean
-    isError:       boolean
-    search:        string
+    hasNext: boolean
+    count: number
+    onLoadMore: () => void
+    isEmpty: boolean
+    isError: boolean
+    search: string
 }
 
 export default function EarningHistoryTable({
@@ -37,7 +37,7 @@ export default function EarningHistoryTable({
     if (isError) return (
         <div className="flex flex-col items-center justify-center py-16 gap-3 text-center mt-5">
             <div className="p-3 rounded-full bg-red-50">
-                <Icon icon="mage:warning-circle" className="size-6 text-red-400" />
+                <Icon icon="mingcute:warning-line" className="size-6 text-red-400" />
             </div>
             <p className="text-sm font-medium text-brand-secondary-8">Something went wrong</p>
             <p className="text-xs text-brand-secondary-5">Could not load earnings. Please try again.</p>

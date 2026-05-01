@@ -1,5 +1,5 @@
 import { cookies } from "next/headers"
-import { getCategories } from "@/actions/filters"
+import { getCategories } from "@/actions/filters/index"
 import MyTicketsPageCW from "@/components/page-content-wrappers/MyTicketsPageCW"
 import { ATTENDEE_DASHBOARD_ENDPOINT } from "@/endpoints"
 import { ATTENDEE_PAGE_METADATA } from "@/lib/metadata"

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group"
 import { Label } from "../ui/label"
 import { Icon } from "@iconify/react"
-import { getPaymentAccounts } from "@/actions/payment"
+import { getPaymentAccounts } from "@/actions/payment/client"
 import { BankAccountSkeleton } from "../loaders/BankListLoader"
 import BankLogo from "../financials/BankLogo"
 
@@ -21,9 +21,9 @@ interface Props {
 
 export default function BankAccountsList({ onSelect, isLoading, setIsLoading }: Props) {
 
-    const [accounts,    setAccounts]    = useState<PaymentAccount[]>([])
-    const [isError,     setIsError]     = useState(false)
-    const [selectedId,  setSelectedId]  = useState<string>("")
+    const [accounts, setAccounts] = useState<PaymentAccount[]>([])
+    const [isError, setIsError] = useState(false)
+    const [selectedId, setSelectedId] = useState<string>("")
 
     useEffect(() => {
         const load = async () => {
@@ -56,7 +56,7 @@ export default function BankAccountsList({ onSelect, isLoading, setIsLoading }: 
     if (isError) return (
         <div className="flex flex-col items-center justify-center py-6 gap-2 text-center">
             <div className="p-2 rounded-full bg-red-50">
-                <Icon icon="mage:warning-circle" className="size-5 text-red-400" />
+                <Icon icon="mingcute:warning-line" className="size-5 text-red-400" />
             </div>
             <p className="text-xs font-medium text-brand-secondary-8">Could not load accounts</p>
             <p className="text-[10px] text-brand-secondary-5">Please close and try again</p>

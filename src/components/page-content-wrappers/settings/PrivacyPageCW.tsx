@@ -12,7 +12,7 @@ import { showAlert } from "@/lib/redux/slices/alertSlice"
 import {
     updatePrivacySettings,
     downloadPrivacyData,
-} from "@/actions/settings/privacy"
+} from "@/actions/settings/privacy/client"
 import { useRouter } from "next/navigation"
 
 interface Props {

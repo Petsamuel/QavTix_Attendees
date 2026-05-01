@@ -6,7 +6,7 @@ import { Badge } from "../ui/badge"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { EDIT_GROUP } from "@/enums/navigation"
-import { Group, deleteGroup } from "@/actions/groups"
+import { Group, deleteGroup } from "@/actions/groups/client"
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
 import {

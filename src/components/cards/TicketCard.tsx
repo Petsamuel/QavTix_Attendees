@@ -17,7 +17,7 @@ const buildMapsUrl = (location: EventTicket["event_location"]) => {
 }
 
 interface TicketCardProps {
-    ticket:      EventTicket
+    ticket: EventTicket
     hideActions?: boolean   // true during silent download — hides links & download btn
     // Slot for the download button (injected by parent so each use case controls it)
     downloadSlot?: React.ReactNode
@@ -33,7 +33,7 @@ export default function TicketCard({ ticket, hideActions = false, downloadSlot }
 
             <div className="w-full lg:w-[35%] h-64 lg:h-auto relative">
                 <Image
-                    src="/images/demo-images/event-detail-img.png"
+                    src={ticket.event_image}
                     alt="Event Cover"
                     className="w-full h-full object-cover"
                     fill
