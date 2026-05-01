@@ -10,8 +10,8 @@ import { openSuccessModal } from "@/lib/redux/slices/successModalSlice"
 import { usePathname } from "next/navigation"
 import { Icon } from "@iconify/react"
 import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
-import { cancelPlan, deleteAccount } from "@/actions/settings/privacy"
-import { logOut, verifyPassword } from "@/actions/auth"
+import { cancelPlan, deleteAccount } from "@/actions/settings/privacy/client"
+import { logOut, verifyPassword } from "@/actions/auth/client"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
 
 export default function PasswordModal() {

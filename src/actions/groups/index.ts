@@ -1,11 +1,7 @@
-"use server"
-
 import { handleApiError } from "@/helper-fns/handleApiErrors"
-import { getServerAxios } from "@/lib/axios"
-import { revalidateTag, cacheTag } from "next/cache"
-import { CREATE_GROUP_ENDPOINT, DELETE_GROUP_ENDPOINT, EDIT_GROUP_ENDPOINT, GET_GROUPS_ENDPOINT } from "@/endpoints"
+import { cacheTag } from "next/cache"
+import { GET_GROUPS_ENDPOINT } from "@/endpoints"
 import { CACHE_TAGS } from "@/cache-tags"
-import { cookies } from "next/headers"
 
 export interface GroupMemberItem {
     email: string
@@ -24,19 +20,8 @@ interface GroupsResult {
     message?: string
 }
 
-interface MutateGroupResult {
-    success:  boolean
-    data?:    Group
-    message?: string
-}
-
-export async function getGroups(): Promise<GroupsResult> {
-    const accessToken = (await cookies()).get("access_token")?.value;
-    return _getGroups(accessToken);
-}
-
-async function _getGroups(accessToken: string | undefined): Promise<GroupsResult> {
-    "use cache"
+export async function getGroups(token: string | undefined): Promise<GroupsResult> {
+    'use cache'
     cacheTag(CACHE_TAGS.GROUPS)
     try {
         const res = await fetch(
@@ -44,7 +29,7 @@ async function _getGroups(accessToken: string | undefined): Promise<GroupsResult
             {
                 headers: {
                     "Content-Type": "application/json",
-                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 },
             }
         )
@@ -60,58 +45,6 @@ async function _getGroups(accessToken: string | undefined): Promise<GroupsResult
 
         return { success: true, data: groups }
     } catch (error: any) {
-        console.log("[getGroups] error:", error)
         return { success: false, message: "Failed to load groups." }
     }
 }
-
-export async function createGroup(payload: {
-    name:    string
-    members: string[]
-}): Promise<MutateGroupResult> {
-    const axiosInstance = await getServerAxios()
-try {
-        const { data } = await axiosInstance.post(CREATE_GROUP_ENDPOINT, {
-            name:    payload.name,
-            members: payload.members.map(email => ({ email })),
-        })
-        revalidateTag(CACHE_TAGS.GROUPS, "max")
-        return { success: true, data: data.data ?? data }
-    } catch (error: any) {
-        console.log("[createGroup] status:", error?.response?.status)
-        console.log("[createGroup] body:", JSON.stringify(error?.response?.data))
-        return { success: false, message: handleApiError(error?.response?.data) }
-    }
-}
-
-export async function updateGroup(
-    groupID: string,
-    payload: { name: string; members: string[] },
-): Promise<MutateGroupResult> {
-    const axiosInstance = await getServerAxios()
-try {
-        const { data } = await axiosInstance.patch(EDIT_GROUP_ENDPOINT.replace("[group_id]", groupID), {
-            name:    payload.name,
-            members: payload.members.map(email => ({ email })),
-        })
-        revalidateTag(CACHE_TAGS.GROUPS, "max")
-        return { success: true, data: data.data ?? data }
-    } catch (error: any) {
-        console.log("[updateGroup] status:", error?.response?.status)
-        console.log("[updateGroup] body:", JSON.stringify(error?.response?.data))
-        return { success: false, message: handleApiError(error?.response?.data) }
-    }
-}
-
-export async function deleteGroup(groupID: string): Promise<{ success: boolean; message?: string }> {
-    const axiosInstance = await getServerAxios()
-try {
-        await axiosInstance.delete(DELETE_GROUP_ENDPOINT.replace("[group_id]", groupID))
-        revalidateTag(CACHE_TAGS.GROUPS, "max")
-        return { success: true }
-    } catch (error: any) {
-        console.log("[deleteGroup] status:", error?.response?.status)
-        console.log("[deleteGroup] body:", JSON.stringify(error?.response?.data))
-        return { success: false, message: handleApiError(error?.response?.data) }
-    }
-}

@@ -13,7 +13,7 @@ import PasswordInput from "@/components/custom-utils/inputs/PasswordInput"
 import PasswordStrengthIndicator from "@/components/custom-utils/security/PasswordStrengthIndicator"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
-import { changePassword, toggle2FAProvider } from "@/actions/settings/security"
+import { changePassword, toggle2FAProvider } from "@/actions/settings/security/client"
 import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
 
 interface Props {
@@ -22,8 +22,8 @@ interface Props {
 
 export default function SecurityPageForm({ initialProviders }: Props) {
 
-    const dispatch  = useAppDispatch()
-    const [providers,  setProviders]  = useState<TwoFactorProvider[]>(initialProviders)
+    const dispatch = useAppDispatch()
+    const [providers, setProviders] = useState<TwoFactorProvider[]>(initialProviders)
     const [togglingId, setTogglingId] = useState<string | null>(null)
 
     const {
@@ -31,7 +31,7 @@ export default function SecurityPageForm({ initialProviders }: Props) {
         handleSubmit,
         watch,
         reset,
-        formState: { errors, isSubmitting },
+        formState: { errors, isSubmitting, isDirty },
     } = useForm<PasswordSchema>({
         resolver: zodResolver(passwordSchema),
     })
@@ -43,7 +43,7 @@ export default function SecurityPageForm({ initialProviders }: Props) {
         setTogglingId(provider.id)
 
         const enabling = provider.status !== "connected"
-        const result   = await toggle2FAProvider(provider.id, enabling)
+        const result = await toggle2FAProvider(provider.id, enabling)
 
         if (result.success) {
             setProviders(prev => prev.map(p =>
@@ -52,16 +52,16 @@ export default function SecurityPageForm({ initialProviders }: Props) {
                     : p
             ))
             dispatch(showAlert({
-                variant:     "success",
-                title:       enabling ? `${provider.name} enabled` : `${provider.name} disabled`,
+                variant: "success",
+                title: enabling ? `${provider.name} enabled` : `${provider.name} disabled`,
                 description: enabling
                     ? `Two-factor authentication via ${provider.name} is now active.`
                     : `${provider.name} has been disconnected.`,
             }))
         } else {
             dispatch(showAlert({
-                variant:     "destructive",
-                title:       "Could not update 2FA",
+                variant: "destructive",
+                title: "Could not update 2FA",
                 description: result.message ?? "Please try again.",
             }))
         }
@@ -76,14 +76,14 @@ export default function SecurityPageForm({ initialProviders }: Props) {
         if (result.success) {
             reset()
             dispatch(showAlert({
-                variant:     "success",
-                title:       "Password updated",
+                variant: "success",
+                title: "Password updated",
                 description: "Your password has been changed successfully.",
             }))
         } else {
             dispatch(showAlert({
-                variant:     "destructive",
-                title:       "Password update failed",
+                variant: "destructive",
+                title: "Password update failed",
                 description: result.message ?? "Please check your current password and try again.",
             }))
         }
@@ -213,7 +213,7 @@ export default function SecurityPageForm({ initialProviders }: Props) {
                             iconPosition="right"
                             buttonType="submit"
                             icon={isSubmitting ? "eos-icons:three-dots-loading" : "gravity-ui:arrow-right"}
-                            isDisabled={isSubmitting}
+                            isDisabled={isSubmitting || !isDirty}
                             isLoading={isSubmitting}
                         />
                     </form>

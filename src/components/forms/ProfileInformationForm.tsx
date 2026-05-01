@@ -17,7 +17,7 @@ import { ChevronDown } from "lucide-react"
 import ActionButton1 from "@/components/custom-utils/buttons/ActionBtn1"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
-import { updateProfile } from "@/actions/settings/profile"
+import { updateProfile } from "@/actions/settings/profile/client"
 import { uploadToCloudinary } from "@/lib/upload/cloudinary"
 import { setUser } from "@/lib/redux/slices/authUserSlice"
 import { resolveCountryLabel, resolveStateLabel } from "@/helper-fns/resolveCountryCode"
@@ -41,27 +41,25 @@ const toFormValues = (profile: UserProfile): ProfileFormValues => ({
     profileImage: profile.profile_picture ?? undefined,
 })
 
-const toPayload = (values: ProfileFormValues): UpdateProfilePayload => {
-    const profilePicture: string | null =
-        values.profileImage instanceof File
-            ? null
-            : (values.profileImage as string | undefined) ?? null
-
-    return {
+const toPayload = (values: ProfileFormValues, hasCountry: boolean): UpdateProfilePayload => {
+    const payload: UpdateProfilePayload = {
         full_name: values.fullName,
         phone_number: values.phoneNumber,
         gender: values.gender,
-        country: resolveCountryLabel(values.country),
         state: resolveStateLabel(values.country, values.state),
         city: values.city,
         dob: values.dob
-            ? `${(values.dob as Date).getFullYear()}-${String((values.dob as Date).getMonth() + 1).padStart(2, '0')}-${String((values.dob as Date).getDate()).padStart(2, '0')}`
+            ? `${values.dob.getFullYear()}-${String(values.dob.getMonth() + 1).padStart(2, '0')}-${String(values.dob.getDate()).padStart(2, '0')}`
             : null,
-        profile_picture: profilePicture,
+        profile_picture: values.profileImage instanceof File ? null : (values.profileImage as string) ?? null,
     }
+
+    if (!hasCountry) {
+        payload.country = resolveCountryLabel(values.country)
+    }
+
+    return payload
 }
-
-
 
 interface Props {
     profile: UserProfile
@@ -110,10 +108,11 @@ export default function ProfileInformationForm({ profile }: Props) {
                 return;
             }
         }
-        const payload = toPayload({
-            ...values,
-            ...(profileImageUrl ? { profileImage: profileImageUrl } : {})
-        })
+
+        const payload = toPayload(
+            { ...values, ...(profileImageUrl ? { profileImage: profileImageUrl } : {}) },
+            !!activeData.country
+        )
 
         const result = await updateProfile(payload)
 

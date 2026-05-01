@@ -9,7 +9,7 @@ import { showAlert } from "@/lib/redux/slices/alertSlice"
 import { cn } from "@/lib/utils"
 import { Icon } from "@iconify/react"
 import { useEffect, useRef, useState } from "react"
-import { resellTicket } from "@/actions/marketplace"
+import { resellTicket } from "@/actions/marketplace/client"
 
 // Module-level: survives React StrictMode unmount/remount cycles
 const handledSessions = new Set<string>()

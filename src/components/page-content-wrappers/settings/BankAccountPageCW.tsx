@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import { Icon } from "@iconify/react"
 import BankAccountCard from "@/components/cards/BankAccountCard"
 import AddBankAccountForm from "@/components/forms/AddBankAccountForm"
-import { BankOption, PayoutAccount } from "@/actions/payout"
+import { BankOption, PayoutAccount } from "@/actions/payout/index"
 
 interface Props {
     initialAccounts: PayoutAccount[]

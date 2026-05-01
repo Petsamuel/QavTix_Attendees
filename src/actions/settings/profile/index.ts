@@ -1,11 +1,7 @@
-"use server"
-
-import { GET_PROFILE_ENDPOINT, UPDATE_PROFILE_ENDPOINT } from "@/endpoints"
+import { GET_PROFILE_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
-import { getServerAxios } from "@/lib/axios"
-import { revalidateTag, cacheTag } from "next/cache"
+import { cacheTag } from "next/cache"
 import { CACHE_TAGS } from "@/cache-tags"
-import { cookies } from "next/headers"
 
 interface ProfileResult {
     success:  boolean
@@ -13,13 +9,8 @@ interface ProfileResult {
     message?: string
 }
 
-export async function getProfile(): Promise<ProfileResult> {
-    const accessToken = (await cookies()).get("access_token")?.value;
-    return _getProfile(accessToken);
-}
-
-async function _getProfile(accessToken: string | undefined): Promise<ProfileResult> {
-    "use cache"
+export async function getProfile(token: string | undefined): Promise<ProfileResult> {
+    'use cache'
     cacheTag(CACHE_TAGS.PROFILE)
     try {
         const res = await fetch(
@@ -27,7 +18,7 @@ async function _getProfile(accessToken: string | undefined): Promise<ProfileResu
             {
                 headers: {
                     "Content-Type": "application/json",
-                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 },
             }
         )
@@ -42,20 +33,6 @@ async function _getProfile(accessToken: string | undefined): Promise<ProfileResu
         return { success: true, data: profile }
 
     } catch (error: any) {
-        console.log("[getProfile] error:", error)
         return { success: false, message: "Failed to load profile." }
-    }
-}
-
-export async function updateProfile(payload: UpdateProfilePayload): Promise<ProfileResult> {
-    const axiosInstance = await getServerAxios()
-try {
-        const { data } = await axiosInstance.patch(UPDATE_PROFILE_ENDPOINT, payload)
-        revalidateTag(CACHE_TAGS.PROFILE, "max")
-        return { success: true, data: data.data ?? data }
-    } catch (error: any) {
-        console.log("[updateProfile] status:", error?.response?.status)
-        console.log("[updateProfile] body:", JSON.stringify(error?.response?.data))
-        return { success: false, message: handleApiError(error?.response?.data) }
     }
 }

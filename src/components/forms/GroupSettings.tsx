@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 import { space_grotesk } from "@/lib/fonts"
 import GroupCard from "@/components/cards/GroupCard"
 import CreateGroupForm from "@/components/forms/CreateGroupForm"
-import { Group } from "@/actions/groups"
+import { Group } from "@/actions/groups/index"
 
 interface Props {
     initialGroups: Group[]

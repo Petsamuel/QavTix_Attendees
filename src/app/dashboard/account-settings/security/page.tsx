@@ -1,15 +1,19 @@
 import SecurityPageForm from "@/components/forms/SecurityPageForm"
 import { INITIAL_PROVIDERS } from "@/components-data/auth-providers"
-import { get2FASettings } from "@/actions/settings/security"
+import { get2FASettings } from "@/actions/settings/security/index"
 import { ATTENDEE_PAGE_METADATA } from "@/lib/metadata"
 import type { Metadata } from "next"
+import { cookies } from "next/headers"
 
 
 export const metadata: Metadata = ATTENDEE_PAGE_METADATA.SECURITY;
 
 
 export default async function SecurityPage() {
-    const result = await get2FASettings()
+    const cookieStore = await cookies()
+    const token = cookieStore.get("access_token")?.value
+
+    const result = await get2FASettings(token)
 
     const providers = INITIAL_PROVIDERS.map((provider) => {
         if (!result.success || !result.data) return provider

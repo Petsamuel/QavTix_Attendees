@@ -9,7 +9,7 @@ import { EditGroupFormValues, editGroupSchema } from "@/schemas/edit-group.schem
 import CustomInput1 from "../custom-utils/inputs/CustomInput1"
 import { validateEmail } from "@/helper-fns/validateEmail"
 import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
-import { updateGroup } from "@/actions/groups"
+import { updateGroup } from "@/actions/groups/client"
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
 import { useRouter } from "next/navigation"

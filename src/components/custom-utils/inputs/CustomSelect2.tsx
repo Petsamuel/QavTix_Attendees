@@ -40,10 +40,10 @@ const CustomSelect2 = ({
                 <SelectTrigger
                     className={cn(
                         "w-full px-4 py-3 text-sm rounded-lg shadow-none min-h-14 h-14 border transition-all outline-none bg-white",
-                        error 
-                            ? 'border-red-400 focus:border-red-500' 
+                        error
+                            ? 'border-red-400 focus:border-red-500'
                             : 'border-brand-secondary-5 focus:border-[1.5px] focus:border-brand-accent-4 hover:border-brand-neutral-6',
-                        disabled && "bg-gray-50/50 border-transparent opacity-100 cursor-not-allowed" 
+                        disabled && "cursor-not-allowed"
                     )}
                 >
                     <SelectValue placeholder={`Select ${label.toLowerCase()}`} />

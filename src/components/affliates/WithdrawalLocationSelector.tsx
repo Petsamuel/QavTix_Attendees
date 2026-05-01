@@ -10,7 +10,7 @@ import { DialogDescription, DialogTitle } from "../ui/dialog"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { openSuccessModal } from "@/lib/redux/slices/successModalSlice"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
-import { requestWithdrawal } from "@/actions/payout"
+import { requestWithdrawal } from "@/actions/payout/client"
 import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
 
 

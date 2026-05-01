@@ -14,7 +14,7 @@ import {
     addPayoutAccount,
     verifyAccountNumber,
     PayoutAccount,
-} from "@/actions/payout"
+} from "@/actions/payout/client"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
 import ActionButton1 from "../custom-utils/buttons/ActionBtn1"

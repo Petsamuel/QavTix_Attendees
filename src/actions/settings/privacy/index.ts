@@ -1,16 +1,6 @@
-"use server"
-
-import {
-    DOWNLOAD_DATA_ENDPOINT,
-    DELETE_ACCOUNT_ENDPOINT,
-    GET_PRIVACY_SETTINGS_ENDPOINT,
-    SET_PRIVACY_SETTINGS_ENDPOINT,
-    CANCEL_PLAN_ENDPOINT,
-} from "@/endpoints";
+import { GET_PRIVACY_SETTINGS_ENDPOINT } from "@/endpoints";
 import { handleApiError } from "@/helper-fns/handleApiErrors"
-import { getServerAxios } from "@/lib/axios"
-import { revalidateTag, cacheTag } from "next/cache"
-import { cookies } from "next/headers"
+import { cacheTag } from "next/cache"
 import { CACHE_TAGS } from "@/cache-tags"
 
 interface PrivacyResult {
@@ -19,13 +9,8 @@ interface PrivacyResult {
     message?: string
 }
 
-export async function getPrivacySettings(): Promise<PrivacyResult> {
-    const accessToken = (await cookies()).get("access_token")?.value;
-    return _getPrivacySettings(accessToken);
-}
-
-async function _getPrivacySettings(accessToken: string | undefined): Promise<PrivacyResult> {
-    "use cache"
+export async function getPrivacySettings(token: string | undefined): Promise<PrivacyResult> {
+    'use cache'
     cacheTag(CACHE_TAGS.PRIVACY_SETTINGS)
     try {
         const res = await fetch(
@@ -33,7 +18,7 @@ async function _getPrivacySettings(accessToken: string | undefined): Promise<Pri
             {
                 headers: {
                     "Content-Type": "application/json",
-                    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 },
             }
         )
@@ -47,64 +32,6 @@ async function _getPrivacySettings(accessToken: string | undefined): Promise<Pri
         return { success: true, data: json.data ?? json }
 
     } catch (error: any) {
-        console.log("[getPrivacySettings] error:", error)
         return { success: false, message: "Failed to load privacy settings." }
-    }
-}
-
-export async function updatePrivacySettings(
-    payload: PrivacySettings,
-): Promise<{ success: boolean; message?: string }> {
-    const axiosInstance = await getServerAxios()
-try {
-        await axiosInstance.patch(SET_PRIVACY_SETTINGS_ENDPOINT, payload)
-        revalidateTag(CACHE_TAGS.PRIVACY_SETTINGS, "max")
-        return { success: true }
-    } catch (error: any) {
-        console.log("[updatePrivacySettings] status:", error?.response?.status)
-        console.log("[updatePrivacySettings] body:", JSON.stringify(error?.response?.data))
-        return { success: false, message: handleApiError(error?.response?.data) }
-    }
-}
-
-export async function downloadPrivacyData(): Promise<{ success: boolean; message?: string }> {
-    const axiosInstance = await getServerAxios()
-try {
-        await axiosInstance.post(DOWNLOAD_DATA_ENDPOINT)
-        return { success: true }
-    } catch (error: any) {
-        console.log("[downloadPrivacyData] status:", error?.response?.status)
-        console.log("[downloadPrivacyData] body:", JSON.stringify(error?.response?.data))
-        return { success: false, message: handleApiError(error?.response?.data) }
-    }
-}
-
-export async function deleteAccount(): Promise<{ success: boolean; message?: string }> {
-    const axiosInstance = await getServerAxios()
-try {
-        await axiosInstance.delete(DELETE_ACCOUNT_ENDPOINT)
-
-        const cookieStore = await cookies()
-        cookieStore.delete("access_token")
-        cookieStore.delete("refresh_token")
-
-        return { success: true }
-    } catch (error: any) {
-        console.log("[deleteAccount] status:", error?.response?.status)
-        console.log("[deleteAccount] body:", JSON.stringify(error?.response?.data))
-        return { success: false, message: handleApiError(error?.response?.data) }
-    }
-}
-
-export async function cancelPlan(): Promise<{ success: boolean; message?: string }> {
-    const axiosInstance = await getServerAxios()
-try {
-        await axiosInstance.post(CANCEL_PLAN_ENDPOINT)
-        revalidateTag(CACHE_TAGS.PROFILE, "max")
-        return { success: true }
-    } catch (error: any) {
-        console.log("[cancelPlan] status:", error?.response?.status)
-        console.log("[cancelPlan] body:", JSON.stringify(error?.response?.data))
-        return { success: false, message: handleApiError(error?.response?.data) }
     }
 }

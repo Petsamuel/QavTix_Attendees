@@ -1,4 +1,4 @@
-import { getTicketReceipt } from "@/actions/tickets"
+import { getTicketReceipt } from "@/actions/tickets/client"
 import { addToCalendar } from "@/helper-fns/addToCalendar"
 
 export type EventAction = {
@@ -31,10 +31,11 @@ async function tryNativeShare(ticket: EventTicket): Promise<boolean> {
     return true
 }
 
+import { getAuthToken } from "@/helper-fns/getAuthToken"
+
 export function buildUpcomingEventActions(
     ticket:          EventTicket,
     onOpenShare:     () => void,
-    // Called with fetched receipt data so the parent can mount <DownloadReceipt />
     onDownloadReceipt: (receipt: TicketReceipt) => void,
     onReceiptError:    (msg: string) => void,
 ): EventAction[] {
@@ -44,7 +45,8 @@ export function buildUpcomingEventActions(
             label: 'Download Receipt',
             icon:  'hugeicons:download-01',
             onClick: async () => {
-                const result = await getTicketReceipt(ticket.id)
+                const token = await getAuthToken()
+                const result = await getTicketReceipt(token, ticket.id)
                 if (result.success && result.data) {
                     onDownloadReceipt(result.data)
                 } else {

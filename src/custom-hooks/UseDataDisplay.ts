@@ -2,36 +2,37 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { format } from "date-fns"
-import { fetchPaginatedData } from "@/actions/paginated-data"
+import { fetchPaginatedData } from "@/actions/paginated-data/index"
 import { useOnRevalidate } from "./UseRevalidate"
+import { getAuthToken } from "@/helper-fns/getAuthToken"
 
 export interface PageData<T> {
-    results:      T[]
-    count:        number
-    next:         number | null
-    previous:     number | null
+    results: T[]
+    count: number
+    next: number | null
+    previous: number | null
     total_pages?: number
 }
 
 export interface TabSlice<T> {
-    results:      T[]
-    count:        number
-    next:         number | null
-    previous:     number | null
+    results: T[]
+    count: number
+    next: number | null
+    previous: number | null
     total_pages?: number
 }
 
 export interface TabConfig<T> {
-    key:          string
-    initialData:  TabSlice<T>
+    key: string
+    initialData: TabSlice<T>
     staticParams: Record<string, string>
-    onCards?:     (cards: any | null) => void
+    onCards?: (cards: any | null) => void
 }
 
 export interface UseDataDisplayConfig<T> {
-    endpoint:          string
-    tabs:              TabConfig<T>[]
-    activeTab?:        string
+    endpoint: string
+    tabs: TabConfig<T>[]
+    activeTab?: string
     /** When set, calling useRevalidate(target).trigger() will refresh all tabs. */
     revalidateTarget?: RevalidateTarget
 }
@@ -39,36 +40,36 @@ export interface UseDataDisplayConfig<T> {
 type FetchStatus = "idle" | "loading" | "loadingMore" | "error" | "empty"
 
 export interface TabState<T> {
-    items:         T[]
-    cachedItems:   T[]
-    count:         number
-    totalPages:    number
-    currentPage:   number
-    hasNext:       boolean
-    status:        FetchStatus
-    isLoading:     boolean
+    items: T[]
+    cachedItems: T[]
+    count: number
+    totalPages: number
+    currentPage: number
+    hasNext: boolean
+    status: FetchStatus
+    isLoading: boolean
     isLoadingMore: boolean
-    isError:       boolean
-    isEmpty:       boolean
-    search:        string
-    handleSearch:  (query: string) => void
-    loadMore:      () => void
-    fetchPage:     (page: number) => void
-    resetSearch:   () => void
+    isError: boolean
+    isEmpty: boolean
+    search: string
+    handleSearch: (query: string) => void
+    loadMore: () => void
+    fetchPage: (page: number) => void
+    resetSearch: () => void
     /** Re-fetches page 1 without clearing the cache key — use after mutations. */
-    refresh:       () => void
+    refresh: () => void
 }
 
 const buildFilterParams = (filters: Partial<FilterValues>): Record<string, string> => {
     const params: Record<string, string> = {}
-    if (filters.categories?.length)                                    params.category    = filters.categories.join(',')
-    if (filters.dateRange?.from)                                       params.start_date  = format(new Date(filters.dateRange.from), 'yyyy-MM-dd')
-    if (filters.dateRange?.to)                                         params.end_date    = format(new Date(filters.dateRange.to),   'yyyy-MM-dd')
-    if (filters.priceRange?.min != null && filters.priceRange.min > 0) params.min_price   = String(filters.priceRange.min)
-    if (filters.priceRange?.max != null)                               params.max_price   = String(filters.priceRange.max)
-    if (filters.status)                                                params.status      = filters.status
-    if (filters.ticketType?.length)                                    params.ticket_type = filters.ticketType.join(',')
-    if (filters.isMineFilter != null)                                  params.is_mine     = String(filters.isMineFilter)
+    if (filters.categories?.length) params.category = filters.categories.join(',')
+    if (filters.dateRange?.from) params.start_date = format(new Date(filters.dateRange.from), 'yyyy-MM-dd')
+    if (filters.dateRange?.to) params.end_date = format(new Date(filters.dateRange.to), 'yyyy-MM-dd')
+    if (filters.priceRange?.min != null && filters.priceRange.min > 0) params.min_price = String(filters.priceRange.min)
+    if (filters.priceRange?.max != null) params.max_price = String(filters.priceRange.max)
+    if (filters.status) params.status = filters.status
+    if (filters.ticketType?.length) params.ticket_type = filters.ticketType.join(',')
+    if (filters.isMineFilter != null) params.is_mine = String(filters.isMineFilter)
     return params
 }
 
@@ -85,45 +86,45 @@ const hasActiveFilters = (filters: Partial<FilterValues>): boolean =>
     )
 
 const useTabState = <T>(
-    config:   TabConfig<T>,
-    filters:  Partial<FilterValues>,
+    config: TabConfig<T>,
+    filters: Partial<FilterValues>,
     endpoint: string,
 ): TabState<T> => {
 
-    const [items,       setItems]       = useState<T[]>(config.initialData.results)
+    const [items, setItems] = useState<T[]>(config.initialData.results)
     const [cachedItems, setCachedItems] = useState<T[]>(config.initialData.results)
-    const [count,       setCount]       = useState(config.initialData.count)
-    const [totalPages,  setTotalPages]  = useState(config.initialData.total_pages ?? 1)
+    const [count, setCount] = useState(config.initialData.count)
+    const [totalPages, setTotalPages] = useState(config.initialData.total_pages ?? 1)
     const [currentPage, setCurrentPage] = useState(1)
-    const [hasNext,     setHasNext]     = useState(!!config.initialData.next)
-    const [search,      setSearch]      = useState("")
-    const [status,      setStatus]      = useState<FetchStatus>("idle")
+    const [hasNext, setHasNext] = useState(!!config.initialData.next)
+    const [search, setSearch] = useState("")
+    const [status, setStatus] = useState<FetchStatus>("idle")
 
     const configRef = useRef(config)
     configRef.current = config
-    const filtersRef       = useRef(filters)
-    filtersRef.current     = filters
+    const filtersRef = useRef(filters)
+    filtersRef.current = filters
 
-    const cachedItemsRef   = useRef(cachedItems)
+    const cachedItemsRef = useRef(cachedItems)
     cachedItemsRef.current = cachedItems
 
-    const searchRef        = useRef(search)
-    searchRef.current      = search
+    const searchRef = useRef(search)
+    searchRef.current = search
 
-    const initialized   = useRef(false)
-    const isFetching    = useRef(false)
-    const pageRef       = useRef(1)
+    const initialized = useRef(false)
+    const isFetching = useRef(false)
+    const pageRef = useRef(1)
     const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     const filterKey = [
-        filters.categories?.join(',')       ?? '',
+        filters.categories?.join(',') ?? '',
         filters.dateRange?.from?.toString() ?? '',
-        filters.dateRange?.to?.toString()   ?? '',
-        filters.status                      ?? '',
-        filters.ticketType?.join(',')       ?? '',
-        String(filters.priceRange?.min      ?? ''),
-        String(filters.priceRange?.max      ?? ''),
-        String(filters.isMineFilter         ?? ''),
+        filters.dateRange?.to?.toString() ?? '',
+        filters.status ?? '',
+        filters.ticketType?.join(',') ?? '',
+        String(filters.priceRange?.min ?? ''),
+        String(filters.priceRange?.max ?? ''),
+        String(filters.isMineFilter ?? ''),
     ].join('|')
 
     const prevFilterKey = useRef(filterKey)
@@ -133,18 +134,19 @@ const useTabState = <T>(
         isFetching.current = true
 
         setStatus(append ? "loadingMore" : "loading")
-        
+
         const result = await fetchPaginatedData<T>({
             endpoint,
             staticParams: configRef.current.staticParams,
             filterParams: buildFilterParams(filtersRef.current),
-            page:         p,
-            search:       s,
+            page: p,
+            search: s,
         })
 
         isFetching.current = false
 
         if (!result.success) {
+            console.error("fetchPaginatedData failed in UseDataDisplay:", result.message)
             setItems([])
             setStatus("error")
             return
@@ -192,8 +194,8 @@ const useTabState = <T>(
         }
 
         setSearch("")
-        searchRef.current  = ""
-        pageRef.current    = 1
+        searchRef.current = ""
+        pageRef.current = 1
         fetchData.current(1, "", false)
     }, [filterKey])
 
@@ -210,7 +212,7 @@ const useTabState = <T>(
         if (!trimmed) {
             setSearch("")
             searchRef.current = ""
-            pageRef.current   = 1
+            pageRef.current = 1
             setCurrentPage(1)
             setItems(cachedItemsRef.current)
             setCount(cachedItemsRef.current.length)
@@ -230,8 +232,8 @@ const useTabState = <T>(
 
     const loadMore = useCallback(() => {
         if (!hasNext || status === "loadingMore" || isFetching.current) return
-        const nextPage      = pageRef.current + 1
-        pageRef.current     = nextPage
+        const nextPage = pageRef.current + 1
+        pageRef.current = nextPage
         fetchData.current(nextPage, searchRef.current, true)
     }, [hasNext, status])
 
@@ -247,7 +249,7 @@ const useTabState = <T>(
         if (debounceTimer.current) clearTimeout(debounceTimer.current)
         setSearch("")
         searchRef.current = ""
-        pageRef.current   = 1
+        pageRef.current = 1
         setCurrentPage(1)
         setItems(cachedItemsRef.current)
         setCount(cachedItemsRef.current.length)
@@ -266,20 +268,20 @@ const useTabState = <T>(
     return {
         items, cachedItems, count, totalPages, currentPage, hasNext,
         status,
-        isLoading:     status === "loading",
+        isLoading: status === "loading",
         isLoadingMore: status === "loadingMore",
-        isError:       status === "error",
-        isEmpty:       status === "empty",
+        isError: status === "error",
+        isEmpty: status === "empty",
         search, handleSearch, loadMore, fetchPage,
         resetSearch, refresh,
     }
 }
 
 export function useDataDisplay<T>(
-    config:  UseDataDisplayConfig<T>,
+    config: UseDataDisplayConfig<T>,
     filters: Partial<FilterValues>,
 ): {
-    tabStates:      Record<string, TabState<T>>
+    tabStates: Record<string, TabState<T>>
     activeTabState: TabState<T>
 } {
     const activeTab = config.activeTab ?? config.tabs[0].key

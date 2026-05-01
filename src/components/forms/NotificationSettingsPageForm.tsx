@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils"
 import { space_grotesk } from "@/lib/fonts"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
-import { updateNotificationSettings } from "@/actions/settings/notification"
+import { updateNotificationSettings } from "@/actions/settings/notification/client"
 import { useRouter } from "next/navigation"
 
 interface Props {

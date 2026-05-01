@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks"
 import { openConfirmation, finishConfirmAction, resetConfirmationStatus, parseConfirmationSession } from "@/lib/redux/slices/confirmationSlice"
 import { CONFIRMATION_ACTION_TYPES } from "@/components/modals/resources/confirmationActions"
 import { openSuccessModal } from "@/lib/redux/slices/successModalSlice"
-import { transferTicket } from "@/actions/marketplace"
+import { transferTicket } from "@/actions/marketplace/client"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
 
 // Module-level: survives React StrictMode unmount/remount cycles
