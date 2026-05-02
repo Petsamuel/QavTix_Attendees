@@ -1,7 +1,5 @@
-import { CACHE_TAGS } from "@/cache-tags"
 import { MARKETPLACE_LIST_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
-import { cacheTag } from "next/cache"
 
 interface GetMarketplaceParams {
     page?: number
@@ -20,8 +18,6 @@ interface GetMarketplaceResult {
 }
 
 export async function getMarketplace(token: string | undefined, params: GetMarketplaceParams = {}): Promise<GetMarketplaceResult> {
-    'use cache'
-    cacheTag(CACHE_TAGS.EVENT_CARDS, CACHE_TAGS.MARKETPLACE)
     try {
         const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/${MARKETPLACE_LIST_ENDPOINT}`)
         Object.entries(params).forEach(([k, v]) => {

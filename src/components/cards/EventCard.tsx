@@ -15,11 +15,12 @@ import { EventIconActionButton } from '../buttons/EventIconActionButton'
 import ShareEventModal from '@/components/modals/ShareEventModal'
 import { EventCardProps } from './resources/event-card-adapter'
 import { formatPrice, parsePrice } from '@/helper-fns/formatPrice'
-import { useAppSelector } from '@/lib/redux/hooks'
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks'
 import { useFavourite } from '@/custom-hooks/UseFavourite'
 import { usePathname } from 'next/navigation'
 import { formatEventDate } from '@/helper-fns/date-utils'
 import { delistTicket } from '@/actions/marketplace/client'
+import { openSuccessModal } from '@/lib/redux/slices/successModalSlice'
 import { mockAttendees } from '@/components-data/mock-attendees'
 import { EVENT_DETAILS_LINK, MARKETPLACE_EVENT_DETAILS_LINK } from '@/enums/navigation'
 import Link from 'next/link'
@@ -28,6 +29,7 @@ import { useIsMounted } from '@/custom-hooks/UseIsMounted'
 export default function EventsCard(card: EventCardProps & { eventCardFor?: "marketplace" | "global" }) {
 
     const { user } = useAppSelector(store => store.authUser)
+    const dispatch = useAppDispatch()
     const isMounted = useIsMounted()
 
     // Use undefined (platform default) until client has hydrated.
@@ -59,14 +61,22 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
         e.stopPropagation()
         if (isDelisting) return
         setIsDelisting(true)
-        await delistTicket(card.marketplace_id!)
+        const res = await delistTicket(card.marketplace_id!)
+        if (res.success) {
+            dispatch(openSuccessModal({
+                title: "Event successfully delisted",
+                description: "Your ticket has been removed from the marketplace.",
+                variant: 'success',
+                autoClose: true
+            }))
+        }
         setIsDelisting(false)
     }
 
     return (
         <>
             <Link
-                href={(card.eventCardFor === "marketplace" ? MARKETPLACE_EVENT_DETAILS_LINK : EVENT_DETAILS_LINK)
+                href={(card.eventCardFor === "marketplace" ? MARKETPLACE_EVENT_DETAILS_LINK.replace("[event_id]", card.marketplace_id || "") : EVENT_DETAILS_LINK)
                     .replace("[event_id]", card.eventCardFor === "marketplace" ? (card.marketplace_id || "") : card.id)}
                 target="_blank"
                 className="block w-full max-w-72 p-3 relative min-h-[25em] rounded-[32px] border border-brand-neutral-6 bg-white hover:bg-brand-secondary-1 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-[1.5px] focus:ring-brand-accent-5 focus:ring-offset-[1.5px] group"

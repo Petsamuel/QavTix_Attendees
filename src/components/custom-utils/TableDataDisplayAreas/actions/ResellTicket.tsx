@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { Icon } from "@iconify/react"
 import { useEffect, useRef, useState } from "react"
 import { resellTicket } from "@/actions/marketplace/client"
+import { useRevalidate } from "@/custom-hooks/UseRevalidate"
 
 // Module-level: survives React StrictMode unmount/remount cycles
 const handledSessions = new Set<string>()
@@ -17,6 +18,7 @@ const handledSessions = new Set<string>()
 export default function ResellTicket({ className, ticket }: { className?: string; ticket: EventTicket }) {
 
     const dispatch = useAppDispatch()
+    const { trigger } = useRevalidate("tickets")
     const [showResellTicket, setShowResellTicket] = useState(false)
 
     const priceRef = useRef("")
@@ -58,6 +60,7 @@ export default function ResellTicket({ className, ticket }: { className?: string
             dispatch(resetConfirmationStatus())
 
             if (result.success) {
+                trigger()
                 priceRef.current = ""
                 dispatch(openSuccessModal({
                     autoClose:   false,

@@ -1,5 +1,4 @@
 import { handleApiError } from "@/helper-fns/handleApiErrors"
-import { cacheTag } from "next/cache"
 import { GET_GROUPS_ENDPOINT } from "@/endpoints"
 import { CACHE_TAGS } from "@/cache-tags"
 
@@ -8,21 +7,19 @@ export interface GroupMemberItem {
 }
 
 export interface Group {
-    id:           string
-    name:         string
+    id: string
+    name: string
     member_count: string
-    members:      GroupMemberItem[]
+    members: GroupMemberItem[]
 }
 
 interface GroupsResult {
-    success:  boolean
-    data?:    Group[]
+    success: boolean
+    data?: Group[]
     message?: string
 }
 
 export async function getGroups(token: string | undefined): Promise<GroupsResult> {
-    'use cache'
-    cacheTag(CACHE_TAGS.GROUPS)
     try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${GET_GROUPS_ENDPOINT}`,
@@ -31,6 +28,7 @@ export async function getGroups(token: string | undefined): Promise<GroupsResult
                     "Content-Type": "application/json",
                     ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 },
+                next: { tags: [CACHE_TAGS.GROUPS], revalidate: 300 }
             }
         )
 

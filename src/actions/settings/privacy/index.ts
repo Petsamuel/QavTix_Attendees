@@ -1,7 +1,5 @@
 import { GET_PRIVACY_SETTINGS_ENDPOINT } from "@/endpoints";
 import { handleApiError } from "@/helper-fns/handleApiErrors"
-import { cacheTag } from "next/cache"
-import { CACHE_TAGS } from "@/cache-tags"
 
 interface PrivacyResult {
     success:  boolean
@@ -10,8 +8,6 @@ interface PrivacyResult {
 }
 
 export async function getPrivacySettings(token: string | undefined): Promise<PrivacyResult> {
-    'use cache'
-    cacheTag(CACHE_TAGS.PRIVACY_SETTINGS)
     try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${GET_PRIVACY_SETTINGS_ENDPOINT}`,

@@ -9,6 +9,7 @@ import { openConfirmation, finishConfirmAction, resetConfirmationStatus, parseCo
 import { CONFIRMATION_ACTION_TYPES } from "@/components/modals/resources/confirmationActions"
 import { openSuccessModal } from "@/lib/redux/slices/successModalSlice"
 import { transferTicket } from "@/actions/marketplace/client"
+import { useRevalidate } from "@/custom-hooks/UseRevalidate"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
 
 // Module-level: survives React StrictMode unmount/remount cycles
@@ -18,6 +19,7 @@ const handledSessions = new Set<string>()
 export default function TransferTicket({ className, ticketID }: { className?: string; ticketID: string }) {
 
     const dispatch = useAppDispatch()
+    const { trigger } = useRevalidate("tickets")
     const [showTransferTicketModal, setShowTransferTicketModal] = useState(false)
 
     const recipientEmailRef = useRef("")
@@ -30,11 +32,11 @@ export default function TransferTicket({ className, ticketID }: { className?: st
         setShowTransferTicketModal(false)
 
         dispatch(openConfirmation({
-            actionType:  CONFIRMATION_ACTION_TYPES.TRANSFER_TICKET,
-            targetId:    ticketID,
-            title:       "Confirm Transfer",
+            actionType: CONFIRMATION_ACTION_TYPES.TRANSFER_TICKET,
+            targetId: ticketID,
+            title: "Confirm Transfer",
             description: "Are you sure you want to transfer this ticket to the selected recipient?",
-            cancelText:  "Cancel",
+            cancelText: "Cancel",
             confirmText: "Yes, Transfer",
         }))
     }
@@ -51,7 +53,7 @@ export default function TransferTicket({ className, ticketID }: { className?: st
 
         const run = async () => {
             const result = await transferTicket({
-                ticket_id:       ticketID,
+                ticket_id: ticketID,
                 recipient_email: recipientEmailRef.current,
             })
 
@@ -59,16 +61,17 @@ export default function TransferTicket({ className, ticketID }: { className?: st
             dispatch(resetConfirmationStatus())
 
             if (result.success) {
+                trigger()
                 recipientEmailRef.current = ""
                 dispatch(openSuccessModal({
-                    autoClose:   false,
-                    title:       "Transfer Successful!",
+                    autoClose: false,
+                    title: "Transfer Successful!",
                     description: "Your ticket transfer was successful. Thank you for choosing QavTix.",
                 }))
             } else {
                 dispatch(showAlert({
-                    variant:     "destructive",
-                    title:       "Transfer Failed",
+                    variant: "destructive",
+                    title: "Transfer Failed",
                     description: result.message || "An error occurred while transferring the ticket. Please try again.",
                 }))
             }

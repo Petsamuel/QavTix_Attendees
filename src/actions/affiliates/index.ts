@@ -1,7 +1,3 @@
-'use cache'
-
-
-import { CACHE_TAGS } from "@/cache-tags"
 import {
     AFFILIATE_DASHBOARD_ENDPOINT,
     AFFILIATE_LINKS_ENDPOINT,
@@ -10,15 +6,12 @@ import {
     WITHDRAWAL_HISTORY_ENDPOINT,
 } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
-import { cacheTag } from "next/cache"
 
-async function _fetchWithTag<T>(
+async function _fetchPure<T>(
     endpoint: string,
-    tag: string,
     accessToken: string | undefined,
     params?: Record<string, string | number>,
 ): Promise<{ success: true; data: T } | { success: false; message: string }> {
-    cacheTag(tag)
     try {
         const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/${endpoint}`)
         if (params) {
@@ -48,9 +41,8 @@ async function _fetchWithTag<T>(
 }
 
 export async function getAffiliateDashboard(token: string | undefined) {
-    return _fetchWithTag<AffiliateDashboardMetrics>(
+    return _fetchPure<AffiliateDashboardMetrics>(
         AFFILIATE_DASHBOARD_ENDPOINT,
-        CACHE_TAGS.AFFILIATE_DASHBOARD,
         token
     )
 }
@@ -64,9 +56,8 @@ interface GetAffiliateLinksParams {
 }
 
 export async function getAffiliateLinks(token: string | undefined, params: GetAffiliateLinksParams = {}) {
-    return _fetchWithTag<PaginatedResponse<AffiliateEvent>>(
+    return _fetchPure<PaginatedResponse<AffiliateEvent>>(
         AFFILIATE_LINKS_ENDPOINT,
-        CACHE_TAGS.AFFILIATE_LINKS,
         token,
         params as Record<string, string | number>,
     )
@@ -82,9 +73,8 @@ interface GetEarningsParams {
 }
 
 export async function getEarningsHistory(token: string | undefined, params: GetEarningsParams = {}) {
-    return _fetchWithTag<PaginatedResponse<EarningHistoryItem>>(
+    return _fetchPure<PaginatedResponse<EarningHistoryItem>>(
         AFFILIATE_EARNINGS_ENDPOINT,
-        CACHE_TAGS.AFFILIATE_EARNINGS,
         token,
         params as Record<string, string | number>,
     )
@@ -95,15 +85,8 @@ export async function getAffiliatePerformanceSingle(
     filter: PerformanceFilter,
     year?: number,
 ) {
-    const tagMap: Record<PerformanceFilter, string> = {
-        week: CACHE_TAGS.AFFILIATE_PERFORMANCE_WEEK,
-        month: CACHE_TAGS.AFFILIATE_PERFORMANCE_MONTH,
-        year: CACHE_TAGS.AFFILIATE_PERFORMANCE_YEAR,
-    }
-
-    return _fetchWithTag<AffiliatePerformanceData>(
+    return _fetchPure<AffiliatePerformanceData>(
         AFFILIATE_PERFORMANCE_ENDPOINT,
-        tagMap[filter],
         token,
         { filter, ...(year != null && { year }) },
     )
@@ -124,9 +107,8 @@ export async function getAffiliatePerformanceAll(token: string | undefined, year
 }
 
 export async function getWithdrawalHistory(token: string | undefined, page = 1) {
-    return _fetchWithTag<PaginatedResponse<WithdrawalHistoryItem>>(
+    return _fetchPure<PaginatedResponse<WithdrawalHistoryItem>>(
         WITHDRAWAL_HISTORY_ENDPOINT,
-        CACHE_TAGS.WITHDRAWAL_HISTORY,
         token,
         { page },
     )

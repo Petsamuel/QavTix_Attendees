@@ -56,6 +56,8 @@ const toPayload = (values: ProfileFormValues, hasCountry: boolean): UpdateProfil
 
     if (!hasCountry) {
         payload.country = resolveCountryLabel(values.country)
+    } else {
+        delete payload.country
     }
 
     return payload

@@ -11,32 +11,37 @@ export interface GroupMemberItem {
 }
 
 export interface Group {
-    id:           string
-    name:         string
+    id: string
+    name: string
     member_count: string
-    members:      GroupMemberItem[]
+    members: GroupMemberItem[]
 }
 
 interface MutateGroupResult {
-    success:  boolean
-    data?:    Group
+    success: boolean
+    data?: Group
     message?: string
+    non_existing_users?: string[]
 }
 
 export async function createGroup(payload: {
-    name:    string
+    name: string
     members: string[]
 }): Promise<MutateGroupResult> {
     const axiosInstance = await getServerAxios()
     try {
         const { data } = await axiosInstance.post(CREATE_GROUP_ENDPOINT, {
-            name:    payload.name,
+            name: payload.name,
             members: payload.members.map(email => ({ email })),
         })
         revalidateTag(CACHE_TAGS.GROUPS, "max")
         return { success: true, data: data.data ?? data }
     } catch (error: any) {
-        return { success: false, message: handleApiError(error?.response?.data) }
+        return {
+            success: false,
+            message: handleApiError(error?.response?.data),
+            non_existing_users: error?.response?.data?.data?.non_existing_users
+        }
     }
 }
 
@@ -47,13 +52,18 @@ export async function updateGroup(
     const axiosInstance = await getServerAxios()
     try {
         const { data } = await axiosInstance.patch(EDIT_GROUP_ENDPOINT.replace("[group_id]", groupID), {
-            name:    payload.name,
+            name: payload.name,
             members: payload.members.map(email => ({ email })),
         })
         revalidateTag(CACHE_TAGS.GROUPS, "max")
         return { success: true, data: data.data ?? data }
     } catch (error: any) {
-        return { success: false, message: handleApiError(error?.response?.data) }
+        console.log("[updateGroup] error response:", JSON.stringify(error?.response?.data, null, 2))
+        return {
+            success: false,
+            message: handleApiError(error?.response?.data),
+            non_existing_users: error?.response?.data?.data?.non_existing_users
+        }
     }
 }
 

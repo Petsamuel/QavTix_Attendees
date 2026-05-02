@@ -1,7 +1,5 @@
 import { GET_TWO_FACTOR_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
-import { cacheTag } from "next/cache"
-import { CACHE_TAGS } from "@/cache-tags"
 
 interface Get2FAResult {
     success: boolean
@@ -13,8 +11,6 @@ interface Get2FAResult {
 }
 
 export async function get2FASettings(token: string | undefined): Promise<Get2FAResult> {
-    'use cache'
-    cacheTag(CACHE_TAGS.TWO_FACTOR)
     try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${GET_TWO_FACTOR_ENDPOINT}`,

@@ -15,6 +15,8 @@ import { showAlert } from "@/lib/redux/slices/alertSlice"
 import { useRouter } from "next/navigation"
 import { NAVIGATION_LINKS, SETTINGS_SUB_LINKS } from "@/enums/navigation"
 import { useIsMounted } from "@/custom-hooks/UseIsMounted"
+import { useRevalidate } from "@/custom-hooks/UseRevalidate"
+import { GroupMembersErrorModal } from "../modals/groups/GroupMembersErrorModal"
 
 interface Props {
     groupID: string
@@ -25,7 +27,13 @@ export default function EditGroupForm({ groupID, initialData }: Props) {
 
     const dispatch = useAppDispatch()
     const router = useRouter()
+    const { trigger } = useRevalidate("groups")
     const [emailInput, setEmailInput] = useState("")
+    const [errorModal, setErrorModal] = useState<{ open: boolean; message: string; emails: string[] }>({
+        open: false,
+        message: "",
+        emails: [],
+    })
 
     const {
         register,
@@ -69,19 +77,28 @@ export default function EditGroupForm({ groupID, initialData }: Props) {
         const result = await updateGroup(groupID, values)
 
         if (result.success) {
+            trigger()
             reset(values)   // update baseline so isDirty resets
             dispatch(showAlert({
-                variant: "default",
+                variant: "success",
                 title: "Group updated",
                 description: `"${values.name}" has been updated.`,
             }))
             router.push(SETTINGS_SUB_LINKS.find(v => v.href.includes("groups"))?.href || NAVIGATION_LINKS.ACCOUNT_SETTINGS.href)
         } else {
-            dispatch(showAlert({
-                variant: "destructive",
-                title: "Could not update group",
-                description: result.message ?? "Please try again.",
-            }))
+            if (result.non_existing_users && result.non_existing_users.length > 0) {
+                setErrorModal({
+                    open: true,
+                    message: result.message || "Some users do not exist",
+                    emails: result.non_existing_users
+                })
+            } else {
+                dispatch(showAlert({
+                    variant: "destructive",
+                    title: "Could not update group",
+                    description: result.message ?? "Please try again.",
+                }))
+            }
         }
     }
 
@@ -121,6 +138,7 @@ export default function EditGroupForm({ groupID, initialData }: Props) {
                             className="flex-1 ps-1 min-w-30 bg-transparent outline-none text-sm text-brand-secondary-9 placeholder:text-brand-secondary-4"
                         />
                     </div>
+                    <p className="text-[11px] text-brand-secondary-8">Enter member's email and click enter to save</p>
                     {errors.members && (
                         <p className="text-xs text-red-500 mt-1">{errors.members.message}</p>
                     )}
@@ -136,6 +154,12 @@ export default function EditGroupForm({ groupID, initialData }: Props) {
                     className="rounded-md h-11!"
                 />
             </div>
+            <GroupMembersErrorModal
+                open={errorModal.open}
+                onOpenChange={open => setErrorModal(prev => ({ ...prev, open }))}
+                message={errorModal.message}
+                emails={errorModal.emails}
+            />
         </form>
     )
 }
