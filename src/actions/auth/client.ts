@@ -1,5 +1,6 @@
 "use server"
 
+import { accessCookieOptions, refreshCookieOptions } from "@/components-data/cookie-keys"
 import { LOGIN_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
@@ -8,13 +9,23 @@ import { redirect } from "next/navigation"
 
 export const logOut = async () => {
     const cookiesStore = await cookies()
-    cookiesStore.delete("access_token")
-    cookiesStore.delete("refresh_token")
+
+    cookiesStore.delete({
+        name: "access_token",
+        path: accessCookieOptions.path,
+        ...("domain" in accessCookieOptions && { domain: accessCookieOptions.domain })
+    })
+    cookiesStore.delete({
+        name: "refresh_token",
+        path: refreshCookieOptions.path,
+        ...("domain" in accessCookieOptions && { domain: refreshCookieOptions.domain })
+    })
+
     redirect(process.env.NEXT_PUBLIC_APP_DOMAIN || "/")
 }
 
 export async function verifyPassword(
-    email:    string,
+    email: string,
     password: string,
 ): Promise<{ success: boolean; message?: string }> {
     const axiosInstance = await getServerAxios()

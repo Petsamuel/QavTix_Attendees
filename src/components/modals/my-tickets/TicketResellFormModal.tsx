@@ -6,18 +6,19 @@ import { Icon } from "@iconify/react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { formatPrice } from "@/helper-fns/formatPrice";
+import { getCurrencySymbol } from "@/components-data/currencies";
 
 interface ResellTicketProps {
-    open:     boolean;
-    setOpen:  Dispatch<SetStateAction<boolean>>;
-    ticket:   EventTicket;
+    open: boolean;
+    setOpen: Dispatch<SetStateAction<boolean>>;
+    ticket: EventTicket;
     onResell: (price: string) => void;
 }
 
 export default function TicketResellFormModal({ open, setOpen, ticket, onResell }: ResellTicketProps) {
     const [displayValue, setDisplayValue] = useState("")  // formatted: "1,500,000"
-    const [rawValue,     setRawValue]     = useState("")  // numeric string sent to API: "1500000"
-    const [error,        setError]        = useState("")
+    const [rawValue, setRawValue] = useState("")  // numeric string sent to API: "1500000"
+    const [error, setError] = useState("")
 
     const { user } = useAppSelector(state => state.authUser)
 
@@ -76,7 +77,9 @@ export default function TicketResellFormModal({ open, setOpen, ticket, onResell 
                 <div className="mt-6 relative">
                     <div className="flex gap-2 border-b border-b-neutral-5">
                         <div className="border-e pe-3 pb-2 border-e-neutral-5">
-                            <Icon icon="mdi:currency-ngn" className="text-brand-secondary-8 text-xl" />
+                            <p className="text-brand-secondary-8 text-xl">
+                                {getCurrencySymbol(user?.currency)}
+                            </p>
                         </div>
                         <input
                             type="text"
@@ -86,12 +89,12 @@ export default function TicketResellFormModal({ open, setOpen, ticket, onResell 
                                 // Strip everything except digits and one decimal point
                                 const stripped = e.target.value.replace(/[^0-9.]/g, "")
                                 // Prevent multiple decimal points
-                                const parts    = stripped.split(".")
-                                const cleaned  = parts.length > 2
+                                const parts = stripped.split(".")
+                                const cleaned = parts.length > 2
                                     ? `${parts[0]}.${parts.slice(1).join("")}`
                                     : stripped
                                 // Limit to 2 decimal places
-                                const limited  = cleaned.includes(".")
+                                const limited = cleaned.includes(".")
                                     ? `${cleaned.split(".")[0]}.${cleaned.split(".")[1].slice(0, 2)}`
                                     : cleaned
                                 // Format integer part with commas

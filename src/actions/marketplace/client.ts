@@ -33,6 +33,7 @@ interface MutateMarketplaceResult {
 
 export async function transferTicket(payload: TransferTicketPayload): Promise<TransferTicketResult> {
     const axiosInstance = await getServerAxios()
+
     try {
         const { data } = await axiosInstance.post(TRANSFER_TICKET_ENDPOINT, payload)
         revalidateTag(CACHE_TAGS.MARKETPLACE, "max")

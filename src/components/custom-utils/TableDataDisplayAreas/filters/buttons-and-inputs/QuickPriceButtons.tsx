@@ -3,15 +3,15 @@
 import { cn } from '@/lib/utils'
 
 interface QuickPriceButtonsProps {
-  currency: string
-  selectedMax: number
-  onSelect: (value: number) => void
+    currency: string
+    selectedMax: number
+    onSelect: (value: number) => void
 }
 
 export function QuickPriceButtons({
-  currency,
-  selectedMax,
-  onSelect,
+    currency,
+    selectedMax,
+    onSelect,
 }: QuickPriceButtonsProps) {
     const quickPrices = [
         { label: 'Free', value: 0 },
@@ -23,23 +23,23 @@ export function QuickPriceButtons({
     return (
         <div className="flex flex-wrap gap-3">
             {quickPrices.map((price) => {
-                const isSelected = 
-                (price.value === 0 && selectedMax === 0) ||
-                (price.value > 0 && selectedMax === price.value)
+                const isSelected =
+                    (price.value === 0 && selectedMax === 0) ||
+                    (price.value > 0 && selectedMax === price.value)
 
                 return (
-                <button
-                    key={price.value}
-                    onClick={() => onSelect(price.value)}
-                    className={cn(
-                        'px-4 py-3 rounded-lg h-10 flex justify-center items-center text-xs font-medium transition-all',
-                        isSelected
-                            ? 'bg-primary-1 text-brand-neutral-8 border border-brand-primary-6'
-                            : 'bg-white text-brand-neutral-7 border border-brand-neutral-4 hover:border-brand-neutral-6'
+                    <button
+                        key={price.value}
+                        onClick={() => onSelect(price.value)}
+                        className={cn(
+                            'px-4 py-3 rounded-lg h-10 flex justify-center items-center text-xs font-medium transition-all',
+                            isSelected
+                                ? 'bg-brand-primary-1 text-brand-neutral-8 border border-brand-primary-6'
+                                : 'bg-white text-brand-neutral-7 border border-brand-neutral-4 hover:border-brand-neutral-6'
                         )}
-                >
-                    {price.label}
-                </button>
+                    >
+                        {price.label}
+                    </button>
                 )
             })}
         </div>

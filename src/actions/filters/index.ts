@@ -1,9 +1,4 @@
-"use cache"
-
-import { cacheTag } from "next/cache"
 import { CATEGORIES_ENDPOINT } from "@/endpoints"
-import { CACHE_TAGS } from "@/cache-tags"
-
 export interface ApiCategory {
     id: number
     name: string
@@ -16,7 +11,6 @@ export interface GetCategoriesResult {
 }
 
 export async function getCategories(): Promise<GetCategoriesResult> {
-    cacheTag(CACHE_TAGS.CATEGORIES)
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/${CATEGORIES_ENDPOINT}`)
 

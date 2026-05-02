@@ -1,4 +1,4 @@
-import { getPaymentMethods } from "@/actions/payment/client"
+import { getPaymentMethods } from "@/actions/payment"
 import PaymentMethodsPageCW from "@/components/page-content-wrappers/PaymentMethodPageCW"
 import { ATTENDEE_PAGE_METADATA } from "@/lib/metadata"
 import type { Metadata } from "next"
@@ -12,7 +12,7 @@ export default async function PaymentMethodsPage() {
     const cookieStore = await cookies()
     const token = cookieStore.get("access_token")?.value
 
-    const result = await getPaymentMethods()
+    const result = await getPaymentMethods(token)
 
     return (
         <PaymentMethodsPageCW

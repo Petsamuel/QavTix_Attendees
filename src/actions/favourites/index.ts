@@ -1,4 +1,4 @@
-import { cacheTag } from "next/cache"
+
 import { CACHE_TAGS } from "@/cache-tags"
 import { FAVOURITES_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
@@ -20,8 +20,6 @@ interface GetFavouritesResult {
 }
 
 export async function getFavourites(token: string | undefined, params: GetFavouritesParams = {}): Promise<GetFavouritesResult> {
-    'use cache'
-    cacheTag(CACHE_TAGS.EVENT_CARDS)
     try {
         const url = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/${FAVOURITES_ENDPOINT}`)
         Object.entries(params).forEach(([k, v]) => {
@@ -33,6 +31,7 @@ export async function getFavourites(token: string | undefined, params: GetFavour
                 "Content-Type": "application/json",
                 ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
+            next: { tags: [CACHE_TAGS.MY_FAVOURITES], revalidate: 300 }
         })
 
         if (!res.ok) {

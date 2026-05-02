@@ -296,7 +296,7 @@ export function useDataDisplay<T>(
     // ── Revalidation bus ─────────────────────────────────────────────────────
     // When external code calls useRevalidate(target).trigger(), every mounted
     // useDataDisplay with the same target will refresh all its tabs.
-    useOnRevalidate(config.revalidateTarget ?? "favourites", () => {
+    useOnRevalidate(config.revalidateTarget ?? ("" as RevalidateTarget), () => {
         if (!config.revalidateTarget) return
         Object.values(tabStates).forEach(state => state.refresh())
     })

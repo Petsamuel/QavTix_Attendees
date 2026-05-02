@@ -57,6 +57,7 @@ export default function MyTicketsPageCW({ metrics, categories, upcoming, past, c
                 { key: "cancelled", initialData: cancelled, staticParams: { event_status: "cancelled"  } },
             ],
             activeTab,
+            revalidateTarget: "tickets",
         },
         filters,
     )

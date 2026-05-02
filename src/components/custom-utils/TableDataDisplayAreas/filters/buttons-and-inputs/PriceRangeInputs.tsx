@@ -42,12 +42,12 @@ function PriceInput({ value, label, currency, onChange }: {
                     onChange(num)
                 }}
                 placeholder="0"
-                className="pl-10 pt-6 pb-2 h-16 rounded-xl placeholder:text-neutral-6 border-2 border-neutral-3 focus:outline-0 focus:outline-offset-0 focus:outline-none focus:ring-0 focus:border-primary text-base"
+                className="pl-10 pt-6 pb-2 h-16 rounded-xl placeholder:text-brand-neutral-6 border-2 border-neutral-3 focus:outline-0 focus:outline-offset-0 focus:outline-none focus:ring-0 focus:border-brand-primary text-base"
             />
-            <label className="absolute left-4 top-2 text-xs font-medium text-neutral-7 pointer-events-none">
+            <label className="absolute left-4 top-2 text-xs font-medium text-brand-neutral-7 pointer-events-none">
                 {label}
             </label>
-            <span className="absolute left-4 bottom-3 text-neutral-7 text-base font-medium">
+            <span className="absolute left-4 bottom-3 text-brand-neutral-7 text-base font-medium">
                 {currency}
             </span>
         </div>
@@ -58,7 +58,7 @@ export function PriceRangeInputs({ min, max, currency, onMinChange, onMaxChange 
     return (
         <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-3">
             <PriceInput value={min} label="Minimum amount" currency={currency} onChange={onMinChange} />
-            <span className="text-neutral-6 text-sm pb-4">to</span>
+            <span className="text-brand-neutral-6 text-sm pb-4">to</span>
             <PriceInput value={max} label="Maximum amount" currency={currency} onChange={onMaxChange} />
         </div>
     )

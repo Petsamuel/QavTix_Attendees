@@ -49,7 +49,7 @@ export default function TicketReceiptDocument({ receipt }: TicketReceiptDocument
     const { event, ticket_type, quantity, billed_to, payment } = receipt
 
     const locationStr = formatLocation(event.event_location)
-    const qrValue     = `TICKET-${receipt.issued_ticket_id}-${event.id}`
+    const qrValue = `TICKET-${receipt.issued_ticket_id}-${event.id}`
 
     return (
         <div
@@ -74,7 +74,7 @@ export default function TicketReceiptDocument({ receipt }: TicketReceiptDocument
                     {/* Event image */}
                     <div className="relative w-full sm:w-60 h-52 sm:h-auto shrink-0">
                         <Image
-                            src={"/images/demo-images/event-detail-img.png"}
+                            src={event.event_image}
                             alt={event.event_name}
                             fill
                             className="object-cover"

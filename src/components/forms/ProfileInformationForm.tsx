@@ -56,6 +56,8 @@ const toPayload = (values: ProfileFormValues, hasCountry: boolean): UpdateProfil
 
     if (!hasCountry) {
         payload.country = resolveCountryLabel(values.country)
+    } else {
+        delete payload.country
     }
 
     return payload
@@ -175,8 +177,8 @@ export default function ProfileInformationForm({ profile }: Props) {
                                 position: "absolute",
                                 top: "-36px",
                                 left: "50%",
-                                background: "#1e3a8a",
-                                color: "#e0e7ff",
+                                background: "var(--color-primary-9)",
+                                color: "var(--color-primary-2)",
                                 fontSize: "11px",
                                 fontWeight: 500,
                                 padding: "4px 10px",
@@ -201,7 +203,7 @@ export default function ProfileInformationForm({ profile }: Props) {
                                     position: "absolute",
                                     inset: "-4px",
                                     borderRadius: "10px",
-                                    border: "2px solid #3b82f6",
+                                    border: "2px solid var(--color-primary-5)",
                                     animation: "editRing 0.65s ease-out 0s 3 forwards",
                                     pointerEvents: "none",
                                 }} />
@@ -209,20 +211,19 @@ export default function ProfileInformationForm({ profile }: Props) {
                                     position: "absolute",
                                     inset: "-4px",
                                     borderRadius: "10px",
-                                    border: "2px solid #3b82f6",
+                                    border: "2px solid var(--color-primary-5)",
                                     animation: "editRing 0.65s ease-out 0.22s 3 forwards",
                                     pointerEvents: "none",
                                     opacity: 0.5,
                                 }} />
                             </>
                         )}
-
                         <button
                             ref={editBtnRef}
                             type="button"
                             onClick={() => setIsEditing(true)}
                             style={{
-                                outline: showRing ? "2px solid #93c5fd" : "2px solid transparent",
+                                outline: showRing ? "2px solid #91b5e9" : "2px solid transparent",
                                 outlineOffset: "2px",
                                 transition: "outline 0.3s ease",
                                 borderRadius: "8px",

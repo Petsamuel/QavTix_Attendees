@@ -1,7 +1,5 @@
-import { CACHE_TAGS } from "@/cache-tags"
 import { PAYOUT_ACCOUNTS_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
-import { cacheTag } from "next/cache"
 
 export interface PayoutAccount {
     id: string
@@ -20,8 +18,6 @@ export interface BankOption {
 }
 
 export async function getPaystackBanks(): Promise<{ success: boolean; data?: BankOption[]; message?: string }> {
-    'use cache'
-    cacheTag("paystack_banks")
     try {
         const res = await fetch("https://api.paystack.co/bank?country=nigeria&perPage=100", {
             headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}` },
@@ -43,8 +39,6 @@ export async function getPaystackBanks(): Promise<{ success: boolean; data?: Ban
 }
 
 export async function getPayoutAccounts(token: string | undefined): Promise<{ success: boolean; data?: PayoutAccount[]; message?: string }> {
-    'use cache'
-    cacheTag(CACHE_TAGS.PAYOUT_ACCOUNTS)
     try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${PAYOUT_ACCOUNTS_ENDPOINT}`,

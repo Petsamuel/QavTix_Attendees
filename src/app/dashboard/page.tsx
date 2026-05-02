@@ -22,7 +22,7 @@ async function fetchDashboard(params: string, tags: string[]) {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    next: { tags, revalidate: 120 },
+    next: { tags, revalidate: 300 },
   })
 
   if (!res.ok) return null

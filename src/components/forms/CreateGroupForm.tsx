@@ -12,6 +12,7 @@ import { validateEmail } from "@/helper-fns/validateEmail"
 import { createGroup, Group } from "@/actions/groups/client"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
+import { GroupMembersErrorModal } from "../modals/groups/GroupMembersErrorModal"
 
 const createGroupSchema = z.object({
     name: z.string().min(1, "Group name is required"),
@@ -29,6 +30,11 @@ export default function CreateGroupForm({ onCreated, onCancel }: Props) {
 
     const dispatch = useAppDispatch()
     const [emailInput, setEmailInput] = useState("")
+    const [errorModal, setErrorModal] = useState<{ open: boolean; message: string; emails: string[] }>({
+        open: false,
+        message: "",
+        emails: [],
+    })
 
     const {
         register,
@@ -71,11 +77,19 @@ export default function CreateGroupForm({ onCreated, onCancel }: Props) {
                 description: `"${values.name}" has been created.`,
             }))
         } else {
-            dispatch(showAlert({
-                variant: "destructive",
-                title: "Could not create group",
-                description: result.message ?? "Please try again.",
-            }))
+            if (result.non_existing_users && result.non_existing_users.length > 0) {
+                setErrorModal({
+                    open: true,
+                    message: result.message || "Some users do not exist",
+                    emails: result.non_existing_users
+                })
+            } else {
+                dispatch(showAlert({
+                    variant: "destructive",
+                    title: "Could not create group",
+                    description: result.message ?? "Please try again.",
+                }))
+            }
         }
     }
 
@@ -133,6 +147,12 @@ export default function CreateGroupForm({ onCreated, onCancel }: Props) {
                     className="flex-1 rounded-md h-11!"
                 />
             </div>
+            <GroupMembersErrorModal
+                open={errorModal.open}
+                onOpenChange={open => setErrorModal(prev => ({ ...prev, open }))}
+                message={errorModal.message}
+                emails={errorModal.emails}
+            />
         </form>
     )
 }

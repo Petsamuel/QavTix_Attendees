@@ -1,7 +1,5 @@
 import { GET_PROFILE_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
-import { cacheTag } from "next/cache"
-import { CACHE_TAGS } from "@/cache-tags"
 
 interface ProfileResult {
     success:  boolean
@@ -10,8 +8,6 @@ interface ProfileResult {
 }
 
 export async function getProfile(token: string | undefined): Promise<ProfileResult> {
-    'use cache'
-    cacheTag(CACHE_TAGS.PROFILE)
     try {
         const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/${GET_PROFILE_ENDPOINT}`,
