@@ -1,3 +1,4 @@
+import { CACHE_TAGS } from "@/cache-tags"
 import { MARKETPLACE_LIST_ENDPOINT } from "@/endpoints"
 import { handleApiError } from "@/helper-fns/handleApiErrors"
 
@@ -29,6 +30,7 @@ export async function getMarketplace(token: string | undefined, params: GetMarke
                 "Content-Type": "application/json",
                 ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
+            next: { tags: [CACHE_TAGS.MARKETPLACE], revalidate: 300 }
         })
 
         if (!res.ok) {

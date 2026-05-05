@@ -124,10 +124,14 @@ export default function ProfileInformationForm({ profile }: Props) {
 
             dispatch(setUser(result.data))
 
+            const isFirstTimeUpdate = !activeData.country;
+
             dispatch(showAlert({
                 variant: "success",
-                title: "Profile updated",
-                description: "Your profile has been successfully updated.",
+                title: isFirstTimeUpdate ? "Profile setup complete" : "Profile updated",
+                description: isFirstTimeUpdate 
+                    ? "Welcome to QAVTIX! Your profile has been successfully set up." 
+                    : "Your profile has been successfully updated.",
             }))
         } else {
             dispatch(showAlert({

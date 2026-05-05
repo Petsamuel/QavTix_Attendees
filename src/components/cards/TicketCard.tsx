@@ -67,9 +67,9 @@ export default function TicketCard({ ticket, hideActions = false, downloadSlot }
 
                 {/* Main Ticket Details */}
                 <div className="flex flex-col lg:flex-row flex-1 py-4 gap-8 gap-y-4">
-                    <div className="flex-1 space-y-4">
+                    <div className="flex-1 space-y-4 min-w-0">
                         <div>
-                            <h2 className={cn(space_grotesk.className, "text-2xl md:text-3xl font-bold text-[#0046AD] leading-tight")}>
+                            <h2 className={cn(space_grotesk.className, "text-2xl md:text-3xl font-bold text-[#0046AD] leading-tight", "line-clamp-2 wrap-break-words")}>
                                 {ticket.event_name}
                             </h2>
                             <p className="text-brand-secondary-6 text-base capitalize font-light md:text-lg">{ticket.category}</p>

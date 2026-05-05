@@ -2,6 +2,9 @@
 
 import { Icon } from "@iconify/react"
 import { cn } from "@/lib/utils"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { getAttendeeNotifications } from "@/actions/notifications/index"
 
 interface NotificationBellProps {
     /** The number of unread notifications to display in the badge */
@@ -15,19 +18,40 @@ interface NotificationBellProps {
 }
 
 export function NotificationBell({
-    count = 0,
+    count: initialCount,
     showBadge = true,
     onClick,
     className
 }: NotificationBellProps) {
+    const router = useRouter()
+    const [count, setCount] = useState(initialCount ?? 0)
 
-    // Determine if the badge should be visible
+    useEffect(() => {
+        if (initialCount === undefined) {
+            getAttendeeNotifications({ page: 1 }).then((res) => {
+                if (res.success && res.data) {
+                    setCount(res.data.unread_notifications_count ?? 0)
+                }
+            })
+        } else {
+            setCount(initialCount)
+        }
+    }, [initialCount])
+
+    const handleClick = () => {
+        if (onClick) {
+            onClick()
+        } else {
+            router.push('/dashboard/all-activities')
+        }
+    }
+
     const isBadgeVisible = showBadge && count > 0;
 
     return (
         <button
             type="button"
-            onClick={onClick}
+            onClick={handleClick}
             className={cn(
                 "relative flex items-center justify-center p-2 rounded-full transition-colors",
                 "hover:bg-brand-neutral-1 active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-5",

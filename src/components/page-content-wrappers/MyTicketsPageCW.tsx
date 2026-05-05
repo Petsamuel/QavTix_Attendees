@@ -24,24 +24,24 @@ import { SETTINGS_SUB_LINKS } from "@/enums/navigation"
 
 
 interface MyTicketsPageCWProps {
-    metrics:    AttendeeDashboardMetrics
+    metrics: AttendeeDashboardMetrics
     categories: ApiCategory[]
-    upcoming:   TabSlice<EventTicket>
-    past:       TabSlice<EventTicket>
-    cancelled:  TabSlice<EventTicket>
+    upcoming: TabSlice<EventTicket>
+    past: TabSlice<EventTicket>
+    cancelled: TabSlice<EventTicket>
 }
 
 export default function MyTicketsPageCW({ metrics, categories, upcoming, past, cancelled }: MyTicketsPageCWProps) {
 
     const { filterOptions, tabList } = MyTicketsFiltersNTabsData
     const [filters, setFilters] = useState<Partial<FilterValues>>({
-        dateRange:  { from: undefined, to: undefined },
+        dateRange: { from: undefined, to: undefined },
         categories: [],
     })
     const [activeTab, setActiveTab] = useState<typeof tabList[number]["value"]>("upcoming")
 
-    const { user }    = useAppSelector(store => store.authUser)
-    const isMounted   = useIsMounted()
+    const { user } = useAppSelector(store => store.authUser)
+    const isMounted = useIsMounted()
     const router = useRouter()
 
     const currency = isMounted
@@ -52,9 +52,9 @@ export default function MyTicketsPageCW({ metrics, categories, upcoming, past, c
         {
             endpoint: ATTENDEE_DASHBOARD_ENDPOINT,
             tabs: [
-                { key: "upcoming",  initialData: upcoming,  staticParams: { event_status: "active"    } },
-                { key: "past",      initialData: past,      staticParams: { past:          "true"      } },
-                { key: "cancelled", initialData: cancelled, staticParams: { event_status: "cancelled"  } },
+                { key: "upcoming", initialData: upcoming, staticParams: { event_status: "active" } },
+                { key: "past", initialData: past, staticParams: { past: "true" } },
+                { key: "cancelled", initialData: cancelled, staticParams: { event_status: "cancelled" } },
             ],
             activeTab,
             revalidateTarget: "tickets",
@@ -71,10 +71,10 @@ export default function MyTicketsPageCW({ metrics, categories, upcoming, past, c
     // after mount — so formatPrice will never produce a server/client mismatch.
     const analyticsMetrics = useMemo(
         () => buildMetricsFromConfig(myTicketsMetricsConfig, {
-            "total-earnings":   metrics.total_earnings,
-            "total-spent":      metrics.total_spent,
+            "total-earnings": metrics.total_earnings,
+            "total-spent": metrics.total_spent,
             "ticket-purchased": metrics.tickets_purchased,
-            "upcoming-events":  metrics.upcoming_events,
+            "upcoming-events": metrics.upcoming_events,
         }, currency),
         // Re-format whenever the real currency arrives post-mount
         [metrics, currency]
@@ -93,7 +93,10 @@ export default function MyTicketsPageCW({ metrics, categories, upcoming, past, c
             <div className="flex justify-between items-center gap-5 mb-5 mt-10 lg:mt-0">
                 <h2 className={cn(space_grotesk.className, "text-brand-secondary-8 font-bold text-lg")}>Overview</h2>
                 <div className="flex gap-6 items-center">
-                    <button className="text-brand-primary-6 font-bold text-sm hidden md:inline-block">Complete Profile</button>
+                    {
+                        isMounted && user && !user.is_completed && (
+                            <button className="text-brand-primary-6 font-bold text-sm hidden md:inline-block">Complete Profile</button>
+                        )}
                     <ExportButton1
                         data={activeTabState.cachedItems}
                         filename={`my-tickets-${activeTab}`}
@@ -102,11 +105,11 @@ export default function MyTicketsPageCW({ metrics, categories, upcoming, past, c
                 </div>
             </div>
             {
-                isMounted && !user?.is_completed && (
-                <button onClick={() => router.push(SETTINGS_SUB_LINKS[0].href)} className="text-brand-primary-6 font-bold text-sm mb-4 md:hidden">
-                    Complete Profile
-                </button>
-            )}
+                isMounted && user && !user.is_completed && (
+                    <button onClick={() => router.push(SETTINGS_SUB_LINKS[0].href)} className="text-brand-primary-6 font-bold text-sm mb-4 md:hidden">
+                        Complete Profile
+                    </button>
+                )}
 
             <AnalyticsMetricsCardsContainer metrics={analyticsMetrics} />
 
