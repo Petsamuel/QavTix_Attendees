@@ -1,4 +1,5 @@
 export const ATTENDEE_DASHBOARD_ENDPOINT = "attendee/dashboard";
+export const ATTENDEE_NOTIFICATIONS_ENDPOINT = "attendee/notifications/";
 export const LOGIN_ENDPOINT = "auth/login/"
 export const GET_PROFILE_ENDPOINT = "attendee/profile/"
 export const REFRESH_TOKEN_ENDPOINT = "auth/token/refresh/"

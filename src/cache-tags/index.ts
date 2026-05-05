@@ -35,4 +35,7 @@ export const CACHE_TAGS = {
 
     // Tickets
     TICKET_RECEIPTS: "ticket_receipts",
+
+    // Notifications
+    NOTIFICATIONS: "notifications",
 } as const

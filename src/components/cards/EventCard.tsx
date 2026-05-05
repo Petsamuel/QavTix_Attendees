@@ -25,6 +25,7 @@ import { mockAttendees } from '@/components-data/mock-attendees'
 import { EVENT_DETAILS_LINK, MARKETPLACE_EVENT_DETAILS_LINK } from '@/enums/navigation'
 import Link from 'next/link'
 import { useIsMounted } from '@/custom-hooks/UseIsMounted'
+import { useRevalidate } from '@/custom-hooks/UseRevalidate'
 
 export default function EventsCard(card: EventCardProps & { eventCardFor?: "marketplace" | "global" }) {
 
@@ -41,6 +42,8 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
     const [showShare, setShowShare] = useState(false)
     const [isDelisting, setIsDelisting] = useState(false)
     const pathName = usePathname()
+
+    const { trigger } = useRevalidate("marketplace")
 
     const displayCount = Math.min(card.attendees || 0, 3)
 
@@ -63,6 +66,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
         setIsDelisting(true)
         const res = await delistTicket(card.marketplace_id!)
         if (res.success) {
+            trigger()
             dispatch(openSuccessModal({
                 title: "Event successfully delisted",
                 description: "Your ticket has been removed from the marketplace.",

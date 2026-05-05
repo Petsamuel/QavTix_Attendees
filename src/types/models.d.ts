@@ -18,6 +18,24 @@ interface Message {
 
 // auth / attendee
 
+interface AttendeeNotification {
+    id:                string  // UUID
+    attendee:          number  // FK → User.id
+    notification_type: "event_update" | "ticket" | "refund" | "system" | "reminder" | string
+    title:             string
+    message:           string
+    is_read:           boolean
+    created_at:        string
+}
+
+interface AttendeeNotificationsData {
+    results: AttendeeNotification[]
+    count: number
+    next: string | null
+    previous: string | null
+    unread_notifications_count: number
+}
+
 interface Attendee {
     id:                   number
     user:                 number  // FK → User.id

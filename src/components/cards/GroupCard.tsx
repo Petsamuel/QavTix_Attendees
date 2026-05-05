@@ -18,13 +18,13 @@ import {
 import { CONFIRMATION_ACTION_TYPES } from "@/components/modals/resources/confirmationActions"
 
 interface Props {
-    group:    Group
+    group: Group
     onDelete: (id: string) => void
 }
 
 export default function GroupCard({ group, onDelete }: Props) {
 
-    const router   = useRouter()
+    const router = useRouter()
     const dispatch = useAppDispatch()
 
     const [isDeleting, setIsDeleting] = useState(false)
@@ -37,7 +37,7 @@ export default function GroupCard({ group, onDelete }: Props) {
         const { actionType, parsedTargetId } = parseConfirmationSession(sessionId)
 
         if (
-            actionType     !== CONFIRMATION_ACTION_TYPES.DELETE_GROUP ||
+            actionType !== CONFIRMATION_ACTION_TYPES.DELETE_GROUP ||
             parsedTargetId !== group.id
         ) return
 
@@ -50,15 +50,15 @@ export default function GroupCard({ group, onDelete }: Props) {
             if (result.success) {
                 onDelete(group.id)
                 dispatch(showAlert({
-                    variant:     "default",
-                    title:       "Group deleted",
+                    variant: "success",
+                    title: "Group deleted",
                     description: `"${group.name}" has been removed.`,
                 }))
             } else {
                 setIsDeleting(false)
                 dispatch(showAlert({
-                    variant:     "destructive",
-                    title:       "Could not delete group",
+                    variant: "destructive",
+                    title: "Could not delete group",
                     description: result.message ?? "Please try again.",
                 }))
             }
@@ -71,12 +71,12 @@ export default function GroupCard({ group, onDelete }: Props) {
 
     const handleDeleteClick = () => {
         dispatch(openConfirmation({
-            actionType:  CONFIRMATION_ACTION_TYPES.DELETE_GROUP,
-            targetId:    group.id,
-            title:       "Delete Group",
+            actionType: CONFIRMATION_ACTION_TYPES.DELETE_GROUP,
+            targetId: group.id,
+            title: "Delete Group",
             description: `Are you sure you want to delete "${group.name}"? This cannot be undone.`,
             confirmText: "Yes, delete it",
-            cancelText:  "Cancel",
+            cancelText: "Cancel",
         }))
     }
 

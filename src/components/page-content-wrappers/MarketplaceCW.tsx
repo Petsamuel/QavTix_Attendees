@@ -118,7 +118,7 @@ export default function MarketplacePageCW({ initialData, categories }: Props) {
         return (
             <div className="grid p-1 grid-cols-[repeat(auto-fill,minmax(14em,1fr))] md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,minmax(16em,1fr))] gap-y-6 gap-x-4 justify-items-center md:justify-items-start">
                 {items.map(event => (
-                    <EventsCard key={event.id} {...fromMarketplaceEvent(event)} eventCardFor="marketplace" />
+                    <EventsCard key={event.marketplace_id || `${event.id}-${event.expires_at}`} {...fromMarketplaceEvent(event)} eventCardFor="marketplace" />
                 ))}
             </div>
         )

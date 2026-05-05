@@ -8,11 +8,11 @@ import { buildUpcomingEventActions } from "./resources/upcoming-events-actions"
 import ShareEventModal from "@/components/modals/ShareEventModal"
 import { useAppDispatch } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
-import { EXPLORE_EVENT_LINK } from "@/enums/navigation"
+import { EVENT_DETAILS_LINK, EXPLORE_EVENT_LINK } from "@/enums/navigation"
 import DownloadReceipt from "@/components/receipts/DownloadReceipt"
 
 interface EventsItemDropdownProps {
-    ticket:    EventTicket
+    ticket: EventTicket
     disabled?: boolean
 }
 
@@ -21,9 +21,9 @@ export default function EventsItemDropdown({ ticket, disabled = false }: EventsI
     const dispatch = useAppDispatch()
 
     const [loadingAction, setLoadingAction] = useState<string | null>(null)
-    const [isOpen,        setIsOpen]        = useState(false)
-    const [showShare,     setShowShare]     = useState(false)
-    const [receiptData,   setReceiptData]   = useState<TicketReceipt | null>(null)
+    const [isOpen, setIsOpen] = useState(false)
+    const [showShare, setShowShare] = useState(false)
+    const [receiptData, setReceiptData] = useState<TicketReceipt | null>(null)
 
     // Centralised error dispatcher — used by action callbacks AND the catch below
     const dispatchError = (title: string, description: string) => {
@@ -35,7 +35,7 @@ export default function EventsItemDropdown({ ticket, disabled = false }: EventsI
             ticket,
             () => setShowShare(true),
             (receipt) => setReceiptData(receipt),
-            (msg)     => dispatchError("Receipt Error", msg),
+            (msg) => dispatchError("Receipt Error", msg),
         ),
         [ticket]
     )
@@ -70,14 +70,14 @@ export default function EventsItemDropdown({ ticket, disabled = false }: EventsI
                         )}
                         disabled={disabled}
                     >
-                        <Icon icon="tabler:dots"     className="w-5 h-5 text-brand-secondary-9 hidden md:inline-block" />
+                        <Icon icon="tabler:dots" className="w-5 h-5 text-brand-secondary-9 hidden md:inline-block" />
                         <Icon icon="ix:context-menu" className="w-5 h-5 text-brand-secondary-9 md:hidden" />
                     </button>
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end" className="w-52 text-brand-secondary-9 space-y-1.5">
                     {actions.map((action) => {
-                        const isActionLoading  = loadingAction === action.id
+                        const isActionLoading = loadingAction === action.id
                         const isActionDisabled = loadingAction !== null && !isActionLoading
 
                         return (
@@ -112,7 +112,7 @@ export default function EventsItemDropdown({ ticket, disabled = false }: EventsI
             <ShareEventModal
                 isOpen={showShare}
                 onClose={() => setShowShare(false)}
-                shareUrl={`${EXPLORE_EVENT_LINK}/${ticket.id}`}
+                shareUrl={`${EVENT_DETAILS_LINK.replace("[event_id]", ticket.event_id)}`}
                 title={ticket.event_name}
             />
 
