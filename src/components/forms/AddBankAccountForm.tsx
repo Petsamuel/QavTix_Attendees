@@ -188,7 +188,7 @@ export default function AddBankAccountForm({ open, onOpenChange, banks, onAdded 
 
                         {errors.bank_code && (
                             <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                                <Icon icon="mage:exclamation-circle" className="size-3.5 shrink-0" />
+                                <Icon icon="bx:error-alt" className="size-3.5 shrink-0" />
                                 {errors.bank_code.message}
                             </p>
                         )}
