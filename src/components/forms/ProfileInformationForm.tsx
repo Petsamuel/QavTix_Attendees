@@ -25,28 +25,44 @@ import { resolveCountryLabel, resolveStateLabel } from "@/helper-fns/resolveCoun
 
 // const IS_QA = process.env.NEXT_PUBLIC_QA_MODE === "true"
 
-const toFormValues = (profile: UserProfile): ProfileFormValues => ({
-    fullName: profile.full_name ?? "",
-    email: profile.email ?? "",
-    phoneNumber: profile.phone_number ?? "",
-    gender: profile.gender ?? "",
-    country: countries.find(v =>
+const toFormValues = (profile: UserProfile): ProfileFormValues => {
+    const countryCode = countries.find(v =>
         v.label.toLowerCase() === profile.country?.toLowerCase() ||
         v.value.toLowerCase() === profile.country?.toLowerCase() ||
-        v.label.toLowerCase().trim().match(profile.country?.toLocaleLowerCase().trim())
-    )?.value || profile.country || "",
-    state: profile.state ?? "",
-    city: profile.city ?? "",
-    dob: profile.dob ? new Date(`${profile.dob}T00:00:00`) : undefined as unknown as Date,
-    profileImage: profile.profile_picture ?? undefined,
-})
+        v.label.toLowerCase().trim().match(profile.country?.toLocaleLowerCase().trim() || '')
+    )?.value || profile.country || "";
+
+    let stateCode = profile.state ?? "";
+    if (countryCode && stateCode) {
+        const stateList = getStates(countryCode);
+        const match = stateList.find(s => 
+            s.label.toLowerCase() === stateCode.toLowerCase() ||
+            s.value.toLowerCase() === stateCode.toLowerCase()
+        );
+        if (match) {
+            stateCode = match.value;
+        }
+    }
+
+    return {
+        fullName: profile.full_name ?? "",
+        email: profile.email ?? "",
+        phoneNumber: profile.phone_number ?? "",
+        gender: profile.gender ?? "",
+        country: countryCode,
+        state: stateCode,
+        city: profile.city ?? "",
+        dob: profile.dob ? new Date(`${profile.dob}T00:00:00`) : undefined as unknown as Date,
+        profileImage: profile.profile_picture ?? undefined,
+    }
+}
 
 const toPayload = (values: ProfileFormValues, hasCountry: boolean): UpdateProfilePayload => {
     const payload: UpdateProfilePayload = {
         full_name: values.fullName,
         phone_number: values.phoneNumber,
         gender: values.gender,
-        state: resolveStateLabel(values.country, values.state),
+        state: resolveStateLabel(values.state, values.country),
         city: values.city,
         dob: values.dob
             ? `${values.dob.getFullYear()}-${String(values.dob.getMonth() + 1).padStart(2, '0')}-${String(values.dob.getDate()).padStart(2, '0')}`
@@ -129,8 +145,8 @@ export default function ProfileInformationForm({ profile }: Props) {
             dispatch(showAlert({
                 variant: "success",
                 title: isFirstTimeUpdate ? "Profile setup complete" : "Profile updated",
-                description: isFirstTimeUpdate 
-                    ? "Welcome to QAVTIX! Your profile has been successfully set up." 
+                description: isFirstTimeUpdate
+                    ? "Welcome to QAVTIX! Your profile has been successfully set up."
                     : "Your profile has been successfully updated.",
             }))
         } else {
