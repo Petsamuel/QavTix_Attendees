@@ -17,6 +17,7 @@ import { NAVIGATION_LINKS, SETTINGS_SUB_LINKS } from "@/enums/navigation"
 import { useIsMounted } from "@/custom-hooks/UseIsMounted"
 import { useRevalidate } from "@/custom-hooks/UseRevalidate"
 import { GroupMembersErrorModal } from "../modals/groups/GroupMembersErrorModal"
+import ActionButton2 from "../custom-utils/buttons/ActionButton2"
 
 interface Props {
     groupID: string
@@ -145,7 +146,12 @@ export default function EditGroupForm({ groupID, initialData }: Props) {
                 </div>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-4 flex gap-5">
+                <ActionButton2
+                    buttonText="Cancel"
+                    action={() => router.back()}
+                    className="bg-white h-11! max-w-1/2 w-[10em]"
+                />
                 <ActionButton1
                     buttonText="Save Changes"
                     buttonType="submit"

@@ -88,7 +88,7 @@ export default function GroupCard({ group, onDelete }: Props) {
             <div className="flex items-start justify-between text-brand-secondary-9">
                 <div className="space-y-1">
                     <h3 className="text-sm font-bold">{group.name}</h3>
-                    <p className="text-xs">{group.member_count} Member{Number(group.member_count) !== 1 ? "s" : ""}</p>
+                    <p className="text-xs">You & {Number(group.member_count) - 1} Member{(Number(group.member_count) - 1) !== 1 ? "s" : ""}</p>
                 </div>
 
                 <div className="flex items-center gap-3">
