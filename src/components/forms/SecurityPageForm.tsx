@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 import { passwordSchema, PasswordSchema } from "@/schemas/security.schema"
 import PasswordInput from "@/components/custom-utils/inputs/PasswordInput"
 import PasswordStrengthIndicator from "@/components/custom-utils/security/PasswordStrengthIndicator"
-import { useAppDispatch } from "@/lib/redux/hooks"
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
 import { changePassword, toggle2FAProvider } from "@/actions/settings/security/client"
 import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
@@ -37,6 +37,8 @@ export default function SecurityPageForm({ initialProviders }: Props) {
     })
 
     const newPassword = watch("newPassword")
+
+    const { user } = useAppSelector(store => store.authUser)
 
     const handleToggle = async (provider: TwoFactorProvider) => {
         if (togglingId) return
@@ -123,9 +125,9 @@ export default function SecurityPageForm({ initialProviders }: Props) {
                                                 {provider.name}
                                             </h3>
                                             <p className="text-[11px] text-brand-secondary-5">
-                                                {provider.status === "not_connected"
+                                                {provider.status === "disconnected"
                                                     ? "Not connected yet"
-                                                    : provider.email ?? "Connected"
+                                                    : provider.id === "google" ? user?.email : "Connected"
                                                 }
                                             </p>
 
