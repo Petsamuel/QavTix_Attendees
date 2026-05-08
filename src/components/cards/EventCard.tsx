@@ -24,19 +24,14 @@ import { openSuccessModal } from '@/lib/redux/slices/successModalSlice'
 import { mockAttendees } from '@/components-data/mock-attendees'
 import { EVENT_DETAILS_LINK, MARKETPLACE_EVENT_DETAILS_LINK } from '@/enums/navigation'
 import Link from 'next/link'
-import { useIsMounted } from '@/custom-hooks/UseIsMounted'
+import { useFormatPrice } from '@/custom-hooks/UseFormatPrice'
 import { useRevalidate } from '@/custom-hooks/UseRevalidate'
 
 export default function EventsCard(card: EventCardProps & { eventCardFor?: "marketplace" | "global" }) {
 
     const { user } = useAppSelector(store => store.authUser)
     const dispatch = useAppDispatch()
-    const isMounted = useIsMounted()
-
-    // Use undefined (platform default) until client has hydrated.
-    // This keeps server output and first client render identical,
-    // then updates to the user's real currency after mount.
-    const currency = isMounted ? user?.currency : undefined
+    const format = useFormatPrice()
 
     const [imageError, setImageError] = useState(false)
     const [showShare, setShowShare] = useState(false)
@@ -211,12 +206,12 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                             <div className="text-right shrink-0 ml-auto">
                                 {card.originalPrice && parsePrice(card.originalPrice) != null && (
                                     <p className="text-xs text-neutral-6 line-through">
-                                        {formatPrice(parsePrice(card.originalPrice)!, currency)}
+                                        {format(parsePrice(card.originalPrice)!, user?.currency)}
                                     </p>
                                 )}
                                 {card.price && parsePrice(card.price) != null && (
                                     <p className={`${space_grotesk.className} font-semibold text-lg text-secondary-9`}>
-                                        {formatPrice(parsePrice(card.price)!, currency)}
+                                        {format(parsePrice(card.price)!, user?.currency)}
                                     </p>
                                 )}
                             </div>

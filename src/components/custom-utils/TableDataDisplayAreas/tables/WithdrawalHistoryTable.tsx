@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import { Icon } from "@iconify/react"
 import PaginationControls from "../tools/PaginationControl"
 import { getWithdrawalHistory } from "@/actions/affiliates/client"
-import { formatPrice } from "@/helper-fns/formatPrice"
+import { useFormatPrice } from "@/custom-hooks/UseFormatPrice"
 import { useAppSelector } from "@/lib/redux/hooks"
 import TableLoader from "@/components/loaders/TableLoader"
 
@@ -20,6 +20,7 @@ const PAGE_SIZE = 10
 export default function WithdrawalHistoryTable({ initialData }: Props) {
 
     const { user } = useAppSelector(store => store.authUser)
+    const format = useFormatPrice()
 
     const [items, setItems] = useState<WithdrawalHistoryItem[]>(initialData.results)
     const [isLoading, setIsLoading] = useState(false)
@@ -91,7 +92,7 @@ export default function WithdrawalHistoryTable({ initialData }: Props) {
                                             {new Date(item.created_at).toLocaleDateString()}
                                         </td>
                                         <td className="p-4 text-brand-secondary-9 text-[11px]">
-                                            {formatPrice(parseFloat(item.amount), user?.currency)}
+                                            {format(parseFloat(item.amount), user?.currency)}
                                         </td>
                                         <td className="p-4">
                                             <div className="flex flex-col">
@@ -131,7 +132,7 @@ export default function WithdrawalHistoryTable({ initialData }: Props) {
                                 </div>
                             </div>
                             <div className="flex justify-between text-xs text-brand-secondary-9">
-                                <span className="font-bold">{formatPrice(parseFloat(item.amount), user?.currency)}</span>
+                                <span className="font-bold">{format(parseFloat(item.amount), user?.currency)}</span>
                                 <span>{new Date(item.created_at).toLocaleDateString()}</span>
                             </div>
                         </div>

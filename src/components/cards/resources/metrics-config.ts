@@ -7,7 +7,7 @@ export interface MetricConfig {
     description:     string
     icon:            string
     iconColor:       string
-    valueFormatter?: (value: number, currency: string) => string
+    valueFormatter?: (value: number, currency: string, isMounted?: boolean) => string
 }
 
 // My Tickets
@@ -17,7 +17,7 @@ export const myTicketsMetricsConfig: Record<string, MetricConfig> = {
         id:             'total-earnings',
         label:          "Total Earnings",
         icon:           "/images/vectors/dollar-in.svg",
-        valueFormatter: (value, currency) => formatPrice(value, currency!),
+        valueFormatter: (value, currency, isMounted = true) => formatPrice(value, currency!, true, isMounted),
         iconColor:      "",
         description:    "",
     },
@@ -26,7 +26,7 @@ export const myTicketsMetricsConfig: Record<string, MetricConfig> = {
         label:          "Total Spent",
         icon:           "/images/vectors/dollar-out.svg",
         iconColor:      "",
-        valueFormatter: (value, currency) => formatPrice(value, currency!),
+        valueFormatter: (value, currency, isMounted = true) => formatPrice(value, currency!, true, isMounted),
         description:    "",
     },
     'ticket-purchased': {
@@ -52,7 +52,7 @@ export const affilatesMetricsConfig: Record<string, MetricConfig> = {
         id:             'total-earnings',
         label:          "Total Earnings",
         icon:           "/images/vectors/dollar-in.svg",
-        valueFormatter: (value, currency) => formatPrice(value, currency!),
+        valueFormatter: (value, currency, isMounted = true) => formatPrice(value, currency!, true, isMounted),
         iconColor:      "",
         description:    "",
     },
@@ -76,7 +76,7 @@ export const affilatesMetricsConfig: Record<string, MetricConfig> = {
         icon:           "/images/vectors/upcoming-events.svg",
         description:    "",
         iconColor:      "",
-        valueFormatter: (value, currency) => formatPrice(value, currency!),
+        valueFormatter: (value, currency, isMounted = true) => formatPrice(value, currency!, true, isMounted),
     }
 }
 
@@ -166,7 +166,7 @@ export const AFFILIATE_METRICS_CONFIG = [
         id:             "earnings",
         label:          "Total Earnings",
         iconPath:       "/images/vectors/dollar-in.svg",
-        valueFormatter: (v: number, currency?: string) => formatPrice(v, currency!),
+        valueFormatter: (v: number, currency?: string, isMounted = true) => formatPrice(v, currency!, true, isMounted),
     },
 ] as const
 

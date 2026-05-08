@@ -75,9 +75,9 @@ export default function MyTicketsPageCW({ metrics, categories, upcoming, past, c
             "total-spent": metrics.total_spent,
             "ticket-purchased": metrics.tickets_purchased,
             "upcoming-events": metrics.upcoming_events,
-        }, currency),
+        }, currency, isMounted),
         // Re-format whenever the real currency arrives post-mount
-        [metrics, currency]
+        [metrics, currency, isMounted]
     )
 
     const handleTabChange = (tab: string) => {
