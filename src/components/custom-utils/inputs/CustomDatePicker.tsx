@@ -36,6 +36,7 @@ export default function CustomDatePicker({
     icon: Icon   = CalendarIcon,
     className,
     disabled,
+    fromYear,
     toYear       = new Date().getFullYear(),
 }: CustomDatePickerProps) {
 
@@ -84,6 +85,8 @@ export default function CustomDatePicker({
                         onSelect={handleSelect}
                         captionLayout="dropdown"
                         defaultMonth={value ?? new Date(toYear - 25, 0)}
+                        startMonth={new Date(fromYear ?? 1900, 0)}
+                        endMonth={new Date(toYear, 11)}
                     />
                 </PopoverContent>
             </Popover>
