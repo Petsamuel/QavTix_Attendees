@@ -23,10 +23,9 @@ type SocialPlatform = {
 
 const SOCIAL_PLATFORMS: SocialPlatform[] = [
     { name: "Facebook",  icon: "logos:facebook",         bgColor: "bg-[#E7EAF3]", noShareApi: false },
-    { name: "Instagram", icon: "skill-icons:instagram",  bgColor: "bg-[#FDE2E9]", noShareApi: true,  tooltip: "Copy link — paste in Instagram" },
+    { name: "Instagram", icon: "skill-icons:instagram",  bgColor: "bg-[#FDE2E9]", noShareApi: false },
     { name: "Twitter",   icon: "ri:twitter-x-fill",      bgColor: "bg-[#F0F0F0]", noShareApi: false },
     { name: "WhatsApp",  icon: "logos:whatsapp-icon",     bgColor: "bg-[#E1F3E6]", noShareApi: false },
-    { name: "TikTok",    icon: "logos:tiktok-icon",       bgColor: "bg-[#E1E1E1]", noShareApi: true,  tooltip: "Copy link — paste in TikTok" },
 ]
 
 const buildShareHref = (name: string, encodedUrl: string, encodedFullText: string): string | null => {
@@ -34,7 +33,8 @@ const buildShareHref = (name: string, encodedUrl: string, encodedFullText: strin
         case "Facebook":  return `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`
         case "Twitter":   return `https://twitter.com/intent/tweet?text=${encodedFullText}`
         case "WhatsApp":  return `https://wa.me/?text=${encodedFullText}`
-        default:          return null  // Instagram / TikTok — no web API
+        case "Instagram": return `https://www.instagram.com/` // Fallback to opening Instagram site
+        default:          return null
     }
 }
 
