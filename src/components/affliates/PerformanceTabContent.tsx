@@ -6,7 +6,7 @@ import PerformanceChart from "../charts/PerformanceChart"
 import {
     AFFILIATE_METRICS_CONFIG,
 } from "../cards/resources/metrics-config"
-import { getAffiliatePerformanceAll } from "@/actions/affiliates/client"
+import { getAffiliatePerformanceAllClient } from "@/actions/affiliates/client"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { buildAffiliateMetricStats } from "@/helper-fns/buildMetricsConfig"
 import ChartLoader from "../loaders/ChartLoader"
@@ -44,7 +44,7 @@ export default function PerformanceTabContent({ initialData }: Props) {
     const handleYearChange = (year: string) => {
         setSelectedYear(year)
         startTransition(async () => {
-            const fresh = await getAffiliatePerformanceAll(parseInt(year))
+            const fresh = await getAffiliatePerformanceAllClient(parseInt(year))
             setAllData(fresh)
         })
     }

@@ -3,7 +3,7 @@
 import { Icon } from '@iconify/react'
 import NotificationItem from './NotificationItem'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { markNotificationsAsRead } from '@/actions/notifications/index'
+import { markNotificationsAsReadClient } from '@/actions/notifications/client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select'
 import { cn } from '@/lib/utils'
 import { useTransition } from 'react'
@@ -59,7 +59,7 @@ export default function NotificationsTab({ notifications }: NotificationsTabProp
 
     const handleMarkAllRead = () => {
         startTransition(async () => {
-            await markNotificationsAsRead()
+            await markNotificationsAsReadClient()
         })
     }
 

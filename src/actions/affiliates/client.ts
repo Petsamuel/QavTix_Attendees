@@ -24,7 +24,7 @@ async function getAffiliatePerformanceSingle(filter: PerformanceFilter, year?: n
     }
 }
 
-export async function getAffiliatePerformanceAll(year: number): Promise<AllPerformanceData> {
+export async function getAffiliatePerformanceAllClient(year: number): Promise<AllPerformanceData> {
     const [weekRes, monthRes, yearRes] = await Promise.all([
         getAffiliatePerformanceSingle("week"),
         getAffiliatePerformanceSingle("month"),
@@ -38,7 +38,7 @@ export async function getAffiliatePerformanceAll(year: number): Promise<AllPerfo
     }
 }
 
-export async function getWithdrawalHistory(page = 1) {
+export async function getWithdrawalHistoryClient(page = 1) {
     const axiosInstance = await getServerAxios()
     try {
         const { data } = await axiosInstance.get(WITHDRAWAL_HISTORY_ENDPOINT, { params: { page } })

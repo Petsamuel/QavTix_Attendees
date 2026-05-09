@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import PaymentCard from "@/components/cards/PaymentCard"
 import ChangeDefaultCardModal from "../modals/ChangeDefaultPaymentMethod"
 import AddPaymentCardModal from "@/lib/features/export/add-payment-card"
-import { getPaymentMethods } from "@/actions/payment/client"
+import { getPaymentMethodsClient } from "@/actions/payment/client"
 
 
 interface Props {
@@ -25,7 +25,7 @@ export default function PaymentMethodsPageCW({ initialMethods }: Props) {
     }, [initialMethods])
 
     const handleRefetch = async () => {
-        const res = await getPaymentMethods()
+        const res = await getPaymentMethodsClient()
         if (res.success && res.data) {
             setMethods(res.data)
         }

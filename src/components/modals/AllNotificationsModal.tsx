@@ -8,7 +8,7 @@ import { DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/di
 import { cn } from '@/lib/utils'
 import { space_grotesk } from '@/lib/fonts'
 import NotificationsTab from '../slots/notifications/NotificationTabContent'
-import { getAttendeeNotifications } from '@/actions/notifications/index'
+import { getAttendeeNotificationsClient } from '@/actions/notifications/client'
 
 interface Props {
     initialNotifications?: AttendeeNotification[]
@@ -45,7 +45,7 @@ export default function AllNotificationsModal({
             const params: any = { page: currentPage + 1 }
             if (searchParams.get('notification_type')) params.notification_type = searchParams.get('notification_type')
             
-            const res = await getAttendeeNotifications(params)
+            const res = await getAttendeeNotificationsClient(params)
             if (res.success && res.data) {
                 setNotifications(prev => [...prev, ...res.data!.results])
                 setCurrentPage(currentPage + 1)

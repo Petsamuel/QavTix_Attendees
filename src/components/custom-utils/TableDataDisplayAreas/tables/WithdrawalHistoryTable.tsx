@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { Icon } from "@iconify/react"
 import PaginationControls from "../tools/PaginationControl"
-import { getWithdrawalHistory } from "@/actions/affiliates/client"
+import { getWithdrawalHistoryClient } from "@/actions/affiliates/client"
 import { useFormatPrice } from "@/custom-hooks/UseFormatPrice"
 import { useAppSelector } from "@/lib/redux/hooks"
 import TableLoader from "@/components/loaders/TableLoader"
@@ -32,7 +32,7 @@ export default function WithdrawalHistoryTable({ initialData }: Props) {
     const fetchPage = async (page: number) => {
         setIsLoading(true)
         setIsError(false)
-        const res = await getWithdrawalHistory(page)
+        const res = await getWithdrawalHistoryClient(page)
         if (res.success && res.data) {
             setItems(res.data.results)
             setTotalItems(res.data.count)
