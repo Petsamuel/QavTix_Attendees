@@ -8,9 +8,10 @@ import { Button } from "../ui/button"
 import { ChangeEvent, useState } from "react"
 import WithdrawalHistoryTable from "../custom-utils/TableDataDisplayAreas/tables/WithdrawalHistoryTable"
 import WithdrawalLocationSelector from "./WithdrawalLocationSelector"
-import { formatPrice } from "@/helper-fns/formatPrice"
+import { useFormatPrice } from "@/custom-hooks/UseFormatPrice"
 import { useAppSelector } from "@/lib/redux/hooks"
 import { getCurrencySymbol, MIN_WITHDRAWAL } from "@/components-data/currencies"
+import { useIsMounted } from "@/custom-hooks/UseIsMounted"
 
 interface Props {
     account_balance?:  number
@@ -24,6 +25,8 @@ export default function WithdrawalTabContent({ account_balance, income_this_week
     const [showWithdrawalModal, setShowWithdrawalModal] = useState(false)
     const [amount,              setAmount]              = useState("")
     const { user } = useAppSelector(store => store.authUser)
+    const format = useFormatPrice()
+    const isMounted = useIsMounted()
 
     const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
         setAmount(e.target.value.replace(/[^0-9]/g, ""))
@@ -49,11 +52,11 @@ export default function WithdrawalTabContent({ account_balance, income_this_week
                     </div>
 
                     <strong className={cn(space_grotesk.className, "block my-3 text-brand-secondary-8 font-bold text-2xl md:text-[40px]")}>
-                        {account_balance ? formatPrice(account_balance, user?.currency) : "---"}
+                        {account_balance ? format(account_balance, user?.currency) : "---"}
                     </strong>
 
                     <Badge className="bg-brand-accent-1 text-brand-accent-7 font-medium py-1 px-2 rounded-sm text-xs border-[0.86px] border-brand-accent-2 shadow-none">
-                        Minimum Withdrawal: {formatPrice(MIN_WITHDRAWAL[user?.currency as keyof typeof MIN_WITHDRAWAL] || 1000, user?.currency)}
+                        Minimum Withdrawal: {format(MIN_WITHDRAWAL[user?.currency as keyof typeof MIN_WITHDRAWAL] || 1000, user?.currency)}
                     </Badge>
                 </div>
 
@@ -63,7 +66,7 @@ export default function WithdrawalTabContent({ account_balance, income_this_week
                     </label>
                     <div className="mb-6 rounded-md px-3 items-center h-12 bg-[#F2F2F2] flex gap-2 border-[1.5px] border-transparent focus-within:border-brand-primary-4 hover:border-brand-primary-4 transition-all">
                             <span className="text-brand-secondary-7 text-sm font-semibold shrink-0">
-                                {getCurrencySymbol(user?.currency)}
+                                {isMounted && getCurrencySymbol(user?.currency)}
                             </span>                        
                             <input
                             type="text"
@@ -79,7 +82,7 @@ export default function WithdrawalTabContent({ account_balance, income_this_week
                         disabled={!amount}
                         className="h-12 bg-brand-primary-6 hover:bg-brand-primary-7 text-white shadow-sm w-full font-semibold"
                     >
-                        Withdraw {amount ? `${formatPrice(Number(amount), user?.currency)}` : ""}
+                        Withdraw {amount ? `${format(Number(amount), user?.currency)}` : ""}
                     </Button>
                 </div>
             </div>

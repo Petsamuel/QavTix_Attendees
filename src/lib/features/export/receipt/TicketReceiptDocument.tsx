@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils"
 import { inter, space_grotesk } from "@/lib/fonts"
 import { formatDateSimple, formatDateTime } from "@/helper-fns/date-utils"
 import { capitalize } from "@/helper-fns/stringFormaters"
-import { formatPrice } from "@/helper-fns/formatPrice"
 import { useAppSelector } from "@/lib/redux/hooks"
+import { useFormatPrice } from "@/custom-hooks/UseFormatPrice"
 
 
 const formatLocation = (loc: TicketReceipt["event"]["event_location"]): string => {
@@ -46,6 +46,7 @@ interface TicketReceiptDocumentProps {
 export default function TicketReceiptDocument({ receipt }: TicketReceiptDocumentProps) {
 
     const { user } = useAppSelector(store => store.authUser)
+    const format = useFormatPrice()
     const { event, ticket_type, quantity, billed_to, payment } = receipt
 
     const locationStr = formatLocation(event.event_location)
@@ -196,7 +197,7 @@ export default function TicketReceiptDocument({ receipt }: TicketReceiptDocument
                                 {quantity}
                             </td>
                             <td className="py-4 px-6 text-sm text-right font-medium text-brand-secondary-9">
-                                {formatPrice(parseInt(payment.subtotal), user?.currency)}
+                                {format(parseInt(payment.subtotal), user?.currency)}
                             </td>
                         </tr>
                     </tbody>
@@ -208,25 +209,25 @@ export default function TicketReceiptDocument({ receipt }: TicketReceiptDocument
                 <div className="w-72 space-y-2">
                     <div className="flex justify-between text-sm text-brand-secondary-9">
                         <span className="font-bold">Subtotal</span>
-                        <span>{formatPrice(parseInt(payment.subtotal), user?.currency)}</span>
+                        <span>{format(parseInt(payment.subtotal), user?.currency)}</span>
                     </div>
                     <div className="flex justify-between text-sm text-brand-secondary-9">
                         <span className="font-bold">Service Charge</span>
-                        <span>{formatPrice(parseInt(payment.service_charge), user?.currency)}</span>
+                        <span>{format(parseInt(payment.service_charge), user?.currency)}</span>
                     </div>
                     <div className="flex justify-between text-sm text-brand-secondary-9">
                         <span className="font-bold">Tax</span>
-                        <span>{formatPrice(parseInt(payment.tax), user?.currency)}</span>
+                        <span>{format(parseInt(payment.tax), user?.currency)}</span>
                     </div>
                     {Number(payment.discount) > 0 && (
                         <div className="flex justify-between text-sm text-green-600">
                             <span className="font-bold">Discount</span>
-                            <span>- {formatPrice(parseInt(payment.discount), user?.currency)}</span>
+                            <span>- {format(parseInt(payment.discount), user?.currency)}</span>
                         </div>
                     )}
                     <div className="border-t border-brand-neutral-3 pt-2 flex justify-between text-base font-bold text-brand-secondary-9">
                         <span className="font-bold">Total</span>
-                        <span>{formatPrice(parseInt(payment.total_amount), user?.currency)}</span>
+                        <span>{format(parseInt(payment.total_amount), user?.currency)}</span>
                     </div>
                 </div>
             </div>

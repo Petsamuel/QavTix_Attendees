@@ -5,7 +5,8 @@ import { DialogTitle } from "@/components/ui/dialog";
 import { Icon } from "@iconify/react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useAppSelector } from "@/lib/redux/hooks";
-import { formatPrice } from "@/helper-fns/formatPrice";
+import { useFormatPrice } from "@/custom-hooks/UseFormatPrice";
+import { useIsMounted } from "@/custom-hooks/UseIsMounted";
 import { getCurrencySymbol } from "@/components-data/currencies";
 
 interface ResellTicketProps {
@@ -21,6 +22,8 @@ export default function TicketResellFormModal({ open, setOpen, ticket, onResell 
     const [error, setError] = useState("")
 
     const { user } = useAppSelector(state => state.authUser)
+    const format = useFormatPrice()
+    const isMounted = useIsMounted()
 
     const handleClose = () => {
         setDisplayValue("")
@@ -65,7 +68,7 @@ export default function TicketResellFormModal({ open, setOpen, ticket, onResell 
                     <div className="text-right">
                         <p className="text-[11px] text-brand-secondary-4">Orig. Price</p>
                         <p className="font-bold text-sm text-brand-secondary-9">
-                            {formatPrice(parseInt(ticket.original_price), user?.currency)}
+                            {format(parseInt(ticket.original_price), user?.currency)}
                         </p>
                     </div>
                 </div>
@@ -78,7 +81,7 @@ export default function TicketResellFormModal({ open, setOpen, ticket, onResell 
                     <div className="flex gap-2 border-b border-b-neutral-5">
                         <div className="border-e pe-3 pb-2 border-e-neutral-5">
                             <p className="text-brand-secondary-8 text-xl">
-                                {getCurrencySymbol(user?.currency)}
+                                {isMounted && getCurrencySymbol(user?.currency)}
                             </p>
                         </div>
                         <input
