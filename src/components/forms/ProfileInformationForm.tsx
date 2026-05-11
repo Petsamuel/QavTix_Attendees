@@ -21,21 +21,24 @@ import { updateProfile } from "@/actions/settings/profile/client"
 import { uploadToCloudinary } from "@/lib/upload/cloudinary"
 import { setUser } from "@/lib/redux/slices/authUserSlice"
 import { resolveCountryLabel, resolveStateLabel } from "@/helper-fns/resolveCountryCode"
+import PhoneNumberInput from "../custom-utils/inputs/CustomPhoneInput"
 
 
 // const IS_QA = process.env.NEXT_PUBLIC_QA_MODE === "true"
 
 const toFormValues = (profile: UserProfile): ProfileFormValues => {
-    const countryCode = countries.find(v =>
-        v.label.toLowerCase() === profile.country?.toLowerCase() ||
-        v.value.toLowerCase() === profile.country?.toLowerCase() ||
-        v.label.toLowerCase().trim().match(profile.country?.toLocaleLowerCase().trim() || '')
-    )?.value || profile.country || "";
+    const countryCode = profile.country
+        ? countries.find(v =>
+            v.label.toLowerCase() === profile.country?.toLowerCase() ||
+            v.value.toLowerCase() === profile.country?.toLowerCase() ||
+            v.label.toLowerCase().trim().includes(profile.country.toLocaleLowerCase().trim())
+        )?.value || profile.country || ""
+        : "";
 
     let stateCode = profile.state ?? "";
     if (countryCode && stateCode) {
         const stateList = getStates(countryCode);
-        const match = stateList.find(s => 
+        const match = stateList.find(s =>
             s.label.toLowerCase() === stateCode.toLowerCase() ||
             s.value.toLowerCase() === stateCode.toLowerCase()
         );
@@ -286,13 +289,20 @@ export default function ProfileInformationForm({ profile }: Props) {
                         {...register("email")}
                     />
 
-                    <CustomInput2
-                        showRequired
-                        label="Phone Number"
-                        readOnly={!isEditing}
-                        className={!isEditing ? "pointer-events-none" : ""}
-                        error={errors.phoneNumber?.message}
-                        {...register("phoneNumber")}
+                    <Controller
+                        name="phoneNumber"
+                        control={control}
+                        render={({ field }) => (
+                            <PhoneNumberInput
+                                label="Phone Number"
+                                value={field.value}
+                                onChange={field.onChange}
+                                error={errors.phoneNumber?.message}
+                                showRequired
+                                readOnly={!isEditing}
+                                defaultCountry="US"
+                            />
+                        )}
                     />
 
                     <Controller
