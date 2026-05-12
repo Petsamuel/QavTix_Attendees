@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { format } from "date-fns"
-import { fetchPaginatedData } from "@/actions/paginated-data/index"
+import { fetchPaginatedDataClient } from "@/actions/paginated-data/client"
 import { useOnRevalidate } from "./UseRevalidate"
 import { getAuthToken } from "@/helper-fns/getAuthToken"
 
@@ -135,7 +135,7 @@ const useTabState = <T>(
 
         setStatus(append ? "loadingMore" : "loading")
 
-        const result = await fetchPaginatedData<T>({
+        const result = await fetchPaginatedDataClient<T>({
             endpoint,
             staticParams: configRef.current.staticParams,
             filterParams: buildFilterParams(filtersRef.current),

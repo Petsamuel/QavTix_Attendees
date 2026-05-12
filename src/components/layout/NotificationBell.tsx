@@ -4,7 +4,7 @@ import { Icon } from "@iconify/react"
 import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { getAttendeeNotifications } from "@/actions/notifications/index"
+import { getAttendeeNotificationsClient } from "@/actions/notifications/client"
 
 interface NotificationBellProps {
     /** The number of unread notifications to display in the badge */
@@ -28,7 +28,7 @@ export function NotificationBell({
 
     useEffect(() => {
         if (initialCount === undefined) {
-            getAttendeeNotifications({ page: 1 }).then((res) => {
+            getAttendeeNotificationsClient({ page: 1 }).then((res) => {
                 if (res.success && res.data) {
                     setCount(res.data.unread_notifications_count ?? 0)
                 }

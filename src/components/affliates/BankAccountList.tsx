@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group"
 import { Label } from "../ui/label"
 import { Icon } from "@iconify/react"
-import { getPaymentAccounts } from "@/actions/payment/client"
+import { getPaymentAccountsClient } from "@/actions/payment/client"
 import { BankAccountSkeleton } from "../loaders/BankListLoader"
 import BankLogo from "../financials/BankLogo"
 
@@ -28,7 +28,7 @@ export default function BankAccountsList({ onSelect, isLoading, setIsLoading }: 
     useEffect(() => {
         const load = async () => {
             setIsLoading(true)
-            const res = await getPaymentAccounts()
+            const res = await getPaymentAccountsClient()
             if (res.success && res.data) {
                 setAccounts(res.data.results)
                 // Pre-select default account, or first one

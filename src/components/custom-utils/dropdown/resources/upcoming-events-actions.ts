@@ -1,4 +1,4 @@
-import { getTicketReceipt } from "@/actions/tickets/client"
+import { getTicketReceiptClient } from "@/actions/tickets/client"
 import { addToCalendar } from "@/helper-fns/addToCalendar"
 
 export type EventAction = {
@@ -32,7 +32,7 @@ export function buildUpcomingEventActions(
             label: 'Download Receipt',
             icon: 'hugeicons:download-01',
             onClick: async () => {
-                const result = await getTicketReceipt(ticket.id)
+                const result = await getTicketReceiptClient(ticket.id)
                 if (result.success && result.data) {
                     onDownloadReceipt(result.data)
                 } else {

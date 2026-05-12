@@ -5,7 +5,7 @@ import { handleApiError } from "@/helper-fns/handleApiErrors"
 import { getServerAxios } from "@/lib/axios"
 import { cacheTag } from "next/cache"
 
-export async function getTicketReceipt(ticketId: string | number) {
+export async function getTicketReceiptClient(ticketId: string | number) {
     const axiosInstance = await getServerAxios()
     try {
         const { data } = await axiosInstance.get(TICKET_RECEIPT_ENDPOINT.replace("[id]", String(ticketId)))

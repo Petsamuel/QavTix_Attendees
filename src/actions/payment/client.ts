@@ -35,7 +35,7 @@ interface PaymentMethodsResult {
     message?: string
 }
 
-export async function getPaymentAccounts(): Promise<GetPaymentAccountsResult> {
+export async function getPaymentAccountsClient(): Promise<GetPaymentAccountsResult> {
     const axiosInstance = await getServerAxios()
     try {
         const { data } = await axiosInstance.get(PAYMENT_ACCOUNTS_ENDPOINT)
@@ -45,7 +45,7 @@ export async function getPaymentAccounts(): Promise<GetPaymentAccountsResult> {
     }
 }
 
-export async function getPaymentMethods(): Promise<PaymentMethodsResult> {
+export async function getPaymentMethodsClient(): Promise<PaymentMethodsResult> {
     const axiosInstance = await getServerAxios()
     try {
         const { data } = await axiosInstance.get(PAYMENT_METHODS_ENDPOINT)
