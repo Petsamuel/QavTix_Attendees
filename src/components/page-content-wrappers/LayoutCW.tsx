@@ -4,20 +4,26 @@ import { getServerAxios } from "@/lib/axios"
 import { getOrDetectLocation } from "@/lib/location-utils"
 import AppSettings from "@/persistors/AppSettings"
 import AuthPersistor from "@/persistors/AuthPersistor"
+import { cookies } from "next/headers"
 
 export default async function LayoutCW() {
-    const axiosInstance = await getServerAxios()
+    const cookieStore = await cookies()
+    const token = cookieStore.get("access_token")?.value
 
+    // Always resolve location (fast — reads cookies/headers, no network call)
+    // Only fetch profile when the user has a valid access token
     const [locationResult, profileResult] = await Promise.allSettled([
         getOrDetectLocation(),
-        axiosInstance.get(GET_PROFILE_ENDPOINT).then(r => r.data),
+        token
+            ? getServerAxios().then(ax => ax.get(GET_PROFILE_ENDPOINT).then(r => r.data))
+            : Promise.resolve(null),
     ])
 
     const locationData = locationResult.status === "fulfilled"
         ? locationResult.value
         : DEFAULT_LOCATION
 
-    const profileData = profileResult.status === "fulfilled"
+    const profileData = profileResult.status === "fulfilled" && profileResult.value
         ? profileResult.value?.data as UserProfile
         : null
 

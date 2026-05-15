@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react'
 import { AnimatedDialog } from '@/components/custom-utils/dialogs/AnimatedDialog'
 import { DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import Image from 'next/image'
