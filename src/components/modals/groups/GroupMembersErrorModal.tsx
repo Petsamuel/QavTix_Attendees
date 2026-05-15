@@ -29,10 +29,11 @@ export const GroupMembersErrorModal = ({
 
         // Construct mailto with primary recipient and others in bcc
         const primary = emails[0]
-        const bcc = emails.length > 1 ? `&bcc=${emails.slice(1).join(',')}` : ''
-        const mailto = `mailto:${primary}?subject=${subject}${bcc}&body=${body}`
+        const bcc = emails.length > 1 ? emails.slice(1).join(',') : ''
+        
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${primary}&su=${subject}&body=${body}${bcc ? `&bcc=${bcc}` : ''}`
 
-        window.location.href = mailto
+        window.open(gmailUrl, "_blank")
     }
 
     return (
