@@ -14,6 +14,7 @@ export type FilterKey =
   | 'sortBy'
   | 'priceRange'
   | 'isMineFilter'
+  | 'checkInStatus'
 
 
 export const ALL_FILTERS = {
@@ -61,6 +62,11 @@ export const ALL_FILTERS = {
     value: 'isMineFilter',
     label: 'Listing Types',
     icon: "hugeicons:dollar-square"
+  },
+  checkInStatus: {
+    value: 'checkInStatus',
+    label: 'Check-In Status',
+    icon: 'ic:round-radio-button-checked'
   }
 } as const satisfies Record<FilterKey, TableDataDisplayFilter>
 

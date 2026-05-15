@@ -3,6 +3,7 @@ import { FilterKey } from "../resources/avaliable-filters"
 import CategoryFilter from "./CategoryFilter"
 import DateFilter from "./DateFilter"
 import { StatusFilter } from "./StatusFilter"
+import { CheckInStatusFilter } from "./CheckInStatusFilter"
 import PriceFilter from "./PriceFilter"
 import { IsMineFilter } from "./IsMineFilter"
 
@@ -35,6 +36,10 @@ export const filterRegistry: Partial<Record<FilterKey, FilterRegistryEntry<any>>
   priceRange: {
     component: PriceFilter,
     stateKey: 'priceRange'
+  },
+  checkInStatus: {
+    component: CheckInStatusFilter,
+    stateKey: 'checkInStatus'
   },
   isMineFilter: {
     component: IsMineFilter,
