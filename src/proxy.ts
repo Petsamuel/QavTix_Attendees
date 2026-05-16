@@ -116,6 +116,11 @@ export async function proxy(request: NextRequest) {
 
 	// Access token confirmed invalid — try refresh
 	if (refreshToken) {
+		// Don't bother calling the API if the refresh token is also expired
+		if (isTokenExpiredLocally(refreshToken)) {
+			return redirectToLogin(request.url)
+		}
+
 		const result = await refreshAccessToken(refreshToken)
 
 		if (result.success) {

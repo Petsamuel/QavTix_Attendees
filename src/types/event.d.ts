@@ -10,7 +10,7 @@ interface EventLocation {
 
 type EventType = "single" | "recurring"
 type EventLocationType = "physical" | "online" | "tba"
-type EventStatus = "draft" | "active" | "sold-out" | "new" | "ended" | "cancelled" | "banned" | "filling-fast" | "selling-fast" | "near-capacity" | "starts-soon"
+type EventStatus = "draft" | "active" | "sold_out" | "new" | "ended" | "cancelled" | "banned" | "filling_fast" | "selling_fast" | "near_capacity" | "starts_soon" | "started"
 type RefundPolicy = "no" | "partial" | "full" | "custom"
 
 interface Tag {
@@ -84,7 +84,7 @@ interface EventTicket {
     event_image: string
     category: string
     payment: "Completed" | "Pending" | "Failed" | "Refunded"
-    event_status: "active" | "cancelled" | "postponed" | "completed"
+    event_status: "active" | "cancelled" | "postponed" | "completed" | "started"
     ticket_status: "Active" | "Used" | "Cancelled" | "Expired"
     ticket_type: string
     event_datetime: string

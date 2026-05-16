@@ -8,6 +8,7 @@ interface FilterValues {
     isMineFilter: boolean,
     priceRange?: PriceRange
     purchaseDate?: Date | null
+    checkInStatus?: string[]
 }
 
 

@@ -156,7 +156,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
 
                     <div className="flex flex-col justify-between flex-1 mt-1">
                         <div>
-                            <span className="bg-brand-accent-1 capitalize w-fit block text-brand-accent-7 font-medium py-1 px-2 mt-2 rounded-2xl text-center text-xs">
+                            <span className="bg-brand-accent-1 capitalize w-fit block text-brand-accent-9 font-medium py-1 px-2 mt-2 rounded-2xl text-center text-xs">
                                 {card.category}
                             </span>
                             <span className="text-[11px] block mt-1 w-fit text-brand-neutral-7 truncate max-w-full">

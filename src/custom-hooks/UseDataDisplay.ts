@@ -70,6 +70,7 @@ const buildFilterParams = (filters: Partial<FilterValues>): Record<string, strin
     if (filters.status) params.status = filters.status
     if (filters.ticketType?.length) params.ticket_type = filters.ticketType.join(',')
     if (filters.isMineFilter != null) params.is_mine = String(filters.isMineFilter)
+    if (filters.checkInStatus?.length) params.checkin_status = filters.checkInStatus.join(',')
     return params
 }
 
@@ -82,7 +83,8 @@ const hasActiveFilters = (filters: Partial<FilterValues>): boolean =>
         filters.priceRange?.max ||
         filters.status ||
         filters.ticketType?.length ||
-        filters.isMineFilter != null
+        filters.isMineFilter != null ||
+        filters.checkInStatus?.length
     )
 
 const useTabState = <T>(
@@ -125,6 +127,7 @@ const useTabState = <T>(
         String(filters.priceRange?.min ?? ''),
         String(filters.priceRange?.max ?? ''),
         String(filters.isMineFilter ?? ''),
+        filters.checkInStatus?.join(',') ?? '',
     ].join('|')
 
     const prevFilterKey = useRef(filterKey)

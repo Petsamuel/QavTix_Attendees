@@ -4,59 +4,64 @@ export type StatusStylesRecord = Record<
 >
 
 export const statusStyles: StatusStylesRecord = {
-  "filling-fast": {
-    bg: "bg-warning-tertiary",
-    text: "text-brand-secondary-9",
+  "filling_fast": {
+    bg: "bg-brand-accent-1",
+    text: "text-brand-accent-9",
     label: "Filling fast",
   },
-  "selling-fast": {
-    bg: "bg-warning-tertiary",
-    text: "text-brand-secondary-9",
+  "selling_fast": {
+    bg: "bg-brand-accent-1",
+    text: "text-brand-accent-9",
     label: "Selling fast",
   },
-  "near-capacity": {
+  "near_capacity": {
     bg: "bg-danger-tertiary",
     text: "text-brand-secondary-9",
     label: "Near capacity",
   },
   new: {
-    bg: "bg-red-400",
+    bg: "bg-brand-primary",
     text: "text-white",
     label: "New",
   },
-  "sold-out": {
-    bg: "bg-white border border-red-200",
-    text: "text-red-600",
+  "sold_out": {
+    bg: "bg-brand-secondary-1 border border-brand-secondary-3",
+    text: "text-brand-secondary-8",
     label: "Sold out",
   },
-  "starts-soon": {
+  "starts_soon": {
     bg: "bg-brand-primary-1",
     text: "text-brand-primary-9",
     label: "Starts soon",
   },
+  started: {
+    bg: "bg-brand-primary-1",
+    text: "text-brand-primary-9",
+    label: "Started",
+  },
   draft: {
-    bg: "bg-gray-100",
-    text: "text-gray-600",
+    bg: "bg-brand-secondary-1",
+    text: "text-brand-secondary-6",
     label: "Draft",
   },
   active: {
-    bg: "bg-positive-tertiary",
-    text: "text-brand-secondary-2",
+    bg: "bg-brand-primary-1",
+    text: "text-brand-primary-9",
     label: "Active",
   },
   ended: {
-    bg: "bg-gray-100",
-    text: "text-gray-600",
+    bg: "bg-brand-secondary-1",
+    text: "text-brand-secondary-6",
     label: "Ended",
   },
   cancelled: {
-    bg: "bg-white border border-red-200",
-    text: "text-red-600",
+    bg: "bg-danger-tertiary border border-danger-default/20",
+    text: "text-danger-default",
     label: "Cancelled",
   },
   banned: {
-    bg: "bg-white border border-red-200",
-    text: "text-red-600",
+    bg: "bg-danger-tertiary border border-danger-default/20",
+    text: "text-danger-default",
     label: "Banned",
   },
 };
