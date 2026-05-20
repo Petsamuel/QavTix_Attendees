@@ -38,7 +38,7 @@ export async function downloadPrivacyData(): Promise<{ success: boolean; message
 export async function deleteAccount(): Promise<{ success: boolean; message?: string }> {
     const axiosInstance = await getServerAxios()
     try {
-        await axiosInstance.delete(DELETE_ACCOUNT_ENDPOINT)
+        await axiosInstance.post(DELETE_ACCOUNT_ENDPOINT)
 
         const cookieStore = await cookies()
         cookieStore.delete("access_token")
