@@ -29,10 +29,11 @@ interface AttendeeNotification {
 }
 
 interface AttendeeNotificationsData {
-    results: AttendeeNotification[]
-    count: number
-    next: string | null
-    previous: string | null
+    notifications?: AttendeeNotification[]
+    results?: AttendeeNotification[]
+    count?: number
+    next?: string | null
+    previous?: string | null
     unread_notifications_count: number
 }
 

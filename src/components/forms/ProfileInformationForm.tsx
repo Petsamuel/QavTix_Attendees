@@ -1,10 +1,8 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
 import { useForm, Controller, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { cn } from "@/lib/utils"
-import { Icon } from "@iconify/react"
 import { ProfileFormValues, profileSchema } from "@/schemas/account-settings.schema"
 import ProfileImageUploader from "@/components/custom-utils/inputs/ImageUpload"
 import CustomInput2 from "@/components/custom-utils/inputs/CustomInput2"

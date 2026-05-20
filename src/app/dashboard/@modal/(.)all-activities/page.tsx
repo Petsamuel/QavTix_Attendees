@@ -12,13 +12,14 @@ export default async function AllActivityModalPage(props: { searchParams: Promis
 
     const res = await getAttendeeNotifications(token, params)
 
-    const notifications = res.success ? res.data?.results ?? [] : []
+    const notifications = res.success ? (res.data?.notifications ?? res.data?.results ?? []) : []
+    const hasMore = res.success ? !!res.data?.next : false
 
     return (
         <AllNotificationsModal
             initialNotifications={notifications}
             initialPage={1}
-            initialHasMore={true}
+            initialHasMore={hasMore}
         />
     )
 }

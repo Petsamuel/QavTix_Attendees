@@ -33,7 +33,8 @@ export default function AllNotificationsModal({
     useEffect(() => {
         setNotifications(initialNotifications)
         setCurrentPage(initialPage)
-    }, [initialNotifications, initialPage])
+        setHasMore(initialHasMore)
+    }, [initialNotifications, initialPage, initialHasMore])
 
     const handleClose = () => {
         setOpen(false)
@@ -47,9 +48,10 @@ export default function AllNotificationsModal({
             
             const res = await getAttendeeNotificationsClient(params)
             if (res.success && res.data) {
-                setNotifications(prev => [...prev, ...res.data!.results])
+                const newNotifications = res.data.notifications ?? res.data.results ?? []
+                setNotifications(prev => [...prev, ...newNotifications])
                 setCurrentPage(currentPage + 1)
-                if (!res.data.next) {
+                if (!res.data.next || newNotifications.length === 0) {
                     setHasMore(false)
                 }
             }
