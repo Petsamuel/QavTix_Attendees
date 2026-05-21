@@ -35,10 +35,10 @@ export async function downloadPrivacyData(): Promise<{ success: boolean; message
     }
 }
 
-export async function deleteAccount(): Promise<{ success: boolean; message?: string }> {
+export async function deleteAccount(password?: string): Promise<{ success: boolean; message?: string }> {
     const axiosInstance = await getServerAxios()
     try {
-        await axiosInstance.post(DELETE_ACCOUNT_ENDPOINT)
+        await axiosInstance.post(DELETE_ACCOUNT_ENDPOINT, password ? { password } : undefined)
 
         const cookieStore = await cookies()
         cookieStore.delete("access_token")
