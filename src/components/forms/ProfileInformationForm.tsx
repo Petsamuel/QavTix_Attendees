@@ -7,6 +7,7 @@ import { ProfileFormValues, profileSchema } from "@/schemas/account-settings.sch
 import ProfileImageUploader from "@/components/custom-utils/inputs/ImageUpload"
 import CustomInput2 from "@/components/custom-utils/inputs/CustomInput2"
 import CustomSelect2 from "@/components/custom-utils/inputs/CustomSelect2"
+import SearchableSelect from "@/components/custom-utils/inputs/SearchableSelect"
 import { countries, getStates } from "@/components-data/location"
 import { space_grotesk } from "@/lib/fonts"
 import { GENDER_OPTIONS } from "@/components-data/gender-options"
@@ -20,6 +21,7 @@ import { uploadToCloudinary } from "@/lib/upload/cloudinary"
 import { setUser } from "@/lib/redux/slices/authUserSlice"
 import { resolveCountryLabel, resolveStateLabel } from "@/helper-fns/resolveCountryCode"
 import PhoneNumberInput from "../custom-utils/inputs/CustomPhoneInput"
+import { parsePhoneNumber } from "react-phone-number-input"
 
 
 // const IS_QA = process.env.NEXT_PUBLIC_QA_MODE === "true"
@@ -200,10 +202,22 @@ export default function ProfileInformationForm({ profile }: Props) {
                             <PhoneNumberInput
                                 label="Phone Number"
                                 value={field.value}
-                                onChange={field.onChange}
+                                onChange={(val) => {
+                                    field.onChange(val);
+                                    if (val && val.startsWith('+')) {
+                                        try {
+                                            const parsed = parsePhoneNumber(val);
+                                            if (parsed && parsed.country && !activeData.country) {
+                                                setValue("country", parsed.country, { shouldDirty: true, shouldValidate: true });
+                                            }
+                                        } catch (e) {
+                                            // ignore parse error
+                                        }
+                                    }
+                                }}
                                 error={errors.phoneNumber?.message}
                                 showRequired
-                                defaultCountry="US"
+                                defaultCountry="NG"
                             />
                         )}
                     />
@@ -261,7 +275,7 @@ export default function ProfileInformationForm({ profile }: Props) {
                         name="state"
                         control={control}
                         render={({ field }) => (
-                            <CustomSelect2
+                            <SearchableSelect
                                 label="State"
                                 options={getStates(country)}
                                 value={field.value}
