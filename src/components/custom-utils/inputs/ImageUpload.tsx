@@ -33,6 +33,11 @@ export default function ProfileImageUploader({
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (file) {
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+            if (!allowedTypes.includes(file.type)) {
+                alert("Unsupported file type")
+                return
+            }
             const url = URL.createObjectURL(file)
             setPreviewUrl(url)
             if (onImageChange) onImageChange(file)
@@ -88,7 +93,7 @@ export default function ProfileImageUploader({
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileChange}
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp"
                 className="hidden"
                 disabled={!isEditing}
             />
