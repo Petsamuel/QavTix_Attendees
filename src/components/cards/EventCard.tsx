@@ -40,7 +40,8 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
 
     const { trigger } = useRevalidate("marketplace")
 
-    const displayCount = Math.min(card.attendees || 0, 3)
+    const totalAttendees = card.attendees || 0
+    const avatarsToShow = totalAttendees <= 5 ? totalAttendees : 4
 
     const { isFavourite, toggle: toggleFavourite } = useFavourite(
         card.id,
@@ -185,7 +186,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                         <div className="flex items-center flex-wrap justify-between pt-2 gap-2">
                             {(card.attendees ?? 0) > 0 && (
                                 <div className="flex -space-x-1.5 shrink-0">
-                                    {mockAttendees.slice(displayCount).map((user) => (
+                                    {mockAttendees.slice(0, avatarsToShow).map((user) => (
                                         <Avatar key={user.id} className="ring-2 ring-background size-8">
                                             {user.profile_picture && <AvatarImage src={user.profile_picture} alt={user.full_name} />}
                                             <AvatarFallback className={`${getAvatarColor(user.id.toString())} text-white font-medium text-[10px]`}>
@@ -193,10 +194,10 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                                             </AvatarFallback>
                                         </Avatar>
                                     ))}
-                                    {card.attendees && card.attendees > 3 && (
+                                    {card.attendees && card.attendees > 5 && (
                                         <Avatar className="ring-2 ring-background size-8">
                                             <AvatarFallback className="bg-primary-1 font-medium text-secondary-7 text-xs">
-                                                +{card.attendees - 3}
+                                                +{card.attendees - 4}
                                             </AvatarFallback>
                                         </Avatar>
                                     )}
@@ -211,7 +212,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                                 )}
                                 {card.price && parsePrice(card.price) != null && (
                                     <p className={`${space_grotesk.className} font-semibold text-lg text-secondary-9`}>
-                                        {format(parsePrice(card.price)!, user?.currency)}
+                                        {parsePrice(card.price) === 0 ? 'Free' : format(parsePrice(card.price)!, user?.currency)}
                                     </p>
                                 )}
                             </div>

@@ -1,4 +1,5 @@
 // Add fields here as the card grows. Never put raw API models in the card.
+import { toTitleCase } from '@/helper-fns/stringFormaters'
 
 export interface EventCardProps {
     id: string
@@ -31,12 +32,13 @@ function formatLocation(loc: EventLocation): string {
 }
 
 
+
 export function fromFavouriteEvent(e: FavouriteEvent): EventCardProps {
     return {
         id: e.id,
-        title: e.event_name,
+        title: toTitleCase(e.event_name),
         category: e.category,
-        host: e.host,
+        host: toTitleCase(e.host),
         date: e.event_datetime,
         location: formatLocation(e.event_location),
         image: e.event_image,
@@ -58,9 +60,9 @@ export function fromIEvent(e: IEvent & {
 }): EventCardProps {
     return {
         id: e.id,
-        title: e.title ?? '',
+        title: toTitleCase(e.title ?? ''),
         category: e.resolvedCategory ?? '',
-        host: e.organizer_display_name,
+        host: toTitleCase(e.organizer_display_name),
         date: e.start_datetime,
         location: e.resolvedLocation ?? '',
         image: '',
@@ -76,9 +78,9 @@ export function fromMarketplaceEvent(e: MarketplaceEvent): EventCardProps {
     return {
         id: e.id,
         marketplace_id: e.marketplace_id,
-        title: e.event_name,
+        title: toTitleCase(e.event_name),
         category: e.category,
-        host: e.host,
+        host: toTitleCase(e.host),
         date: e.event_datetime,
         location: formatLocation(e.event_location),
         image: e.event_image ?? null,
@@ -95,9 +97,9 @@ export function fromMarketplaceEvent(e: MarketplaceEvent): EventCardProps {
 export function fromAffiliateEvent(e: AffiliateEvent): EventCardProps {
     return {
         id: e.id,
-        title: e.event_name,
+        title: toTitleCase(e.event_name),
         category: e.category,
-        host: e.host,
+        host: toTitleCase(e.host),
         date: e.event_datetime,
         location: [e.event_location?.venue_name, e.event_location?.city].filter(Boolean).join(', '),
         image: e.event_image ?? null,

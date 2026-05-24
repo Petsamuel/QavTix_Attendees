@@ -202,17 +202,10 @@ export default function ProfileInformationForm({ profile }: Props) {
                             <PhoneNumberInput
                                 label="Phone Number"
                                 value={field.value}
-                                onChange={(val) => {
-                                    field.onChange(val);
-                                    if (val && val.startsWith('+')) {
-                                        try {
-                                            const parsed = parsePhoneNumber(val);
-                                            if (parsed && parsed.country && !activeData.country) {
-                                                setValue("country", parsed.country, { shouldDirty: true, shouldValidate: true });
-                                            }
-                                        } catch (e) {
-                                            // ignore parse error
-                                        }
+                                onChange={field.onChange}
+                                onCountryChange={(countryVal) => {
+                                    if (countryVal && !activeData.country) {
+                                        setValue("country", countryVal, { shouldDirty: true, shouldValidate: true });
                                     }
                                 }}
                                 error={errors.phoneNumber?.message}
