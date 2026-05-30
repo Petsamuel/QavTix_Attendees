@@ -44,8 +44,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
 
     const { trigger } = useRevalidate("marketplace")
 
-    const totalAttendees = card.attendees || 0
-    const avatarsToShow = totalAttendees <= 5 ? totalAttendees : 4
+    const displayCount = Math.min(card.attendees || 0, 3)
 
     const { isFavourite, toggle: toggleFavourite } = useFavourite(
         card.id,
@@ -86,9 +85,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
         }
     }
 
-    const handleShare = (e: React.MouseEvent) => {
-        e.preventDefault()
-        e.stopPropagation()
+    const handleShare = () => {
         if (card.eventCardFor === "affiliate") {
             handleAffiliateAction(() => setShowShare(true))
         } else {
@@ -96,9 +93,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
         }
     }
 
-    const handleCopy = (e: React.MouseEvent) => {
-        e.preventDefault()
-        e.stopPropagation()
+    const handleCopy = () => {
         if (card.eventCardFor === "affiliate") {
             handleAffiliateAction((url) => copyToClipboard(url))
         } else {
@@ -237,7 +232,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                         <div className="flex items-center flex-wrap justify-between pt-2 gap-2">
                             {(card.attendees ?? 0) > 0 && (
                                 <div className="flex -space-x-1.5 shrink-0">
-                                    {mockAttendees.slice(0, avatarsToShow).map((user) => (
+                                    {mockAttendees.slice(displayCount).map((user) => (
                                         <Avatar key={user.id} className="ring-2 ring-background size-8">
                                             {user.profile_picture && <AvatarImage src={user.profile_picture} alt={user.full_name} />}
                                             <AvatarFallback className={`${getAvatarColor(user.id.toString())} text-white font-medium text-[10px]`}>
@@ -245,10 +240,10 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                                             </AvatarFallback>
                                         </Avatar>
                                     ))}
-                                    {card.attendees && card.attendees > 5 && (
+                                    {card.attendees && card.attendees > 3 && (
                                         <Avatar className="ring-2 ring-background size-8">
                                             <AvatarFallback className="bg-primary-1 font-medium text-secondary-7 text-xs">
-                                                +{card.attendees - 4}
+                                                +{card.attendees - 3}
                                             </AvatarFallback>
                                         </Avatar>
                                     )}
@@ -263,7 +258,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                                 )}
                                 {card.price && parsePrice(card.price) != null && (
                                     <p className={`${space_grotesk.className} font-semibold text-lg text-secondary-9`}>
-                                        {parsePrice(card.price) === 0 ? 'Free' : format(parsePrice(card.price)!, user?.currency)}
+                                        {format(parsePrice(card.price)!, user?.currency)}
                                     </p>
                                 )}
                             </div>
