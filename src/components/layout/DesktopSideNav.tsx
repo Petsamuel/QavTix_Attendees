@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Icon } from "@iconify/react"
@@ -14,6 +15,11 @@ function DesktopSideNav() {
     // Dropdown logic: Only open if we are within the account-settings path
     const isSettingsActive = pathName?.startsWith(NAVIGATION_LINKS.ACCOUNT_SETTINGS.href)
 
+    const [isDropdownOpen, setIsDropdownOpen] = useState(isSettingsActive)
+
+    useEffect(() => {
+        setIsDropdownOpen(isSettingsActive)
+    }, [isSettingsActive])
 
     const isActiveRoute = (route: string) => {
         if (!pathName) return false;
@@ -26,47 +32,74 @@ function DesktopSideNav() {
     }
 
     return (
-        <nav className="hidden lg:flex fixed left-0 top-0 h-screen w-60 flex-col justify-between gap-8 bg-white p-4 py-6 text-sm font-medium text-brand-secondary-9 border-r border-gray-100 overflow-y-auto">
-            <div>
+        <nav className="hidden lg:flex fixed left-0 top-0 h-screen w-60 flex-col bg-white p-4 py-6 text-sm font-medium text-brand-secondary-9 border-r border-gray-100">
+            {/* Fixed Logo Section */}
+            <div className="shrink-0 mb-6 px-1">
                 <Logo width={105} />
-                <ul className="mt-8 flex flex-col gap-2">
+            </div>
+
+            {/* Scrollable Navigation Links */}
+            <div className="flex-1 min-h-0 overflow-y-auto thin-scrollbar pr-1">
+                <ul className="flex flex-col gap-2">
                     {Object.values(NAVIGATION_LINKS).map((v) => {
                         const isActive = isActiveRoute(v.href)
                         const isSettingsLink = v.href === NAVIGATION_LINKS.ACCOUNT_SETTINGS.href
 
                         return (
                             <li key={v.href} className="flex flex-col">
-                                <Link
-                                    href={isSettingsLink ? SETTINGS_SUB_LINKS[0].href : v.href}
-                                    className={cn(
-                                        "relative flex items-center gap-2 text-sm px-3 min-h-12 rounded-md transition-all duration-200",
-                                        isActive || (isSettingsLink && isSettingsActive)
-                                            ? "bg-brand-primary-6 text-white" 
-                                            : "hover:bg-brand-primary-4 hover:text-white/90 text-brand-secondary-9 font-normal"
-                                    )}
-                                >
-                                    <Icon icon={v.icon || ""} width="20" height="20" />
-                                    <span>{v.label}</span>
+                                {isSettingsLink ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsDropdownOpen(prev => !prev)}
+                                        className={cn(
+                                            "relative flex items-center gap-2 text-sm px-3 min-h-12 rounded-md transition-all duration-200 cursor-pointer text-left w-full",
+                                            isActive || (isSettingsLink && isSettingsActive)
+                                                ? "bg-brand-primary-6 text-white" 
+                                                : "hover:bg-brand-primary-4 hover:text-white/90 text-brand-secondary-9 font-normal"
+                                        )}
+                                    >
+                                        <Icon icon={v.icon || ""} width="20" height="20" />
+                                        <span>{v.label}</span>
 
-                                    {(isActive || (isSettingsLink)) && (
                                         <Icon
                                             icon="basil:caret-right-outline"
                                             width="26"
                                             height="26"
                                             className={cn(
                                                 "absolute top-0 bottom-0 my-auto -right-1 transition-transform duration-200",
-                                                isSettingsLink && isSettingsActive ? "-rotate-90" : isSettingsLink && !isSettingsActive ? "rotate-90" : null
+                                                isDropdownOpen ? "-rotate-90" : "rotate-90"
                                             )}
                                         />
-                                    )}
-                                    
-                                </Link>
+                                    </button>
+                                ) : (
+                                    <Link
+                                        href={v.href}
+                                        className={cn(
+                                            "relative flex items-center gap-2 text-sm px-3 min-h-12 rounded-md transition-all duration-200",
+                                            isActive
+                                                ? "bg-brand-primary-6 text-white" 
+                                                : "hover:bg-brand-primary-4 hover:text-white/90 text-brand-secondary-9 font-normal"
+                                        )}
+                                    >
+                                        <Icon icon={v.icon || ""} width="20" height="20" />
+                                        <span>{v.label}</span>
 
-                                {/* Dropdown Menu: Only renders/expands if isSettingsActive is true */}
+                                        {isActive && (
+                                            <Icon
+                                                icon="basil:caret-right-outline"
+                                                width="26"
+                                                height="26"
+                                                className="absolute top-0 bottom-0 my-auto -right-1 transition-transform duration-200"
+                                            />
+                                        )}
+                                    </Link>
+                                )}
+
+                                {/* Dropdown Menu: Only renders/expands if isDropdownOpen is true */}
                                 {isSettingsLink && (
                                     <div className={cn(
                                         "grid transition-all duration-300 ease-in-out overflow-hidden",
-                                        isSettingsActive ? "grid-rows-[1fr] opacity-100 mt-4" : "grid-rows-[0fr] opacity-0"
+                                        isDropdownOpen ? "grid-rows-[1fr] opacity-100 mt-4" : "grid-rows-[0fr] opacity-0"
                                     )}>
                                         <div className="relative ml-3 flex flex-col min-h-0">
                                             <div className="absolute left-0 top-0 h-[88%] my-auto bottom-0 w-px bg-brand-neutral-5" />
@@ -103,7 +136,11 @@ function DesktopSideNav() {
                     })}
                 </ul>
             </div>
-            <AuthUserDetails />
+
+            {/* Fixed User/Avatar Section */}
+            <div className="shrink-0 pt-4 border-t border-gray-100 mt-auto">
+                <AuthUserDetails />
+            </div>
         </nav>
     )
 }
