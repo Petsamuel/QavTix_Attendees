@@ -21,13 +21,15 @@ import { usePathname } from 'next/navigation'
 import { formatEventDate } from '@/helper-fns/date-utils'
 import { delistTicket } from '@/actions/marketplace/client'
 import { openSuccessModal } from '@/lib/redux/slices/successModalSlice'
+import { showAlert } from '@/lib/redux/slices/alertSlice'
 import { mockAttendees } from '@/components-data/mock-attendees'
 import { EVENT_DETAILS_LINK, MARKETPLACE_EVENT_DETAILS_LINK } from '@/enums/navigation'
 import Link from 'next/link'
 import { useFormatPrice } from '@/custom-hooks/UseFormatPrice'
 import { useRevalidate } from '@/custom-hooks/UseRevalidate'
+import { generateAffiliateLink } from '@/actions/affiliates/enroll'
 
-export default function EventsCard(card: EventCardProps & { eventCardFor?: "marketplace" | "global" }) {
+export default function EventsCard(card: EventCardProps & { eventCardFor?: "marketplace" | "global" | "affiliate" }) {
 
     const { user } = useAppSelector(store => store.authUser)
     const dispatch = useAppDispatch()
@@ -36,12 +38,13 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
     const [imageError, setImageError] = useState(false)
     const [showShare, setShowShare] = useState(false)
     const [isDelisting, setIsDelisting] = useState(false)
+    const [isGeneratingLink, setIsGeneratingLink] = useState(false)
+    const [affiliateLink, setAffiliateLink] = useState<string | null>(null)
     const pathName = usePathname()
 
     const { trigger } = useRevalidate("marketplace")
 
-    const totalAttendees = card.attendees || 0
-    const avatarsToShow = totalAttendees <= 5 ? totalAttendees : 4
+    const displayCount = Math.min(card.attendees || 0, 3)
 
     const { isFavourite, toggle: toggleFavourite } = useFavourite(
         card.id,
@@ -49,10 +52,53 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
         { refreshOnRemove: card.refreshOnRemove ?? false },
     )
 
-    const eventUrl = EVENT_DETAILS_LINK.replace("[event_id]", card?.id)
+    const baseEventUrl = process.env.NEXT_PUBLIC_WEBSITE_URL 
+        ? `${process.env.NEXT_PUBLIC_WEBSITE_URL}${EVENT_DETAILS_LINK.replace("[event_id]", card?.id)}`
+        : EVENT_DETAILS_LINK.replace("[event_id]", card?.id)
+
+    const eventUrl = affiliateLink || baseEventUrl
+
+    const handleAffiliateAction = async (actionCallback: (url: string) => void) => {
+        if (affiliateLink) {
+            actionCallback(affiliateLink)
+            return
+        }
+
+        setIsGeneratingLink(true)
+        const res = await generateAffiliateLink(card.id)
+        setIsGeneratingLink(false)
+
+        if (res.success && res.data) {
+            // Build the affiliate URL with ?ref=code
+            const url = new URL(baseEventUrl, window.location.origin)
+            url.searchParams.set("ref", res.data.code)
+            const finalUrl = url.toString()
+            
+            setAffiliateLink(finalUrl)
+            actionCallback(finalUrl)
+        } else {
+            dispatch(showAlert({
+                title: "Failed to generate link",
+                description: res.message || "Could not generate affiliate link. Please try again.",
+                variant: "destructive"
+            }))
+        }
+    }
 
     const handleShare = () => {
-        setShowShare(true)
+        if (card.eventCardFor === "affiliate") {
+            handleAffiliateAction(() => setShowShare(true))
+        } else {
+            setShowShare(true)
+        }
+    }
+
+    const handleCopy = () => {
+        if (card.eventCardFor === "affiliate") {
+            handleAffiliateAction((url) => copyToClipboard(url))
+        } else {
+            copyToClipboard(eventUrl)
+        }
     }
 
     const handleDelist = async (e: React.MouseEvent) => {
@@ -137,14 +183,14 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                             onClick={(e) => e.preventDefault()}
                         >
                             <EventIconActionButton
-                                icon="hugeicons:share-08"
+                                icon={isGeneratingLink ? "eos-icons:loading" : "hugeicons:share-08"}
                                 onClick={handleShare}
-                                feedback="Opening share..."
+                                feedback={isGeneratingLink ? "Generating..." : "Opening share..."}
                             />
                             <EventIconActionButton
-                                icon="ph:link-bold"
-                                onClick={() => copyToClipboard(eventUrl)}
-                                feedback="Link copied!"
+                                icon={isGeneratingLink ? "eos-icons:loading" : "ph:link-bold"}
+                                onClick={handleCopy}
+                                feedback={isGeneratingLink ? "Generating..." : "Link copied!"}
                             />
                             <EventIconActionButton
                                 icon={isFavourite ? "teenyicons:heart-solid" : "hugeicons:favourite"}
@@ -186,7 +232,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                         <div className="flex items-center flex-wrap justify-between pt-2 gap-2">
                             {(card.attendees ?? 0) > 0 && (
                                 <div className="flex -space-x-1.5 shrink-0">
-                                    {mockAttendees.slice(0, avatarsToShow).map((user) => (
+                                    {mockAttendees.slice(displayCount).map((user) => (
                                         <Avatar key={user.id} className="ring-2 ring-background size-8">
                                             {user.profile_picture && <AvatarImage src={user.profile_picture} alt={user.full_name} />}
                                             <AvatarFallback className={`${getAvatarColor(user.id.toString())} text-white font-medium text-[10px]`}>
@@ -194,10 +240,10 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                                             </AvatarFallback>
                                         </Avatar>
                                     ))}
-                                    {card.attendees && card.attendees > 5 && (
+                                    {card.attendees && card.attendees > 3 && (
                                         <Avatar className="ring-2 ring-background size-8">
                                             <AvatarFallback className="bg-primary-1 font-medium text-secondary-7 text-xs">
-                                                +{card.attendees - 4}
+                                                +{card.attendees - 3}
                                             </AvatarFallback>
                                         </Avatar>
                                     )}
@@ -212,7 +258,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                                 )}
                                 {card.price && parsePrice(card.price) != null && (
                                     <p className={`${space_grotesk.className} font-semibold text-lg text-secondary-9`}>
-                                        {parsePrice(card.price) === 0 ? 'Free' : format(parsePrice(card.price)!, user?.currency)}
+                                        {format(parsePrice(card.price)!, user?.currency)}
                                     </p>
                                 )}
                             </div>

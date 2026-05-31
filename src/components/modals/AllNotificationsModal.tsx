@@ -4,11 +4,10 @@ import { useState, useTransition, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Icon } from '@iconify/react'
 import { AnimatedDialog } from '@/components/custom-utils/dialogs/AnimatedDialog'
-import { DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
-import { space_grotesk } from '@/lib/fonts'
 import NotificationsTab from '../slots/notifications/NotificationTabContent'
 import { getAttendeeNotificationsClient } from '@/actions/notifications/client'
+import { DialogTitle } from '../ui/dialog'
 
 interface Props {
     initialNotifications?: AttendeeNotification[]
@@ -66,23 +65,26 @@ export default function AllNotificationsModal({
             className="md:max-w-md"
             childrenContainerStyles="px-0"
         >
-            <div className="flex items-center justify-between px-6 pb-4 border-b border-brand-neutral-2">
-                <DialogHeader>
-                    <DialogTitle className={cn(space_grotesk.className, "text-lg font-bold text-brand-secondary-9")}>
-                        All Notifications
-                    </DialogTitle>
-                    <DialogDescription className="text-xs text-brand-neutral-7">
-                        All your recent notifications
-                    </DialogDescription>
-                </DialogHeader>
-
-                <button
-                    onClick={handleClose}
-                    className="text-brand-neutral-7/80 hover:text-brand-neutral-6"
-                    aria-label="Close modal"
-                >
-                    <Icon icon="line-md:close-circle-filled" className="size-6" />
-                </button>
+            {/* Tabs */}
+            <div className="border-b border-brand-neutral-3 relative">
+                <DialogTitle className='sr-only'>AllNotifications</DialogTitle>
+                <div className="flex items-center">
+                    <div
+                        className={cn(
+                            "flex-1 px-6 py-4 text-sm font-bold transition-colors relative text-brand-primary-6 text-center"
+                        )}
+                    >
+                        Notifications
+                        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-primary-6" />
+                    </div>
+                    <button
+                        onClick={handleClose}
+                        className="text-brand-neutral-4 hover:text-brand-neutral-6 absolute right-4 p-2"
+                        aria-label="Close modal"
+                    >
+                        <Icon icon="line-md:close-circle-filled" className="size-6" />
+                    </button>
+                </div>
             </div>
 
             <div className="space-y-2 px-6 pb-2 pt-5">

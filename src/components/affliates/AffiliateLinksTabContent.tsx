@@ -77,6 +77,7 @@ export default function AffiliateLinksTabContent({
                     <EventsCard
                         key={event.id}
                         {...fromAffiliateEvent(event)}
+                        eventCardFor="affiliate"
                     />
                 ))}
             </div>
