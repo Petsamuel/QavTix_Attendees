@@ -1,35 +1,36 @@
-import { Skeleton } from "@/components/ui/skeleton";
-import { Icon } from "@iconify/react";
-
+// This shell exactly mirrors AllNotificationsModal so there is zero layout shift
+// between the loading state and the populated modal.
 export default function Loading() {
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-            <div className="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
-                {/* Tabs Skeleton */}
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <div className="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300">
+                {/* Header — identical to AllNotificationsModal */}
                 <div className="border-b border-brand-neutral-3 relative">
-                    <div className="flex items-center h-[53px]"> {/* Match the exact height of the tab (py-4 text-sm = ~53px) */}
-                        <div className="flex-1 px-6 flex justify-center">
-                            <Skeleton className="h-4 w-24 bg-brand-neutral-3" />
+                    <div className="flex items-center">
+                        <div className="flex-1 px-6 py-4 text-sm font-bold text-brand-primary-6 text-center relative">
+                            Notifications
+                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-primary-6" />
                         </div>
-                        <div className="absolute right-4 p-2">
-                            <Icon icon="line-md:close-circle-filled" className="size-6 text-brand-neutral-4" />
+                        {/* Ghost close button to preserve layout */}
+                        <div className="absolute right-4 p-1.5 rounded-full bg-brand-neutral-2 opacity-40">
+                            <div className="size-5" />
                         </div>
                     </div>
                 </div>
 
-                {/* Content Skeleton */}
-                <div className="p-6 space-y-4">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                        <div key={i} className="flex gap-3">
-                            <Skeleton className="size-10 rounded-full bg-brand-neutral-3 shrink-0" />
-                            <div className="space-y-2 flex-1">
-                                <Skeleton className="h-4 w-3/4 bg-brand-neutral-3" />
-                                <Skeleton className="h-3 w-1/2 bg-brand-neutral-2" />
-                            </div>
-                        </div>
-                    ))}
+                {/* Spinner body */}
+                <div className="flex items-center justify-center py-20">
+                    <svg
+                        className="size-8 animate-spin text-brand-primary-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3V0a12 12 0 00-12 12h4z" />
+                    </svg>
                 </div>
             </div>
         </div>
-    );
+    )
 }

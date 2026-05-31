@@ -79,10 +79,10 @@ export default function AllNotificationsModal({
                     </div>
                     <button
                         onClick={handleClose}
-                        className="text-brand-neutral-4 hover:text-brand-neutral-6 absolute right-4 p-2"
+                        className="text-brand-secondary-6 hover:text-brand-secondary-9 bg-brand-neutral-2 hover:bg-brand-neutral-3 rounded-full transition-colors absolute right-4 p-1.5"
                         aria-label="Close modal"
                     >
-                        <Icon icon="line-md:close-circle-filled" className="size-6" />
+                        <Icon icon="lucide:x" className="size-5" />
                     </button>
                 </div>
             </div>
@@ -92,10 +92,11 @@ export default function AllNotificationsModal({
             </div>
 
             {isPending && (
-                <div className="space-y-2 px-6 pb-2">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                        <div key={i} className="h-16 w-full rounded-lg bg-brand-neutral-5 animate-pulse" />
-                    ))}
+                <div className="flex items-center justify-center py-6">
+                    <svg className="size-6 animate-spin text-brand-primary-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3V0a12 12 0 00-12 12h4z" />
+                    </svg>
                 </div>
             )}
 
