@@ -1,5 +1,6 @@
 import { getAttendeeNotifications } from "@/actions/notifications/index"
 import AllNotificationsModal from "@/components/modals/AllNotificationsModal"
+import { delay } from "@/helper-fns/delay";
 import { cookies } from "next/headers"
 
 export default async function AllActivityModalPage(props: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
