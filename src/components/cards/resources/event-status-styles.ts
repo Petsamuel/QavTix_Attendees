@@ -7,28 +7,24 @@ export const statusStyles: StatusStylesRecord = {
   "filling_fast": {
     bg: "bg-transparent",
     text: "text-brand-accent-9",
-    label: "Filling fast",
+    label: "Filling Fast",
+  },
+  "fast_selling": {
+    bg: "bg-transparent",
+    text: "text-brand-accent-9",
+    label: "Fast Selling",
   },
   "fast_filling": {
     bg: "bg-transparent",
     text: "text-brand-accent-9",
-    label: "Fast filling",
+    label: "Fast Filling",
   },
   "selling_fast": {
     bg: "bg-transparent",
     text: "text-brand-accent-9",
-    label: "Selling fast",
+    label: "Selling Fast",
   },
-  "Fast-Selling": {
-    bg: "bg-transparent backdrop-blur-sm shadow-sm",
-    text: "text-brand-accent-9",
-    label: "Fast-Selling",
-  },
-  "fast-selling": {
-    bg: "bg-transparent backdrop-blur-sm shadow-sm",
-    text: "text-brand-accent-9",
-    label: "Fast-Selling",
-  },
+
   "near_capacity": {
     bg: "bg-danger-tertiary",
     text: "text-brand-secondary-9",
