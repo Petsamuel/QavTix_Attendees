@@ -125,10 +125,10 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                 href={(card.eventCardFor === "marketplace" ? MARKETPLACE_EVENT_DETAILS_LINK.replace("[event_id]", card.marketplace_id || "") : EVENT_DETAILS_LINK)
                     .replace("[event_id]", card.eventCardFor === "marketplace" ? (card.marketplace_id || "") : card.id)}
                 target="_blank"
-                className="block w-full max-w-72 p-3 relative min-h-[25em] rounded-[32px] border border-brand-neutral-6 bg-white hover:bg-brand-secondary-1 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-[1.5px] focus:ring-brand-accent-5 focus:ring-offset-[1.5px] group"
+                className="flex flex-col w-full max-w-72 p-3 relative min-h-[25em] rounded-[32px] border border-brand-neutral-6 bg-white hover:bg-brand-secondary-1 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-[1.5px] focus:ring-brand-accent-5 focus:ring-offset-[1.5px] group"
                 aria-label={`View event: ${card.title}`}
             >
-                <div className="flex flex-col h-full">
+                <div className="flex flex-col flex-1">
                     <div className="relative shrink-0">
                         {!pathName.includes("marketplace") ?
                             (
@@ -213,7 +213,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                             <span className="text-[11px] block mt-1 w-fit text-brand-neutral-7 truncate max-w-full">
                                 Hosted by {card.host}
                             </span>
-                            <p className="text-sm text-secondary-9 font-medium mt-1 mb-3 line-clamp-2">
+                            <p className="text-sm text-brand-secondary-9 font-medium mt-1 mb-3 line-clamp-2">
                                 {card.title}
                             </p>
 
@@ -250,8 +250,8 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                         <div className="flex items-center flex-wrap justify-between pt-2 gap-2">
                             {(card.attendees ?? 0) > 0 && (
                                 <div className="flex -space-x-1.5 shrink-0">
-                                    {mockAttendees.slice(displayCount).map((user) => (
-                                        <Avatar key={user.id} className="ring-2 ring-background size-8">
+                                    {mockAttendees.slice(0, displayCount).map((user) => (
+                                        <Avatar key={user.id} className="ring-2 ring-background size-7">
                                             {user.profile_picture && <AvatarImage src={user.profile_picture} alt={user.full_name} />}
                                             <AvatarFallback className={`${getAvatarColor(user.id.toString())} text-white font-medium text-[10px]`}>
                                                 {getInitialsFromName(user.full_name)}
@@ -259,8 +259,8 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                                         </Avatar>
                                     ))}
                                     {card.attendees && card.attendees > 3 && (
-                                        <Avatar className="ring-2 ring-background size-8">
-                                            <AvatarFallback className="bg-primary-1 font-medium text-secondary-7 text-xs">
+                                        <Avatar className="ring-2 ring-background size-7">
+                                            <AvatarFallback className="bg-brand-primary-1 font-medium text-brand-secondary-7 text-xs">
                                                 +{card.attendees - 3}
                                             </AvatarFallback>
                                         </Avatar>
@@ -270,12 +270,12 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
 
                             <div className="text-right shrink-0 ml-auto">
                                 {card.originalPrice && parsePrice(card.originalPrice) != null && (
-                                    <p className="text-xs text-neutral-6 line-through">
+                                    <p className="text-xs text-brand-neutral-6 line-through">
                                         {format(parsePrice(card.originalPrice)!, user?.currency)}
                                     </p>
                                 )}
                                 {card.price && parsePrice(card.price) != null && (
-                                    <p className={`${space_grotesk.className} font-semibold text-lg text-secondary-9`}>
+                                    <p className={`${space_grotesk.className} font-semibold text-lg text-brand-secondary-9`}>
                                         {format(parsePrice(card.price)!, user?.currency)}
                                     </p>
                                 )}
