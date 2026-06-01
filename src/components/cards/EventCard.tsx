@@ -52,7 +52,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
         { refreshOnRemove: card.refreshOnRemove ?? false },
     )
 
-    const baseEventUrl = process.env.NEXT_PUBLIC_WEBSITE_URL 
+    const baseEventUrl = process.env.NEXT_PUBLIC_WEBSITE_URL
         ? `${process.env.NEXT_PUBLIC_WEBSITE_URL}${EVENT_DETAILS_LINK.replace("[event_id]", card?.id)}`
         : EVENT_DETAILS_LINK.replace("[event_id]", card?.id)
 
@@ -73,7 +73,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
             const url = new URL(baseEventUrl, window.location.origin)
             url.searchParams.set("ref", res.data.code)
             const finalUrl = url.toString()
-            
+
             setAffiliateLink(finalUrl)
             actionCallback(finalUrl)
         } else {
@@ -140,7 +140,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                                     ['selling_fast', 'fast_selling', 'starts_soon', 'near_capacity'].includes(card.status) ? "border border-[#3D4149]! text-[#3D4149]! bg-white/90 backdrop-blur-sm" : ""
                                 )}>
                                     {['selling_fast', 'fast_selling', 'starts_soon', 'near_capacity'].includes(card.status) && (
-                                        <Image src="/Fire.svg" alt="Fire Icon" width={16} height={16}/>
+                                        <Image src="/Fire.svg" alt="Fire Icon" width={16} height={16} />
                                     )}
                                     {statusStyles[card.status as keyof StatusStylesRecord]?.label || card.status}
                                 </span>
@@ -227,8 +227,22 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                                     <span className="text-brand-neutral-7 text-[11px] truncate flex-1">{formatEventDate(card.date)}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <Icon icon="hugeicons:location-01" className="size-4 shrink-0 text-brand-accent-6" />
-                                    <span className="text-brand-neutral-7 text-[11px] truncate flex-1">{card.location}</span>
+                                    {card.locationType === 'online' ? (
+                                        <>
+                                            <Icon icon="hugeicons:internet" className="size-4 shrink-0 text-brand-accent-6" />
+                                            <span className="text-brand-neutral-7 text-[11px] truncate flex-1">Online Event</span>
+                                        </>
+                                    ) : card.locationType === 'tba' ? (
+                                        <>
+                                            <Icon icon="hugeicons:location-01" className="size-4 shrink-0 text-brand-accent-6" />
+                                            <span className="text-brand-neutral-7 text-[11px] truncate flex-1 italic">To Be Announced</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Icon icon="hugeicons:location-01" className="size-4 shrink-0 text-brand-accent-6" />
+                                            <span className="text-brand-neutral-7 text-[11px] truncate flex-1">{card.location}</span>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
