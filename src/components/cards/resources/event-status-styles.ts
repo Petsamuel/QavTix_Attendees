@@ -5,8 +5,8 @@ export type StatusStylesRecord = Record<
 
 export const statusStyles: StatusStylesRecord = {
   "filling_fast": {
-    bg: "bg-transparent",
-    text: "text-brand-accent-9",
+    bg: "bg-warning-tertiary",
+    text: "text-brand-secondary-9",
     label: "Filling Fast",
   },
   "fast_selling": {
@@ -15,8 +15,8 @@ export const statusStyles: StatusStylesRecord = {
     label: "Fast Selling",
   },
   "fast_filling": {
-    bg: "bg-transparent",
-    text: "text-brand-accent-9",
+    bg: "bg-warning-tertiary",
+    text: "text-brand-secondary-9",
     label: "Fast Filling",
   },
   "selling_fast": {
