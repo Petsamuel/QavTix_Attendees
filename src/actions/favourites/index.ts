@@ -55,7 +55,7 @@ export async function getFavourites(token: string | undefined, params: GetFavour
                 "Content-Type": "application/json",
                 ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
-            next: { tags: [CACHE_TAGS.MY_FAVOURITES], revalidate: 300 }
+            // next: { tags: [CACHE_TAGS.MY_FAVOURITES], revalidate: 300 }
         })
 
         if (!res.ok) {
