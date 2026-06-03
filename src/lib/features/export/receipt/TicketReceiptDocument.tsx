@@ -213,11 +213,11 @@ export default function TicketReceiptDocument({ receipt }: TicketReceiptDocument
                     </div>
                     <div className="flex justify-between text-sm text-brand-secondary-9">
                         <span className="font-bold">Service Charge</span>
-                        <span>{format(parseInt(payment.service_charge), user?.currency)}</span>
+                        <span>+ {format(Math.abs(parseInt(payment.service_charge) || 0), user?.currency)}</span>
                     </div>
                     <div className="flex justify-between text-sm text-brand-secondary-9">
                         <span className="font-bold">Tax</span>
-                        <span>{format(parseInt(payment.tax), user?.currency)}</span>
+                        <span>+ {format(Math.abs(parseInt(payment.tax) || 0), user?.currency)}</span>
                     </div>
                     {Number(payment.discount) > 0 && (
                         <div className="flex justify-between text-sm text-green-600">
