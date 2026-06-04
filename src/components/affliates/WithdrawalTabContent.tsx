@@ -14,16 +14,16 @@ import { getCurrencySymbol, MIN_WITHDRAWAL } from "@/components-data/currencies"
 import { useIsMounted } from "@/custom-hooks/UseIsMounted"
 
 interface Props {
-    account_balance?:  number
-    income_this_week?:  number
+    account_balance?: number
+    income_this_week?: number
     withdrawalHistory: PaginatedResponse<WithdrawalHistoryItem>
 }
 
 export default function WithdrawalTabContent({ account_balance, income_this_week, withdrawalHistory }: Props) {
 
-    const [showHistory,         setShowHistory]         = useState(true)
+    const [showHistory, setShowHistory] = useState(true)
     const [showWithdrawalModal, setShowWithdrawalModal] = useState(false)
-    const [amount,              setAmount]              = useState("")
+    const [amount, setAmount] = useState("")
     const { user } = useAppSelector(store => store.authUser)
     const format = useFormatPrice()
     const isMounted = useIsMounted()
@@ -45,19 +45,19 @@ export default function WithdrawalTabContent({ account_balance, income_this_week
                         <span className="text-brand-secondary-8">Amount in Naira</span>
                         {
                             income_this_week ?
-                            <span className="text-[#5F9F7D] font-medium">{`+${income_this_week} This Week`}</span>
-                            :
-                            null
+                                <span className="text-[#5F9F7D] font-medium">{`+${income_this_week} This Week`}</span>
+                                :
+                                null
                         }
                     </div>
 
                     <strong className={cn(space_grotesk.className, "block my-3 text-brand-secondary-8 font-bold text-2xl md:text-[40px]")}>
-                        {account_balance ? format(account_balance, user?.currency) : "---"}
+                        {account_balance != null ? format(account_balance, user?.currency) : "---"}
                     </strong>
 
-                    <Badge className="bg-brand-accent-1 text-brand-accent-7 font-medium py-1 px-2 rounded-sm text-xs border-[0.86px] border-brand-accent-2 shadow-none">
+                    {/* <Badge className="bg-brand-accent-1 text-brand-accent-7 font-medium py-1 px-2 rounded-sm text-xs border-[0.86px] border-brand-accent-2 shadow-none">
                         Minimum Withdrawal: {format(MIN_WITHDRAWAL[user?.currency as keyof typeof MIN_WITHDRAWAL] || 1000, user?.currency)}
-                    </Badge>
+                    </Badge> */}
                 </div>
 
                 <div className="mt-8 px-1">
@@ -65,10 +65,10 @@ export default function WithdrawalTabContent({ account_balance, income_this_week
                         Enter amount to withdraw
                     </label>
                     <div className="mb-6 rounded-md px-3 items-center h-12 bg-[#F2F2F2] flex gap-2 border-[1.5px] border-transparent focus-within:border-brand-primary-4 hover:border-brand-primary-4 transition-all">
-                            <span className="text-brand-secondary-7 text-sm font-semibold shrink-0">
-                                {isMounted && getCurrencySymbol(user?.currency)}
-                            </span>                        
-                            <input
+                        <span className="text-brand-secondary-7 text-sm font-semibold shrink-0">
+                            {isMounted && getCurrencySymbol(user?.currency)}
+                        </span>
+                        <input
                             type="text"
                             value={amount}
                             onChange={handleAmountChange}
