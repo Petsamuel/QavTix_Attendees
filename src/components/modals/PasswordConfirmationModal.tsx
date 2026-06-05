@@ -12,6 +12,7 @@ import { Icon } from "@iconify/react"
 import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
 import { cancelPlan, deleteAccount } from "@/actions/settings/privacy/client"
 import { logOut, verifyPassword } from "@/actions/auth/client"
+import { requestWithdrawal } from "@/actions/payout/client"
 import { showAlert } from "@/lib/redux/slices/alertSlice"
 
 export default function PasswordModal() {
@@ -24,7 +25,7 @@ export default function PasswordModal() {
     const [isProcessing,  setIsProcessing]  = useState(false)
     const [errorMessage,  setErrorMessage]  = useState("")
 
-    const { isOpen, status, actionType, skipVerification } = useAppSelector(state => state.passwordModal)
+    const { isOpen, status, actionType, skipVerification, actionData } = useAppSelector(state => state.passwordModal)
     const { user } = useAppSelector(state => state.authUser)
 
     const closeAndReset = () => {
@@ -102,6 +103,38 @@ export default function PasswordModal() {
             }
         }
 
+        else if (actionType === "withdrawal") {
+            const { amount, payout_account_id } = actionData || {}
+            if (!amount || !payout_account_id) {
+                setIsProcessing(false)
+                return
+            }
+
+            const result = await requestWithdrawal({
+                amount,
+                payout_account_id,
+                password
+            })
+
+            if (result.success) {
+                closeAndReset()
+                dispatch(openSuccessModal({
+                    title: "Withdrawal Submitted!",
+                    description: "Your Payment Withdrawal was successful. Thank you for choosing QavTix.",
+                    variant: "success",
+                }))
+                setTimeout(() => {
+                    window.location.reload()
+                }, 2000)
+                return
+            } else {
+                dispatch(setPasswordStatus("error"))
+                setErrorMessage(result.message ?? "Incorrect password or an error occurred. Please try again.")
+                setIsProcessing(false)
+                return
+            }
+        }
+
         else {
             console.warn("[PasswordModal] Unknown actionType:", actionType)
             setIsProcessing(false)
@@ -120,7 +153,7 @@ export default function PasswordModal() {
                     Enter Password
                 </DialogTitle>
                 <DialogDescription className="text-sm text-brand-secondary-5 mt-1">
-                    Enter your password to confirm
+                    {actionType === "withdrawal" ? "Enter your password to confirm withdrawal" : "Enter your password to confirm"}
                 </DialogDescription>
             </DialogHeader>
 
