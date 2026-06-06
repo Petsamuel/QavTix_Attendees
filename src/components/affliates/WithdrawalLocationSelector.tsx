@@ -8,9 +8,7 @@ import BankAccountsList from "./BankAccountList"
 import { AnimatedDialog } from "../custom-utils/dialogs/AnimatedDialog"
 import { DialogDescription, DialogTitle } from "../ui/dialog"
 import { useAppDispatch } from "@/lib/redux/hooks"
-import { openSuccessModal } from "@/lib/redux/slices/successModalSlice"
-import { showAlert } from "@/lib/redux/slices/alertSlice"
-import { requestWithdrawal } from "@/actions/payout/client"
+import { openPasswordModal } from "@/lib/redux/slices/passwordModalConfirmationSlice"
 import ActionButton1 from "../custom-utils/buttons/ActionBtn1"
 
 
@@ -45,30 +43,16 @@ export default function WithdrawalLocationSelector({ setOpen, open, amount }: Pr
     const handleWithdrawal = async () => {
         if (!selectedAccount || !amount) return
 
-        setIsSubmitting(true)
+        setOpen(false)
 
-        const result = await requestWithdrawal({
-            amount:            amount,
-            payout_account_id: selectedAccount.id,
-        })
-
-        setIsSubmitting(false)
-
-        if (result.success) {
-            setOpen(false)
-            dispatch(openSuccessModal({
-                title:       "Withdrawal Requested",
-                description: "Your withdrawal request has been submitted. Funds will be processed to your bank account shortly.",
-                variant:     "success",
-                autoClose:   true,
-            }))
-        } else {
-            dispatch(showAlert({
-                variant:     "destructive",
-                title:       "Withdrawal Failed",
-                description: result.message ?? "Something went wrong. Please try again.",
-            }))
-        }
+        dispatch(openPasswordModal({
+            actionType: "withdrawal",
+            skipVerification: true,
+            actionData: {
+                amount: amount,
+                payout_account_id: selectedAccount.id
+            }
+        }))
     }
 
     const canWithdraw = !isLoading && !!selectedAccount && !!amount && !isSubmitting

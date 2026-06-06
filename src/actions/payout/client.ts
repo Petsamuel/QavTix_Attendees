@@ -57,6 +57,7 @@ interface MutateResult {
 interface WithdrawalPayload {
     amount: string
     payout_account_id: string
+    password?: string
 }
 
 interface WithdrawalResult {

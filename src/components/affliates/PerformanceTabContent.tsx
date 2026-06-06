@@ -80,7 +80,7 @@ export default function PerformanceTabContent({ initialData }: Props) {
                             iconPath={metric.iconPath}
                             value={metric.valueFormatter(stats.value, currency)}
                             trend={{
-                                value: `$${Math.abs(stats.changePct).toFixed(1)}%`,
+                                value: `${Math.abs(stats.changePct).toFixed(1)}%`,
                                 isUp:  stats.changePct >= 0,
                             }}
                         />
