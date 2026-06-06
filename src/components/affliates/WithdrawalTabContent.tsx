@@ -56,7 +56,7 @@ export default function WithdrawalTabContent({ account_balance, income_this_week
                     </strong>
 
                     <Badge className="bg-brand-accent-1 text-brand-accent-7 font-medium py-1 px-2 rounded-sm text-xs border-[0.86px] border-brand-accent-2 shadow-none">
-                        Minimum Withdrawal: {format(MIN_WITHDRAWAL[user?.currency as keyof typeof MIN_WITHDRAWAL] || 10000, user?.currency)}
+                        Minimum Withdrawal: {format(MIN_WITHDRAWAL[user?.currency as keyof typeof MIN_WITHDRAWAL] || 100, user?.currency)}
                     </Badge>
                 </div>
 

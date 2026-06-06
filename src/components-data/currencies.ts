@@ -31,11 +31,11 @@ export const CURRENCY_CODES = CURRENCIES.map(c => c.code)
 
 
 export const MIN_WITHDRAWAL = {
-    NGN: 100000,   // Nigeria (₦150,000)
-    USD: 100,      // United States ($100)
-    ZAR: 1800,     // South Africa (~$95–100)
-    KES: 15000,    // Kenya (~$100)
-    GHS: 1300      // Ghana (~$100)
+    NGN: 10000,   // Nigeria
+    USD: 100,      // United States
+    ZAR: 100,     // South Africa
+    KES: 100,    // Kenya 
+    GHS: 100      // Ghana
 }
 
 
