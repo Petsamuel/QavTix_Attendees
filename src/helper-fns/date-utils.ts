@@ -97,9 +97,12 @@ export function formatDateTime(date: string | Date) {
 
 
 
-export function formatEventDate(isoString: string): string {
-  
-  const date = new Date(new Date(isoString).getTime() + 60 * 60 * 1000)
+export function formatEventDate(isoString: string | Date): string {
+  if (!isoString) return "Date TBA"
+
+  const date = typeof isoString === 'string' ? new Date(isoString) : isoString
+  if (isNaN(date.getTime())) return "Date TBA"
+
   const now  = new Date()
 
   const timeStr = format(date, "h:mmaaa").toUpperCase() // 9AM, 2:30PM

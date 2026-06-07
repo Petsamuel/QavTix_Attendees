@@ -10,7 +10,7 @@ interface EventLocation {
 
 type EventType = "single" | "recurring"
 type EventLocationType = "physical" | "online" | "tba"
-type EventStatus = "draft" | "active" | "sold_out" | "new" | "normal" | "ended" | "cancelled" | "banned" | "filling_fast" | "selling_fast" | "near_capacity" | "starts_soon" | "started"
+type EventStatus = "draft" | "active" | "sold_out" | "fast_selling" | "new" | "normal" | "on_sale" | "ended" | "cancelled" | "banned" | "filling_fast" | "fast_filling" | "selling_fast" | "near_capacity" | "starts_soon" | "started"
 type RefundPolicy = "no" | "partial" | "full" | "custom"
 
 interface Tag {

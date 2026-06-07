@@ -3,12 +3,13 @@
 import { Icon } from '@iconify/react'
 import { cn } from '@/lib/utils'
 import { formatDistanceToNow } from 'date-fns'
+import { useState } from 'react'
 
 const NOTIFICATION_DOT_COLOR: Record<string, string> = {
-    event_update: 'bg-blue-500',
+    event_update: 'bg-blue-600',
     ticket: 'bg-purple-500',
     refund: 'bg-red-500',
-    system: 'bg-gray-500',
+    system: 'bg-blue-500',
     reminder: 'bg-yellow-500',
 }
 
@@ -18,37 +19,35 @@ interface NotificationItemProps {
 
 export default function NotificationItem({ notification }: NotificationItemProps) {
     const dotColor = NOTIFICATION_DOT_COLOR[notification.notification_type] ?? 'bg-blue-500'
-    const isUnread = !notification.is_read
+    const [isRead, setIsRead] = useState(notification.is_read)
     const timeAgo = formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })
 
+    const handleClick = () => {
+        if (isRead) return
+        setIsRead(true) // Optimistic update
+    }
+
     return (
-        <div className={cn(
-            "flex items-start w-full gap-3 py-2 border-b border-brand-neutral-2 last:border-0 px-2 -mx-4 rounded-lg transition-colors",
-        )}>
-            <div className={cn(isUnread ? "bg-brand-primary-1 p-2 hover:bg-brand-primary-2/50" : "hover:bg-brand-neutral-1")}>
-                <div className="flex items-center pt-1">
-                    {isUnread && (
-                        <div className={cn("w-2 h-2 rounded-full", dotColor)} />
-                    )}
+        <div
+            onClick={handleClick}
+            className={cn(
+                "rounded-[16px] shadow-[0px_4px_16px_rgba(0,0,0,0.04)] border p-4 mb-3 flex flex-col gap-2 transition-colors",
+                !isRead ? "bg-brand-primary-1 border-brand-primary-2/50 hover:bg-brand-primary-2/50 cursor-pointer" : "bg-white border-brand-neutral-2 hover:border-brand-neutral-3 hover:bg-brand-neutral-50"
+            )}
+        >
+            <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                    <div className={cn("w-2 h-2 rounded-full", dotColor)} />
+                    <span className="text-xs font-medium text-brand-neutral-7">{notification.title}</span>
                 </div>
-
-                <div className="flex-1 min-w-0">
-                    <p className="text-[11px] text-brand-neutral-7 mb-1">
-                        {notification.title}
-                    </p>
-                    <p className={cn(
-                        "text-xs mb-0.5",
-                        isUnread ? "text-brand-secondary-8 font-medium" : "text-brand-neutral-8 font-normal"
-                    )}>
-                        {notification.message}
-                    </p>
-                </div>
-
-                <div className="flex items-center gap-1 text-xs text-brand-neutral-7 shrink-0">
+                <div className="flex items-center gap-1 text-[11px] text-brand-neutral-6">
                     <Icon icon="hugeicons:clock-01" className="w-3.5 h-3.5 text-orange-400" />
                     <span>{timeAgo}</span>
                 </div>
             </div>
+            <p className="text-[13px] font-semibold text-brand-secondary-9">
+                {notification.message}
+            </p>
         </div>
     )
 }

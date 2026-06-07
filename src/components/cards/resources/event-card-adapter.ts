@@ -8,6 +8,7 @@ export interface EventCardProps {
     host: string
     date: string          // pre-formatted display string
     location: string          // pre-formatted display string
+    locationType?: string     // "physical" | "online" | "tba"
     image: string
     price: string | null
     originalPrice: string | null
@@ -41,6 +42,7 @@ export function fromFavouriteEvent(e: FavouriteEvent): EventCardProps {
         host: toTitleCase(e.host),
         date: e.event_datetime,
         location: formatLocation(e.event_location),
+        locationType: (e as any).location_type,
         image: e.event_image,
         price: e.price,
         originalPrice: null,
@@ -65,6 +67,7 @@ export function fromIEvent(e: IEvent & {
         host: toTitleCase(e.organizer_display_name),
         date: e.start_datetime,
         location: e.resolvedLocation ?? '',
+        locationType: e.location_type,
         image: '',
         price: e.resolvedPrice ?? null,
         originalPrice: e.resolvedOriginalPrice ?? null,
@@ -83,6 +86,7 @@ export function fromMarketplaceEvent(e: MarketplaceEvent): EventCardProps {
         host: toTitleCase(e.host),
         date: e.event_datetime,
         location: formatLocation(e.event_location),
+        locationType: (e as any).location_type,
         image: e.event_image ?? null,
         price: e.price != null ? String(e.price) : null,
         originalPrice: null,
@@ -102,6 +106,7 @@ export function fromAffiliateEvent(e: AffiliateEvent): EventCardProps {
         host: toTitleCase(e.host),
         date: e.event_datetime,
         location: [e.event_location?.venue_name, e.event_location?.city].filter(Boolean).join(', '),
+        locationType: (e as any).location_type,
         image: e.event_image ?? null,
         price: e.price != null ? String(e.price) : null,
         originalPrice: null,

@@ -24,6 +24,7 @@ export const AFFILIATE_DASHBOARD_ENDPOINT = "attendee/affliate/dashboard"
 export const AFFILIATE_LINKS_ENDPOINT = "attendee/affliate/event"
 export const AFFILIATE_EARNINGS_ENDPOINT = "attendee/affliate/earning/history"
 export const AFFILIATE_PERFORMANCE_ENDPOINT = "attendee/affliate/graph"
+export const AFFILIATE_ENROLL_ENDPOINT = "attendee/affliate/enroll/"
 export const WITHDRAWAL_HISTORY_ENDPOINT = "attendee/withdrawal/history"
 export const WITHDRAWAL_REQUEST_ENDPOINT = "attendee/withdrawal/request/"
 

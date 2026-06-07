@@ -30,7 +30,7 @@ export async function getMarketplace(token: string | undefined, params: GetMarke
                 "Content-Type": "application/json",
                 ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
-            next: { tags: [CACHE_TAGS.MARKETPLACE], revalidate: 300 }
+            // next: { tags: [CACHE_TAGS.MARKETPLACE], revalidate: 300 }
         })
 
         if (!res.ok) {

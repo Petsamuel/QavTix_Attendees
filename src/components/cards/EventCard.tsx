@@ -21,13 +21,15 @@ import { usePathname } from 'next/navigation'
 import { formatEventDate } from '@/helper-fns/date-utils'
 import { delistTicket } from '@/actions/marketplace/client'
 import { openSuccessModal } from '@/lib/redux/slices/successModalSlice'
+import { showAlert } from '@/lib/redux/slices/alertSlice'
 import { mockAttendees } from '@/components-data/mock-attendees'
 import { EVENT_DETAILS_LINK, MARKETPLACE_EVENT_DETAILS_LINK } from '@/enums/navigation'
 import Link from 'next/link'
 import { useFormatPrice } from '@/custom-hooks/UseFormatPrice'
 import { useRevalidate } from '@/custom-hooks/UseRevalidate'
+import { generateAffiliateLink } from '@/actions/affiliates/enroll'
 
-export default function EventsCard(card: EventCardProps & { eventCardFor?: "marketplace" | "global" }) {
+export default function EventsCard(card: EventCardProps & { eventCardFor?: "marketplace" | "global" | "affiliate" }) {
 
     const { user } = useAppSelector(store => store.authUser)
     const dispatch = useAppDispatch()
@@ -36,12 +38,13 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
     const [imageError, setImageError] = useState(false)
     const [showShare, setShowShare] = useState(false)
     const [isDelisting, setIsDelisting] = useState(false)
+    const [isGeneratingLink, setIsGeneratingLink] = useState(false)
+    const [affiliateLink, setAffiliateLink] = useState<string | null>(null)
     const pathName = usePathname()
 
     const { trigger } = useRevalidate("marketplace")
 
-    const totalAttendees = card.attendees || 0
-    const avatarsToShow = totalAttendees <= 5 ? totalAttendees : 4
+    const displayCount = Math.min(card.attendees || 0, 3)
 
     const { isFavourite, toggle: toggleFavourite } = useFavourite(
         card.id,
@@ -49,10 +52,53 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
         { refreshOnRemove: card.refreshOnRemove ?? false },
     )
 
-    const eventUrl = EVENT_DETAILS_LINK.replace("[event_id]", card?.id)
+    const baseEventUrl = process.env.NEXT_PUBLIC_WEBSITE_URL
+        ? `${process.env.NEXT_PUBLIC_WEBSITE_URL}${EVENT_DETAILS_LINK.replace("[event_id]", card?.id)}`
+        : EVENT_DETAILS_LINK.replace("[event_id]", card?.id)
+
+    const eventUrl = affiliateLink || baseEventUrl
+
+    const handleAffiliateAction = async (actionCallback: (url: string) => void) => {
+        if (affiliateLink) {
+            actionCallback(affiliateLink)
+            return
+        }
+
+        setIsGeneratingLink(true)
+        const res = await generateAffiliateLink(card.id)
+        setIsGeneratingLink(false)
+
+        if (res.success && res.data) {
+            // Build the affiliate URL with ?ref=code
+            const url = new URL(baseEventUrl, window.location.origin)
+            url.searchParams.set("ref", res.data.code)
+            const finalUrl = url.toString()
+
+            setAffiliateLink(finalUrl)
+            actionCallback(finalUrl)
+        } else {
+            dispatch(showAlert({
+                title: "Failed to generate link",
+                description: res.message || "Could not generate affiliate link. Please try again.",
+                variant: "destructive"
+            }))
+        }
+    }
 
     const handleShare = () => {
-        setShowShare(true)
+        if (card.eventCardFor === "affiliate") {
+            handleAffiliateAction(() => setShowShare(true))
+        } else {
+            setShowShare(true)
+        }
+    }
+
+    const handleCopy = () => {
+        if (card.eventCardFor === "affiliate") {
+            handleAffiliateAction((url) => copyToClipboard(url))
+        } else {
+            copyToClipboard(eventUrl)
+        }
     }
 
     const handleDelist = async (e: React.MouseEvent) => {
@@ -79,20 +125,24 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                 href={(card.eventCardFor === "marketplace" ? MARKETPLACE_EVENT_DETAILS_LINK.replace("[event_id]", card.marketplace_id || "") : EVENT_DETAILS_LINK)
                     .replace("[event_id]", card.eventCardFor === "marketplace" ? (card.marketplace_id || "") : card.id)}
                 target="_blank"
-                className="block w-full max-w-72 p-3 relative min-h-[25em] rounded-[32px] border border-brand-neutral-6 bg-white hover:bg-brand-secondary-1 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-[1.5px] focus:ring-brand-accent-5 focus:ring-offset-[1.5px] group"
+                className="flex flex-col w-full max-w-72 p-3 relative min-h-[25em] rounded-[32px] border border-brand-neutral-6 bg-white hover:bg-brand-secondary-1 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-[1.5px] focus:ring-brand-accent-5 focus:ring-offset-[1.5px] group"
                 aria-label={`View event: ${card.title}`}
             >
-                <div className="flex flex-col h-full">
+                <div className="flex flex-col flex-1">
                     <div className="relative shrink-0">
                         {!pathName.includes("marketplace") ?
                             (
                                 card.status &&
                                 <span className={cn(
-                                    "absolute top-2 shadow-sm left-2 z-10 py-1 px-2 rounded-2xl text-center text-xs font-medium capitalize",
+                                    "absolute top-2 shadow-sm left-2 z-10 py-1 px-2 rounded-2xl text-center text-xs font-medium capitalize inline-flex items-center justify-center gap-1 whitespace-nowrap",
                                     statusStyles[card.status as keyof StatusStylesRecord]?.bg,
                                     statusStyles[card.status as keyof StatusStylesRecord]?.text,
+                                    ['selling_fast', 'fast_selling', 'starts_soon', 'near_capacity'].includes(card.status) ? "border border-[#3D4149]! text-[#3D4149]! bg-white/90 backdrop-blur-sm" : ""
                                 )}>
-                                    {card.status}
+                                    {['selling_fast', 'fast_selling', 'starts_soon', 'near_capacity'].includes(card.status) && (
+                                        <Image src="/Fire.svg" alt="Fire Icon" width={16} height={16} />
+                                    )}
+                                    {statusStyles[card.status as keyof StatusStylesRecord]?.label || card.status}
                                 </span>
                             )
                             :
@@ -137,14 +187,14 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                             onClick={(e) => e.preventDefault()}
                         >
                             <EventIconActionButton
-                                icon="hugeicons:share-08"
+                                icon={isGeneratingLink ? "eos-icons:loading" : "hugeicons:share-08"}
                                 onClick={handleShare}
-                                feedback="Opening share..."
+                                feedback={isGeneratingLink ? "Generating..." : "Opening share..."}
                             />
                             <EventIconActionButton
-                                icon="ph:link-bold"
-                                onClick={() => copyToClipboard(eventUrl)}
-                                feedback="Link copied!"
+                                icon={isGeneratingLink ? "eos-icons:loading" : "ph:link-bold"}
+                                onClick={handleCopy}
+                                feedback={isGeneratingLink ? "Generating..." : "Link copied!"}
                             />
                             <EventIconActionButton
                                 icon={isFavourite ? "teenyicons:heart-solid" : "hugeicons:favourite"}
@@ -163,7 +213,7 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                             <span className="text-[11px] block mt-1 w-fit text-brand-neutral-7 truncate max-w-full">
                                 Hosted by {card.host}
                             </span>
-                            <p className="text-sm text-secondary-9 font-medium mt-1 mb-3 line-clamp-2">
+                            <p className="text-sm text-brand-secondary-9 font-medium mt-1 mb-3 line-clamp-2">
                                 {card.title}
                             </p>
 
@@ -177,8 +227,22 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                                     <span className="text-brand-neutral-7 text-[11px] truncate flex-1">{formatEventDate(card.date)}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <Icon icon="hugeicons:location-01" className="size-4 shrink-0 text-brand-accent-6" />
-                                    <span className="text-brand-neutral-7 text-[11px] truncate flex-1">{card.location}</span>
+                                    {card.locationType === 'online' ? (
+                                        <>
+                                            <Icon icon="hugeicons:internet" className="size-4 shrink-0 text-brand-accent-6" />
+                                            <span className="text-brand-neutral-7 text-[11px] truncate flex-1">Online Event</span>
+                                        </>
+                                    ) : card.locationType === 'tba' ? (
+                                        <>
+                                            <Icon icon="hugeicons:location-01" className="size-4 shrink-0 text-brand-accent-6" />
+                                            <span className="text-brand-neutral-7 text-[11px] truncate flex-1 italic">To Be Announced</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Icon icon="hugeicons:location-01" className="size-4 shrink-0 text-brand-accent-6" />
+                                            <span className="text-brand-neutral-7 text-[11px] truncate flex-1">{card.location}</span>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -186,18 +250,18 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
                         <div className="flex items-center flex-wrap justify-between pt-2 gap-2">
                             {(card.attendees ?? 0) > 0 && (
                                 <div className="flex -space-x-1.5 shrink-0">
-                                    {mockAttendees.slice(0, avatarsToShow).map((user) => (
-                                        <Avatar key={user.id} className="ring-2 ring-background size-8">
+                                    {mockAttendees.slice(0, displayCount).map((user) => (
+                                        <Avatar key={user.id} className="ring-2 ring-background size-7">
                                             {user.profile_picture && <AvatarImage src={user.profile_picture} alt={user.full_name} />}
                                             <AvatarFallback className={`${getAvatarColor(user.id.toString())} text-white font-medium text-[10px]`}>
                                                 {getInitialsFromName(user.full_name)}
                                             </AvatarFallback>
                                         </Avatar>
                                     ))}
-                                    {card.attendees && card.attendees > 5 && (
-                                        <Avatar className="ring-2 ring-background size-8">
-                                            <AvatarFallback className="bg-primary-1 font-medium text-secondary-7 text-xs">
-                                                +{card.attendees - 4}
+                                    {card.attendees && card.attendees > 3 && (
+                                        <Avatar className="ring-2 ring-background size-7">
+                                            <AvatarFallback className="bg-brand-primary-1 font-medium text-brand-secondary-7 text-xs">
+                                                +{card.attendees - 3}
                                             </AvatarFallback>
                                         </Avatar>
                                     )}
@@ -206,13 +270,13 @@ export default function EventsCard(card: EventCardProps & { eventCardFor?: "mark
 
                             <div className="text-right shrink-0 ml-auto">
                                 {card.originalPrice && parsePrice(card.originalPrice) != null && (
-                                    <p className="text-xs text-neutral-6 line-through">
+                                    <p className="text-xs text-brand-neutral-6 line-through">
                                         {format(parsePrice(card.originalPrice)!, user?.currency)}
                                     </p>
                                 )}
                                 {card.price && parsePrice(card.price) != null && (
-                                    <p className={`${space_grotesk.className} font-semibold text-lg text-secondary-9`}>
-                                        {parsePrice(card.price) === 0 ? 'Free' : format(parsePrice(card.price)!, user?.currency)}
+                                    <p className={`${space_grotesk.className} font-semibold text-lg text-brand-secondary-9`}>
+                                        {format(parsePrice(card.price)!, user?.currency)}
                                     </p>
                                 )}
                             </div>
