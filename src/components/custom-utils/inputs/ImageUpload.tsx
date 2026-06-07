@@ -51,32 +51,35 @@ export default function ProfileImageUploader({
     const actionIcon = previewUrl ? "hugeicons:pencil-edit-01" : "hugeicons:add-01"
 
     return (
-        <div className={cn("relative w-32 h-32 md:w-40 md:h-40 group", className)}>
-            <div
-                onClick={triggerFileInput}
-                className={cn(
-                    "relative w-full h-full rounded-full border-2 overflow-hidden bg-brand-neutral-4 transition-all",
-                    isEditing ? "cursor-pointer border-dashed border-brand-primary-6/40 hover:border-brand-primary-6" : "border-gray-100",
-                    !previewUrl && "flex items-center justify-center"
-                )}
-            >
-                {previewUrl ? (
-                    <img
-                        src={previewUrl}
-                        alt="Profile picture"
-                        className="w-full h-full object-cover"
-                    />
-                ) : (
-                    <div className="flex flex-col items-center justify-center text-brand-secondary-3">
-                        <Icon icon="guidance:image" width="60" />
-                    </div>
-                )}
+        <div className={cn("relative group w-32 h-32 md:w-40 md:h-40", className)}>
+            <div className="relative p-[3px] rounded-full overflow-hidden flex items-center justify-center group-hover:scale-105 transition-transform duration-150 w-full h-full">
+                <div className="absolute inset-0 bg-[conic-gradient(from_0deg,#ef4444,#eab308,#22c55e,#3b82f6,#a855f7,#ef4444)] animate-[spin_3s_linear_infinite]" />
+                <div
+                    onClick={triggerFileInput}
+                    className={cn(
+                        "relative w-full h-full rounded-full border-4 border-white overflow-hidden bg-brand-neutral-4 transition-all z-10",
+                        isEditing ? "cursor-pointer" : "border-gray-100",
+                        !previewUrl && "flex items-center justify-center"
+                    )}
+                >
+                    {previewUrl ? (
+                        <img
+                            src={previewUrl}
+                            alt="Profile picture"
+                            className="w-full h-full object-cover"
+                        />
+                    ) : (
+                        <div className="flex flex-col items-center justify-center text-brand-secondary-3">
+                            <Icon icon="guidance:image" width="60" />
+                        </div>
+                    )}
 
-                {isEditing && (
-                    <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                        <span className="sr-only">Upload Image</span>
-                    </div>
-                )}
+                    {isEditing && (
+                        <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                            <span className="sr-only">Upload Image</span>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {isEditing && (
