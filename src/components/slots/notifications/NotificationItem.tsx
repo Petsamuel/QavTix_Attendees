@@ -19,12 +19,13 @@ interface NotificationItemProps {
 
 export default function NotificationItem({ notification }: NotificationItemProps) {
     const dotColor = NOTIFICATION_DOT_COLOR[notification.notification_type] ?? 'bg-blue-500'
-    const [isRead, setIsRead] = useState(notification.is_read)
+    const [optimisticRead, setOptimisticRead] = useState(false)
+    const isRead = notification.is_read || optimisticRead
     const timeAgo = formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })
 
     const handleClick = () => {
         if (isRead) return
-        setIsRead(true) // Optimistic update
+        setOptimisticRead(true) // Optimistic update
     }
 
     return (

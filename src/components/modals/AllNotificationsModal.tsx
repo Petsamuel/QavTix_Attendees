@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import NotificationsTab from '../slots/notifications/NotificationTabContent'
 import { getAttendeeNotificationsClient } from '@/actions/notifications/client'
 import { DialogTitle } from '../ui/dialog'
+import { useOnRevalidate } from '@/custom-hooks/UseRevalidate'
 
 interface Props {
     initialNotifications?: AttendeeNotification[]
@@ -40,11 +41,27 @@ export default function AllNotificationsModal({
         setTimeout(() => router.back(), 300)
     }
 
+    const fetchInitialData = async () => {
+        const params: any = { page: 1 }
+        if (searchParams.get('notification_type')) params.notification_type = searchParams.get('notification_type')
+
+        const res = await getAttendeeNotificationsClient(params)
+        if (res.success && res.data) {
+            const newNotifications = res.data.notifications ?? res.data.results ?? []
+            console.log("new initial", newNotifications)
+            setNotifications(newNotifications)
+            setCurrentPage(1)
+            setHasMore(!!res.data.next)
+        }
+    }
+
+    useOnRevalidate("notifications", fetchInitialData)
+
     const handleLoadMore = () => {
         startTransition(async () => {
             const params: any = { page: currentPage + 1 }
             if (searchParams.get('notification_type')) params.notification_type = searchParams.get('notification_type')
-            
+
             const res = await getAttendeeNotificationsClient(params)
             if (res.success && res.data) {
                 const newNotifications = res.data.notifications ?? res.data.results ?? []

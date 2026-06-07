@@ -48,4 +48,5 @@ type RevalidateTarget =
     | "affiliates"
     | "wallet"
     | "profile"
-    | "groups"
+    | "groups"
+    | "notifications"
