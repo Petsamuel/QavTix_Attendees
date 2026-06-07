@@ -1,6 +1,7 @@
 import { getTicketReceiptClient } from "@/actions/tickets/client"
 import { addToCalendar } from "@/helper-fns/addToCalendar"
 
+
 export type EventAction = {
     id: string
     label: string
@@ -16,7 +17,9 @@ function getDirections(ticket: EventTicket) {
     )
     window.open(`https://www.google.com/maps/dir/?api=1&destination=${query}`, '_blank')
 }
-
+function viewOnsite(ticket: EventTicket) {
+    window.open(`${process.env.NEXT_PUBLIC_APP_DOMAIN}/events/details/${ticket.event_id}`)
+}
 
 
 
@@ -60,5 +63,12 @@ export function buildUpcomingEventActions(
             icon: 'tabler:buildings',
             onClick: () => getDirections(ticket),
         },
+        {
+            id: 'View onsite',
+            label: 'View onsite',
+            icon: 'tabler:location-pin',
+            //  icon: 'hugeicons:location',
+            onClick: () => viewOnsite(ticket),
+        }
     ]
 }
