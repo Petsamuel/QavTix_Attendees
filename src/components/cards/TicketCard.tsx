@@ -76,9 +76,9 @@ export default function TicketCard({ ticket, hideActions = false, downloadSlot }
                         </div>
 
                         <div className="grid grid-cols-2 gap-y-5">
-                            <div>
+                            <div className="min-w-0 pr-2">
                                 <p className="text-[10px] text-[#AAAAAA] uppercase font-semibold tracking-[12%]">Ticket Holder</p>
-                                <p className="text-sm font-medium text-gray-900">{user?.full_name.split(" ")[0]}</p>
+                                <p className="text-sm font-medium text-gray-900 break-words">{user?.full_name}</p>
                             </div>
                             <div>
                                 <p className="text-[10px] text-[#AAAAAA] uppercase font-semibold tracking-[12%]">Ticket Type</p>
