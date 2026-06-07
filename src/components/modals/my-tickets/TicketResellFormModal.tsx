@@ -120,7 +120,7 @@ export default function TicketResellFormModal({ open, setOpen, ticket, onResell 
                 {/* Service Charge Notice */}
                 <div className="mt-4 bg-[#FFF4ED] border border-[#FFD9C3] rounded-sm p-1">
                     <p className="text-[11px] text-[#FF7A1A] text-center font-medium">
-                        All ticket sales processed are subject to a 15% service charge.
+                        A 15% service charge applies to all ticket sales. Tickets can be sold at up to 20% above their actual cost
                     </p>
                 </div>
             </div>

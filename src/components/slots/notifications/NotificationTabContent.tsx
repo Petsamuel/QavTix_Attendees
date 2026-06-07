@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 import { useTransition } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useState, useEffect } from 'react'
+import { useRevalidate } from "@/custom-hooks/UseRevalidate"
 
 interface NotificationsTabProps {
     notifications: AttendeeNotification[]
@@ -31,6 +32,7 @@ export default function NotificationsTab({ notifications }: NotificationsTabProp
     const searchParams = useSearchParams()
     const [isPending, startTransition] = useTransition()
     const [isFiltering, startFiltering] = useTransition()
+    const { trigger } = useRevalidate("notifications")
 
     const filterValue = searchParams.get('notification_type') || ""
     const [optimisticFilter, setOptimisticFilter] = useState(filterValue)
@@ -61,6 +63,8 @@ export default function NotificationsTab({ notifications }: NotificationsTabProp
     const handleMarkAllRead = () => {
         startTransition(async () => {
             await markNotificationsAsReadClient()
+            trigger()
+            router.refresh()
         })
     }
 
